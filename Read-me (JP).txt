@@ -1,237 +1,237 @@
-���T�v
-�E�V�F�C�v�L�[�������Ă��~���[��K�p�ł���I
-�E�����ō���Ă���\��V�F�C�v�����E�ʁX�ɂł���I
+◆概要
+・シェイプキーがあってもミラーを適用できる！
+・両側で作ってある表情シェイプを左右別々にできる！
 
-�����Blender�p�A�h�I���ł��B
+そんなBlender用アドオンです。
 
-���͂��߂�
-���̃f�[�^�́A3D���f�����O�\�t�g Blender �p�̃A�h�I���ł��B
+◆はじめに
+このデータは、3Dモデリングソフト Blender 用のアドオンです。
 
-���ȉ���Blender�o�[�W�����œ���m�F�ς݂ł��B
+↓以下のBlenderバージョンで動作確認済みです。
 2.93
 3.0
 
-�� Blender 2.8�n�ɂ������\�ł������얢�m�F�ł��B
+※ Blender 2.8系にも導入可能ですが動作未確認です。
 
-�\�\�\�\�\�\
+――――――
 https://sleetcatshop.booth.pm/items/3681748
-����҂̃A�h�I�����gMizoresCustomExporter�h�𓱓����ĘA�g�@�\��L���ɂ��邱�ƂŁA
+同作者のアドオン↑“MizoresCustomExporter”を導入して連携機能を有効にすることで、
 
-�~���[��t�����܂ܕҏW
-�@�@�@�@�@��
-�G�N�X�|�[�g�̂Ƃ������~���[�K�p�i�����j
-�@�@�@�@�@��
-�V�F�C�v�L�[�������ō��E����
-�@�@�@�@�@��
-�G�N�X�|�[�g��͌��ʂ�I
+ミラーを付けたまま編集
+　　　　　↓
+エクスポートのときだけミラー適用（自動）
+　　　　　↓
+シェイプキーを自動で左右分割
+　　　　　↓
+エクスポート後は元通り！
 
-�Ƃ������Ƃ��ł���悤�ɂȂ�܂��B
-�i�ڂ�����Mizores Exporter�A�h�I����Read-me���Q�Ɓj
+ということもできるようになります。
+（詳しくはMizores ExporterアドオンのRead-meを参照）
 
-�\�\�\�\�\�\
-���\�[�X�R�[�h�̃��C�Z���X�F
+――――――
+◇ソースコードのライセンス：
 GNU General Public License, version 2
-�\�\�\�\�\�\
-���I �d�v �I�� (1)
-���̃A�h�I���ɂ́A�����̃V�F�C�v�L�[�����I�u�W�F�N�g�ɑ΂��Ďg���Ǝ��Ԃ�������i���b�`�j�@�\�����݂��܂��B
-�����_�̖{�A�h�I���d�l�ł͏����̒��f�͂ł��Ȃ����߁A�ǂ����Ă����f�������ꍇ��Blender�������I�������邵������܂���B
-�܂��A�����̎��s�r���A�����I��Blender�������I������ꍇ������܂��i�b��I�ȏ��u�ł������x�������Ƌ����I�������ɏ����������ł��܂��j�B
-���̂��߁A�R�}���h�g�p�O�ɂ̓f�[�^��ۑ����A�ʃt�@�C���Ƃ��ăo�b�N�A�b�v���Ƃ��Ă����̂��]�܂����ł��傤�B
-�\�\�\�\�\�\
-���I �d�v �I�� (2)
-���Ԃ������鏈�����ABlender���i�����Ȃ��j��ԂɂȂ邱�Ƃ�����܂���
-�����͐���ɐi��ł��܂��B
-��������܂ł��΂炭���҂��������B
+――――――
+◆！ 重要 ！◆ (1)
+このアドオンには、多くのシェイプキーを持つオブジェクトに対して使うと時間がかかる（数秒～）機能が存在します。
+現時点の本アドオン仕様では処理の中断はできないため、どうしても中断したい場合はBlenderを強制終了させるしかありません。
+また、処理の実行途中、偶発的にBlenderが強制終了する場合があります（暫定的な処置ですが何度か試すと強制終了せずに処理を完了できます）。
+そのため、コマンド使用前にはデータを保存し、別ファイルとしてバックアップもとっておくのが望ましいでしょう。
+――――――
+◆！ 重要 ！◆ (2)
+時間がかかる処理中、Blenderが（応答なし）状態になることがありますが
+処理は正常に進んでいます。
+完了するまでしばらくお待ち下さい。
 
-�i�g�p�O�� Window �� Toggle System Console �Ń��O��ʂ�\�����Ă����Ɛi�s�󋵂��m�F�ł��܂��j
+（使用前に Window → Toggle System Console でログ画面を表示しておくと進行状況が確認できます）
 
-�\�\�\�\�\�\
-���@�\����
-���I�u�W�F�N�g�I�𒆂ɉE�N���b�N �� ShapeKeys Util
-�\�\�\�\�\�\
-�� Apply Modifiers
-Armature�ȊO�̑S���f�B�t�@�C�A��K�p���܂��B
+――――――
+◆機能説明
+◇オブジェクト選択中に右クリック → ShapeKeys Util
+――――――
+→ Apply Modifiers
+Armature以外の全モディファイアを適用します。
 
-�E���f�B�t�@�C�A�̖��O���̐擪�ɕ�����@%A%�@��t���邱�ƂŁAArmature���f�B�t�@�C�A�ł��K�p�\�ł��B
+・モディファイアの名前欄の先頭に文字列　%A%　を付けることで、Armatureモディファイアでも適用可能です。
 
-�E���f�B�t�@�C�A�̖��O���̐擪�ɕ�����@%AS%�@��t���邱�ƂŁA���f�B�t�@�C�A���V�F�C�v�L�[�Ƃ��ēK�p�iApply as shapekey�j�����邱�Ƃ��ł��܂��B
-���e�B�X��Armature���f�B�t�@�C�A�ŃV�F�C�v�L�[�����ꍇ�ɕ֗��ł��B
-�i�V�F�C�v�L�[�K�p���ɖ��O��%AS%�͍폜�j
-�iMirror���f�B�t�@�C�A�Ȃǂɂ�钸�_���̑����ɒ��Ӂj
+・モディファイアの名前欄の先頭に文字列　%AS%　を付けることで、モディファイアをシェイプキーとして適用（Apply as shapekey）させることができます。
+ラティスやArmatureモディファイアでシェイプキーを作る場合に便利です。
+（シェイプキー適用時に名前の%AS%は削除）
+（Mirrorモディファイアなどによる頂点数の増減に注意）
 
-�����_�����O������������Ă��郂�f�B�t�@�C�A�i���f�B�t�@�C�A�ꗗ�ŃJ�����A�C�R����������Ă��Ȃ����́j�͓K�p����܂���B
+レンダリングが無効化されているモディファイア（モディファイア一覧でカメラアイコンが押されていないもの）は適用されません。
 
-�V�F�C�v�L�[�������Ă��g�p�ł��܂��B
+シェイプキーがあっても使用できます。
 
-���ӁF�������Ԃ�������܂�
+注意：少し時間がかかります
 
-���ӁF
-���f�B�t�@�C�A�K�p��̒��_�������ƈقȂ�V�F�C�v�L�[������Ə����ł��܂���B
-���̍ۃG���[���b�Z�[�W���Ɍ����ƂȂ��Ă���V�F�C�v�L�[���ƒ��_�����\������邽�߁A������Q�l�ɏC�����Ă݂Ă��������B
-�i�G���[���o����Ctrl+Z�Ō��ɖ߂��̂𐄏��j
-�iMirror���f�B�t�@�C�A��Merge�@�\��ABoolean���f�B�t�@�C�A���s��̌����ƂȂ邱�Ƃ�����܂��j
-�\�\
-Mirror���f�B�t�@�C�A���������Ǝv����ꍇ�A�ȉ��̑Ώ��@�������Ă݂Ă��������B
+注意：
+モディファイア適用後の頂点数が他と異なるシェイプキーがあると処理できません。
+その際エラーメッセージ内に原因となっているシェイプキー名と頂点数が表示されるため、それを参考に修正してみてください。
+（エラーが出たらCtrl+Zで元に戻すのを推奨）
+（MirrorモディファイアのMerge機能や、Booleanモディファイアが不具合の原因となることがあります）
+――
+Mirrorモディファイアが原因だと思われる場合、以下の対処法を試してみてください。
 
-�P�D�~���[���f�B�t�@�C�A��Merge Limit�i���{��ݒ肾�Ɓu���������v�j���A������Ԃ�1mm����0.01mm�Ȃǂ̏����Ȓl�ɕύX����
-�i0�ɂ���ƒ��_��������Ȃ��Ȃ��Ă��܂��悤�ł��j
+１．ミラーモディファイアのMerge Limit（日本語設定だと「結合距離」）を、初期状態の1mmから0.01mmなどの小さな値に変更する
+（0にすると頂点結合されなくなってしまうようです）
 
-�Q�D����ł��������Ȃ��ꍇ�A���̌����ƂȂ��Ă������ȃV�F�C�v�L�[���̒��_���~���[�̋��E�����班������
+２．それでも解決しない場合、問題の原因となっていそうなシェイプキー内の頂点をミラーの境界線から少し離す
 
-�R�D����ł��ʖڂ������ꍇ�A�~���[���f�B�t�@�C�A��Merge�i���{��ݒ肾�Ɓu�����v�j�Ə����ꂽ�`�F�b�N�{�b�N�X���O����Apply Modifiers���s������A�d�����_���蓮�Ō�������
-�\�\
+３．それでも駄目だった場合、ミラーモディファイアのMerge（日本語設定だと「結合」）と書かれたチェックボックスを外してApply Modifiersを行った後、重複頂点を手動で結合する
+――
 
-�E�c�[���V�F���t
-�@�EDuplicate
-�@�@�`�F�b�N������ƁA�ΏۃI�u�W�F�N�g�̃R�s�[�ɑ΂��ď������s���܂��B
-�@�@
-�@�ERemove NonRender
-�@�@�`�F�b�N������ƁA�����_�����O��������Ԃ̃��f�B�t�@�C�A���폜���܂��B
-�@�@�i�����_�����O������ �� ���f�B�t�@�C�A�ꗗ�ŃJ�����A�C�R����������Ă��Ȃ����́j
+・ツールシェルフ
+　・Duplicate
+　　チェックを入れると、対象オブジェクトのコピーに対して処理を行います。
+　　
+　・Remove NonRender
+　　チェックを入れると、レンダリング無効化状態のモディファイアを削除します。
+　　（レンダリング無効化 ＝ モディファイア一覧でカメラアイコンが押されていないもの）
 
-�\�\�\�\�\�\
-�� Separate Objects
-�V�F�C�v�L�[�����ꂼ��ʃI�u�W�F�N�g�ɂ��܂��B
-���ӁF�������Ԃ�������܂�
+――――――
+→ Separate Objects
+シェイプキーをそれぞれ別オブジェクトにします。
+注意：少し時間がかかります
 
-�E�c�[���V�F���t
-�@�EDuplicate
-�@�@�`�F�b�N������ƁA�����O�̃I�u�W�F�N�g���c���܂��B
-�@�@
-�@�EApply Modifiers
-�@�@�`�F�b�N������ƁA������ɃI�u�W�F�N�g�̃��f�B�t�@�C�A��K�p���܂��B
-�@�@
-�@�ERemove NonRender
-�@�@Apply Modifiers�L�����Ƀ`�F�b�N������ƁA�����_�����O��������Ԃ̃��f�B�t�@�C�A���폜���܂��B
-�@�@�i�����_�����O������ �� ���f�B�t�@�C�A�ꗗ�ŃJ�����A�C�R����������Ă��Ȃ����́j
+・ツールシェルフ
+　・Duplicate
+　　チェックを入れると、分割前のオブジェクトを残します。
+　　
+　・Apply Modifiers
+　　チェックを入れると、分割後にオブジェクトのモディファイアを適用します。
+　　
+　・Remove NonRender
+　　Apply Modifiers有効時にチェックを入れると、レンダリング無効化状態のモディファイアを削除します。
+　　（レンダリング無効化 ＝ モディファイア一覧でカメラアイコンが押されていないもの）
 
-�\�\�\�\�\�\
-�� Separate Shape Key Left and Right
-���݂̃V�F�C�v�L�[��
-�I�u�W�F�N�g���_��ō��E�ʁX�̃V�F�C�v�L�[�ɂ��܂��B
+――――――
+→ Separate Shape Key Left and Right
+現在のシェイプキーを
+オブジェクト原点基準で左右別々のシェイプキーにします。
 
-���ӁF�~���[���f�B�t�@�C�A�����Ă���ꍇ�A�K�p���Ă���łȂ��Ƃ��܂������܂���
+注意：ミラーモディファイアをつけている場合、適用してからでないとうまくいきません
 
-�E�c�[���V�F���t
-�@�EDuplicate
-�@�@�`�F�b�N������ƁA���E�����O�̃V�F�C�v�L�[���c���܂��B
-�@�@���ӁF���E��������O�Ƃ�����̃V�F�C�v�L�[�𓯎��Ɏg����
-�@�@�@�@�@���f�����Ӑ}���Ȃ������ڂɂȂ�\��������܂�
-�@�@�@�@�@�i�V�F�C�v�L�[����d�ɂ����邽�߁j
-�@�@
-�@�EEnable Sort
-�@�@�`�F�b�N������ƁA���E������̃V�F�C�v�L�[�𕪊��O�V�F�C�v�L�[�̂������Ɉړ����܂��B
+・ツールシェルフ
+　・Duplicate
+　　チェックを入れると、左右分割前のシェイプキーを残します。
+　　注意：左右分割する前とした後のシェイプキーを同時に使うと
+　　　　　モデルが意図しない見た目になる可能性があります
+　　　　　（シェイプキーが二重にかかるため）
+　　
+　・Enable Sort
+　　チェックを入れると、左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します。
 
-�\�\�\�\�\�\
-�� Separate All Shape Key Left and Right
-�S�ẴV�F�C�v�L�[���I�u�W�F�N�g���_��ō��E�ʁX�ɂ��܂��B
-���O�̍Ōオ_left�܂���_right�̃V�F�C�v�L�[�͕����ς݂ƌ��Ȃ��������X�L�b�v���܂��B
+――――――
+→ Separate All Shape Key Left and Right
+全てのシェイプキーをオブジェクト原点基準で左右別々にします。
+名前の最後が_leftまたは_rightのシェイプキーは分割済みと見なし処理をスキップします。
 
-���ӁF�~���[���f�B�t�@�C�A�����Ă���ꍇ�A�K�p���Ă���łȂ��Ƃ��܂������܂���
+注意：ミラーモディファイアをつけている場合、適用してからでないとうまくいきません
 
-�E�c�[���V�F���t
-�@�EDuplicate
-�@�@�`�F�b�N������ƁA���E�����O�̃V�F�C�v�L�[���c���܂��B
-�@�@���ӁF���E��������O�Ƃ�����̃V�F�C�v�L�[�𓯎��Ɏg����
-�@�@�@�@�@���f�����Ӑ}���Ȃ������ڂɂȂ�\��������܂�
-�@�@�@�@�@�i�V�F�C�v�L�[����d�ɂ����邽�߁j
-�@�@
-�@�EEnable Sort
-�@�@�`�F�b�N������ƁA���E������̃V�F�C�v�L�[�𕪊��O�V�F�C�v�L�[�̂������Ɉړ����܂��B
-�@�@���ӁF���Ԃ�������܂�
+・ツールシェルフ
+　・Duplicate
+　　チェックを入れると、左右分割前のシェイプキーを残します。
+　　注意：左右分割する前とした後のシェイプキーを同時に使うと
+　　　　　モデルが意図しない見た目になる可能性があります
+　　　　　（シェイプキーが二重にかかるため）
+　　
+　・Enable Sort
+　　チェックを入れると、左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します。
+　　注意：時間がかかります
 
-�\�\�\�\�\�\
-�� (Tag) Separate All Shape Key Left and Right
-�I�𒆃I�u�W�F�N�g�̃V�F�C�v�L�[�̂����A
-���O�� %LR% ���܂ނ��̂ɑ΂��Ă̂ݏ������s���܂��B
+――――――
+→ (Tag) Separate All Shape Key Left and Right
+選択中オブジェクトのシェイプキーのうち、
+名前に %LR% を含むものに対してのみ処理を行います。
 
-%LR% �ɉ����A
+%LR% に加え、
 
-%D% ���܂ނ��͍̂��E�����O�̃V�F�C�v�L�[���c��
-%S% ���܂ނ��͍̂��E������̃V�F�C�v�L�[�𕪊��O�V�F�C�v�L�[�̂������Ɉړ�����
+%D% を含むものは左右分割前のシェイプキーを残す
+%S% を含むものは左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動する
 
-�Ƃ����@�\������܂��B
+という機能があります。
 
-��F
-[Smile%LR%%D%]�Ƃ������O�̃V�F�C�v�L�[�����E���������
-[Smile][Smile_left][Smile_right]��3�ɂȂ�܂�
-�\�\
-���ӁF
-%S% �̏����͎��Ԃ�������̂ŁA�K�v�ȏꍇ�����t���邱�Ƃ��������߂��܂�
-�i�V�F�C�v�L�[�̏��Ԃ��d�v�Ȃ��́A�Ⴆ��VRChat�̃A�C�g���b�L���O�p�V�F�C�v�L�[�Ȃǁj
-�\�\
-���ӁF�~���[���f�B�t�@�C�A�����Ă���ꍇ�A�K�p���Ă���łȂ��Ƃ��܂������܂���
-�\�\
-���̋@�\�͓���҂̃A�h�I���gAuto Merge�h�Ƃ̘A�g�p�ɍ���Ă��܂��B
-�gAuto Merge�h���Őݒ�����邱�Ƃɂ��A
-��p�G�N�X�|�[�g�@�\�g�p���ɂ��̋@�\�������Ŏg�p�����邱�Ƃ��ł��܂��B
+例：
+[Smile%LR%%D%]という名前のシェイプキーを左右分割すると
+[Smile][Smile_left][Smile_right]の3つになります
+――
+注意：
+%S% の処理は時間がかかるので、必要な場合だけ付けることをおすすめします
+（シェイプキーの順番が重要なもの、例えばVRChatのアイトラッキング用シェイプキーなど）
+――
+注意：ミラーモディファイアをつけている場合、適用してからでないとうまくいきません
+――
+この機能は同作者のアドオン“Auto Merge”との連携用に作られています。
+“Auto Merge”側で設定をすることにより、
+専用エクスポート機能使用時にこの機能を自動で使用させることができます。
 
-�\�\
-�� ��L�� %LR% �Ȃǂ̕�����͏������ʃV�F�C�v�L�[�̖��O����͍폜����܂�
+――
+※ 上記の %LR% などの文字列は処理結果シェイプキーの名前からは削除されます
 
-�� ��L�̕�����͈ȉ���Assign Tag�R�}���h�ŊȒP�ɒ��E�ł��܂��B
+※ 上記の文字列は以下のAssign Tagコマンドで簡単に着脱できます。
 
-�\�\�\�\�\�\
-�� Assign Tag
-���݂̃V�F�C�v�L�[�ɑ΂��A
-(Tag) Separate All Shape Key Left and Right �̏����p�e�L�X�g��
-������͂������肵�܂��B
+――――――
+→ Assign Tag
+現在のシェイプキーに対し、
+(Tag) Separate All Shape Key Left and Right の処理用テキストを
+つけたりはずしたりします。
 
-�E�c�[���V�F���t
-�@�EEnable
-�@�@�`�F�b�N������ƁA���̃V�F�C�v�L�[���� %LR% ��ǉ������E���������̑ΏۂƂ��܂��B
-�@�@�`�F�b�N���O���ƁA���̃V�F�C�v�L�[������ %LR% ���폜���܂��B
-�@�@
-�@�EDuplicate
-�@�@�`�F�b�N������ƁA���̃V�F�C�v�L�[���� %D% ��ǉ������E�����O�̃V�F�C�v�L�[���c���悤�ɂ��܂��B
-�@�@�`�F�b�N���O���ƁA���̃V�F�C�v�L�[������ %D% ���폜���܂��B
-�@�@���ӁFEnable�Ƀ`�F�b�N�������Ă��Ȃ��Ƒ���ł��܂���
-�@�@
-�@�EEnable Sort
-�@�@�`�F�b�N������ƁA���̃V�F�C�v�L�[���� %S% ��ǉ���
-�@�@���E������̃V�F�C�v�L�[�𕪊��O�V�F�C�v�L�[�̂������Ɉړ�������悤�ɂ��܂��B
-�@�@�`�F�b�N���O���ƁA���̃V�F�C�v�L�[������ %S% ���폜���܂��B
-�@�@���ӁFEnable�Ƀ`�F�b�N�������Ă��Ȃ��Ƒ���ł��܂���
-�@�@���ӁF�����̃V�F�C�v�L�[�ŗL���ɂ���Ǝ��Ԃ�������܂�
+・ツールシェルフ
+　・Enable
+　　チェックを入れると、そのシェイプキー名に %LR% を追加し左右分割処理の対象とします。
+　　チェックを外すと、そのシェイプキー名から %LR% を削除します。
+　　
+　・Duplicate
+　　チェックを入れると、そのシェイプキー名に %D% を追加し左右分割前のシェイプキーを残すようにします。
+　　チェックを外すと、そのシェイプキー名から %D% を削除します。
+　　注意：Enableにチェックが入っていないと操作できません
+　　
+　・Enable Sort
+　　チェックを入れると、そのシェイプキー名に %S% を追加し
+　　左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動させるようにします。
+　　チェックを外すと、そのシェイプキー名から %S% を削除します。
+　　注意：Enableにチェックが入っていないと操作できません
+　　注意：多くのシェイプキーで有効にすると時間がかかります
 
-�\�\�\�\�\�\
-���ҏW���[�h�ŉE�N���b�N �� ShapeKeys Util
-�\�\�\�\�\�\
-�� Side of Active from Point
-�A�h�I�����쎞�̕��Y���Ƃ��Đ��܂ꂽ�@�\�ł��B
-�w����W�����Side of Active���s���܂��B
+――――――
+◇編集モードで右クリック → ShapeKeys Util
+――――――
+→ Side of Active from Point
+アドオン製作時の副産物として生まれた機能です。
+指定座標を基準にSide of Activeを行います。
 
-�E�c�[���V�F���t
-�@�EPoint
-�@�@��ƂȂ���W�ł��B
+・ツールシェルフ
+　・Point
+　　基準となる座標です。
 
-�\�\�\�\�\�\
-��Addon Preference�i�A�h�I��������ʂŕύX�\�Ȑݒ�j
-�\�\�\�\�\�\
-�EWait Interval
-�ꕔ�����ɋ��܂��ҋ@�����̊Ԋu��ݒ肵�܂��B
-���l��傫������ƁA�V�F�C�v�L�[�������ꍇ�̏������Ԃ��Z���Ȃ�܂����A�����CPU���ׂ������܂��B
+――――――
+◇Addon Preference（アドオン導入画面で変更可能な設定）
+――――――
+・Wait Interval
+一部処理に挟まれる待機処理の間隔を設定します。
+数値を大きくすると、シェイプキーが多い場合の処理時間が短くなりますが、代わりにCPU負荷が増します。
 
-�EWait Sleep
-�ꕔ�����ɋ��܂��ҋ@�����̒�����ݒ肵�܂��B
-���l������������ƁA�V�F�C�v�L�[�������ꍇ�̏������Ԃ��Z���Ȃ�܂����A�����CPU���ׂ������܂��B
-���דI�ɖ��Ȃ������ł���Ώ��������Ă����Ǝ��ԒZ�k�ɂȂ邩������܂���B
-�\�\�\�\�\�\
-���s��E�G���[���N������
-���̃A�h�I���̋@�\��Blender�W����API���g���č쐬���Ă��邽�߁A
-���炩�̕s������������ꍇ�ɂ�
-������ Undo�iCtrl+Z�j ����΋@�\�g�p�O�̏�Ԃɕ����ł��܂��B
+・Wait Sleep
+一部処理に挟まれる待機処理の長さを設定します。
+数値を小さくすると、シェイプキーが多い場合の処理時間が短くなりますが、代わりにCPU負荷が増します。
+負荷的に問題なさそうであれば小さくしておくと時間短縮になるかもしれません。
+――――――
+◆不具合・エラーが起きた時
+このアドオンの機能はBlender標準のAPIを使って作成しているため、
+何らかの不具合が発生した場合には
+すぐに Undo（Ctrl+Z） すれば機能使用前の状態に復元できます。
 
-�܂��A�ȉ��̘A����ɕs��������̏󋵂𑗂��Ă����������
-�C���̎菕���ɂȂ�܂��B
+また、以下の連絡先に不具合発生時の状況を送っていただけると
+修正の手助けになります。
 
-�\�\�\�\�\�\
-���A����
-�s��񍐂�v�]�A���z�Ȃǂ���܂����炱����ɂǂ����B
+――――――
+◆連絡先
+不具合報告や要望、感想などありましたらこちらにどうぞ。
 
-�C���E�������\�Ǝv������̂Ɋւ��Ă͒�����������܂����A
-���A���̎����Z�p�I���Ȃǂ̗��R�ɂ��
-�Ώ��̐扄�΂��܂��͂��f�������ꍇ�����邩������܂���B
-�\�߂��������������B
+修正・実装が可能と思われるものに関しては着手を検討しますが、
+リアルの事情や技術的問題などの理由により
+対処の先延ばしまたはお断りをする場合があるかもしれません。
+予めご了承ください。
 
-Twitter�F�L���݂���@https://twitter.com/sleetcat123
+Twitter：猫柳みぞれ　https://twitter.com/sleetcat123
