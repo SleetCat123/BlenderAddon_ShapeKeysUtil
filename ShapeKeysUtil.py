@@ -138,6 +138,9 @@ translations_dict = {
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
     obj = get_active_object()
+
+    # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
+    bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
     
     print("Apply Modifiers: ["+obj.name+"]")
     for modifier in obj.modifiers:
