@@ -55,6 +55,7 @@ def set_active_object(obj):
     bpy.context.view_layer.objects.active=obj
 
 def deselect_all_objects():
+    print("deselect_all_objects")
     targets = bpy.context.selected_objects
     for obj in targets:
         select_object(obj, False)
@@ -135,12 +136,47 @@ translations_dict = {
 
 ### Data ###
 ### Func ###
+def remove_objects(targets=None):
+    print("remove_objects")
+    if targets==None:
+        targets = bpy.context.selected_objects
+
+    data_list = []
+    # オブジェクトを削除
+    for obj in targets:
+        try:
+            if obj.data:
+                data_list.append(obj.data)
+            print("remove: " + str(obj))
+            bpy.data.objects.remove(obj)
+        except ReferenceError:
+            continue
+
+    # オブジェクトのデータを削除
+    for data in data_list:
+        blocks = None
+        data_type = type(data)
+        if data_type == bpy.types.Mesh: blocks = bpy.data.meshes
+        elif data_type == bpy.types.Armature: blocks = bpy.data.armatures
+        elif data_type == bpy.types.Curve: blocks = bpy.data.curves
+        elif data_type == bpy.types.Lattice: blocks = bpy.data.lattices
+        elif data_type == bpy.types.Light: blocks = bpy.data.lights
+        elif data_type == bpy.types.Camera: blocks = bpy.data.cameras
+        elif data_type == bpy.types.MetaBall: blocks = bpy.data.metaballs
+        elif data_type == bpy.types.GreasePencil: blocks = bpy.data.grease_pencils
+
+        if blocks and data.users == 0:
+            print("remove: " + str(data))
+            blocks.remove(data)
+
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
+    print("apply_modifiers")
     obj = get_active_object()
 
-    # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
-    bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
+    if obj.users!=1 or (obj.data and obj.data.users!=1):
+        # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
+        bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
     
     print("Apply Modifiers: ["+obj.name+"]")
     for modifier in obj.modifiers:
@@ -202,11 +238,13 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         if modifier.name.startswith(APPLY_AS_SHAPEKEY_PREFIX):
             apply_as_shape_index=i
             apply_as_shape_modifier=modifier
+            print(f"apply as shape: {modifier.name}[{str(apply_as_shape_index)}]")
             break
     if apply_as_shape_index==0:
         # Apply as shapekey用のモディファイアが一番上にあったらApply as shapekeyを実行
-        print("apply_as_shapekeyB")
+        print("apply_as_shapekey__B1")
         apply_as_shapekey(apply_as_shape_modifier)
+        print("apply_as_shapekey__B2")
         # 関数を再実行して終了
         return apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender)
     elif apply_as_shape_index!=-1:
@@ -215,8 +253,10 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         bpy.ops.object.duplicate()
         tempobj=get_active_object()
         select_object(tempobj, True)
+        print("duplicate: "+tempobj.name)
         set_active_object(source_obj)
         # モディファイアを一時オブジェクトにコピー
+        print("copyto temp: make_links_data(type='MODIFIERS')")
         bpy.ops.object.make_links_data(type='MODIFIERS')
 
         # Apply as shapekeyとそれよりあとのモディファイアを削除
@@ -236,7 +276,9 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         # 削除していたモディファイアを一時オブジェクトから復元
         select_object(source_obj, True)
         set_active_object(tempobj)
+        print("restore: make_links_data(type='MODIFIERS')")
         bpy.ops.object.make_links_data(type='MODIFIERS')
+        print("a")
         set_active_object(source_obj)
         # 適用済みのモディファイアを削除
         for modifier in source_obj.modifiers[:apply_as_shape_index]:
@@ -245,7 +287,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         # 一時オブジェクトを削除
         select_object(source_obj, False)
         select_object(tempobj, True)
-        bpy.ops.object.delete()
+        remove_objects()
         select_object(source_obj, True)
         set_active_object(source_obj)
 
@@ -254,10 +296,12 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
 
     if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks)==1:
         # Basisしかなければシェイプキー削除
+        print("remove basis: " + source_obj.name)
         bpy.ops.object.shape_key_remove(all=True)
 
     if source_obj.data.shape_keys==None or len(source_obj.data.shape_keys.key_blocks)==0:
         # シェイプキーがなければモディファイア適用処理だけ実行
+        print("only apply_modifiers: " + source_obj.name)
         apply_modifiers(remove_nonrender=remove_nonrender)
         if duplicate == True:
             bpy.ops.object.duplicate()
@@ -315,7 +359,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
                 select_object(source_obj, True)
                 for child in source_obj.children:
                     select_object(child, True)
-                bpy.ops.object.delete()
+                remove_objects()
                 select_object(source_obj_dup, True)
                 set_active_object(source_obj_dup)
                 return False
@@ -333,7 +377,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         select_object(source_obj, False)
         # 使い終わったオブジェクトを削除
         select_objects(shape_objects, True)
-        bpy.ops.object.delete()
+        remove_objects()
 
         # シェイプキーの名前と数値を復元
         source_obj.active_shape_key_index = active_shape_key_index
@@ -344,7 +388,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         if duplicate==False:
             # 処理が正常に終了したら複製オブジェクトを削除する
             select_object(source_obj_dup, True)
-            bpy.ops.object.delete()
+            remove_objects()
 
     print("Shapekey Count (Include Basis Shapekey): " + str(len(source_obj.data.shape_keys.key_blocks)))
 
