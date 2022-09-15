@@ -138,7 +138,7 @@ translations_dict = {
 ### Func ###
 def remove_objects(targets=None):
     print("remove_objects")
-    if targets==None:
+    if targets is None:
         targets = bpy.context.selected_objects
 
     data_list = []
@@ -299,7 +299,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         print("remove basis: " + source_obj.name)
         bpy.ops.object.shape_key_remove(all=True)
 
-    if source_obj.data.shape_keys==None or len(source_obj.data.shape_keys.key_blocks)==0:
+    if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks)==0:
         # シェイプキーがなければモディファイア適用処理だけ実行
         print("only apply_modifiers: " + source_obj.name)
         apply_modifiers(remove_nonrender=remove_nonrender)
@@ -707,7 +707,7 @@ class OBJECT_OT_specials_shapekeys_util_separateobj(bpy.types.Operator):
         source_obj = context.object
         
         # 実行する必要がなければキャンセル
-        if source_obj.data.shape_keys==None or len(source_obj.data.shape_keys.key_blocks)==0:
+        if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks)==0:
             return {'CANCELLED'}
         
         deselect_all_objects()
@@ -731,7 +731,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (obj.type == 'MESH' and obj.data.shape_keys!=None and len(obj.data.shape_keys.key_blocks)!=0)
+        return (obj.type == 'MESH' and obj.data.shape_keys is not None and len(obj.data.shape_keys.key_blocks)!=0)
     
     def execute(self, context):
         obj = context.object
@@ -757,7 +757,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all(bpy.types.Opera
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (obj.type == 'MESH' and obj.data.shape_keys!=None and len(obj.data.shape_keys.key_blocks)!=0)
+        return (obj.type == 'MESH' and obj.data.shape_keys is not None and len(obj.data.shape_keys.key_blocks)!=0)
     
     def execute(self, context):
         obj = context.object
@@ -774,7 +774,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tagdetect(bpy.t
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return (obj.type == 'MESH' and obj.data.shape_keys!=None and len(obj.data.shape_keys.key_blocks)!=0)
+        return (obj.type == 'MESH' and obj.data.shape_keys is not None and len(obj.data.shape_keys.key_blocks)!=0)
     
     def execute(self, context):
         obj = context.object
@@ -799,7 +799,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
     def poll(cls, context):
         obj = context.object
         
-        b = (obj.type == 'MESH' and obj.data.shape_keys!=None and obj.active_shape_key_index!=0)
+        b = (obj.type == 'MESH' and obj.data.shape_keys is not None and obj.active_shape_key_index!=0)
         if b==True:
             shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
             # 名前の最後が_leftまたは_rightのシェイプキーには使えないように
