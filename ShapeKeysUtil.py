@@ -837,8 +837,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
         return b
     
     def invoke(self, context, event):
-        self.obj=context.object
-        obj = self.obj
+        obj = context.object
         shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
         self.target_name=obj.name
         self.target_shape_name=shapekey.name
