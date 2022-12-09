@@ -22,63 +22,74 @@ import time
 from bpy.props import *
 
 bl_info = {
-    "name" : "ShapeKeys Util",
-    "author" : "@sleetcat123(Twitter)",
-    "version" : (1,1,6),
-    "blender" : (2, 80, 0),
+    "name": "ShapeKeys Util",
+    "author": "@sleetcat123(Twitter)",
+    "version": (1,1,6),
+    "blender": (2, 80, 0),
     "location": "",
-    "description" : "",
-    "category" : "Object"
+    "description": "",
+    "category": "Object"
 }
 
 # Create Left and Right Shape Keys の自動判定で使うやつ
-ENABLE_LR_TAG="%LR%"
-ENABLE_DUPLICATE_TAG="%D%"
-ENABLE_SORT_TAG="%S%"
+ENABLE_LR_TAG = "%LR%"
+ENABLE_DUPLICATE_TAG = "%D%"
+ENABLE_SORT_TAG = "%S%"
 
 # Apply Modifier用
-APPLY_AS_SHAPEKEY_PREFIX="%AS%" # モディファイア名が%AS%で始まっているならApply as shapekey
-FORCE_APPLY_MODIFIER_PREFIX="%A%" # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
+APPLY_AS_SHAPEKEY_PREFIX = "%AS%"  # モディファイア名が%AS%で始まっているならApply as shapekey
+FORCE_APPLY_MODIFIER_PREFIX = "%A%"  # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
 
-### Func - Version Compatible ###
+# Func - Version Compatible #
+
+
 def select_object(obj, value=True):
     obj.select_set(value)
+
 
 def select_objects(objects, value=True):
     for obj in objects:
         select_object(obj, value)
 
+
 def get_active_object():
     return bpy.context.view_layer.objects.active
 
+
 def set_active_object(obj):
     bpy.context.view_layer.objects.active=obj
+
 
 def deselect_all_objects():
     print("deselect_all_objects")
     targets = bpy.context.selected_objects
     for obj in targets:
         select_object(obj, False)
-    #bpy.context.view_layer.objects.active = None
+    # bpy.context.view_layer.objects.active = None
+
 
 def set_object_name(obj, name):
     obj.name=name
     if obj.data:
         obj.data.name=name
 
+
 def select_axis(mode='POSITIVE', axis='X', threshold=0.0001):
-    if mode=='POSITIVE':
-        mode='POS'
-    elif mode=='NEGATIVE':
-        mode='NEG'
-    elif mode=='ALIGNED':
-        mode='ALIGN'
+    if mode == 'POSITIVE':
+        mode = 'POS'
+    elif mode == 'NEGATIVE':
+        mode = 'NEG'
+    elif mode == 'ALIGNED':
+        mode = 'ALIGN'
     bpy.ops.mesh.select_axis(sign=mode, axis=axis, threshold=threshold)
+
 
 def get_addon_prefs():
     return bpy.context.preferences.addons[__name__].preferences
 
-### region Translation ###
+# region Translation #
+
+
 translations_dict = {
     "en_US": {
         ("*",
@@ -132,10 +143,12 @@ translations_dict = {
           "verts_count_difference"): "シェイプキーの頂点数が異なっているため処理を実行できませんでした。\nミラーモディファイアの\"結合\"で他より多くの頂点が結合されてしまっている、などの原因が考えられます。\n[{0}]({2}), [{1}]({3})",
     },
 }
-### endregion ###
+# endregion #
 
-### Data ###
-### Func ###
+# Data #
+# Func #
+
+
 def remove_objects(targets=None):
     print("remove_objects")
     if targets is None:
@@ -169,6 +182,7 @@ def remove_objects(targets=None):
             print("remove: " + str(data))
             blocks.remove(data)
 
+
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
     print("apply_modifiers")
@@ -180,9 +194,9 @@ def apply_modifiers(remove_nonrender=True):
     
     print("Apply Modifiers: ["+obj.name+"]")
     for modifier in obj.modifiers:
-        if modifier.show_render == False:
+        if not modifier.show_render:
             # モディファイアがレンダリング対象ではない（モディファイア一覧のカメラアイコンが押されていない）なら無視
-            if remove_nonrender==True:
+            if remove_nonrender:
                 bpy.ops.object.modifier_remove(modifier=modifier.name)
             continue
         
@@ -207,10 +221,11 @@ def apply_modifiers(remove_nonrender=True):
                     print("Apply")
     print("Finish Apply Modifiers: [{0}]".format(obj.name))
 
+
 def apply_as_shapekey(modifier):
     try:
         # 名前の文字列から%AS%を削除する
-        modifier.name=modifier.name[len(APPLY_AS_SHAPEKEY_PREFIX):len(modifier.name)]
+        modifier.name = modifier.name[len(APPLY_AS_SHAPEKEY_PREFIX):len(modifier.name)]
         # Apply As Shape
         bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier.name)
     except RuntimeError:
@@ -223,10 +238,12 @@ def apply_as_shapekey(modifier):
         except UnicodeDecodeError:
             print("Apply as shapekey")
 
+
 # シェイプキーをもつオブジェクトのモディファイアを適用
 # AutoMerge連携用
 def apply_modifiers_with_shapekeys_for_automerge_addon(self, source_obj):
     return apply_modifiers_with_shapekeys(self=self, source_obj=source_obj, duplicate=False, remove_nonrender=True)
+
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
 def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender=True):
@@ -251,7 +268,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         # 2番目以降にApply as shape用のモディファイアがあったら
         # 一時オブジェクトを作成
         bpy.ops.object.duplicate()
-        tempobj=get_active_object()
+        tempobj = get_active_object()
         select_object(tempobj, True)
         print("duplicate: "+tempobj.name)
         set_active_object(source_obj)
@@ -265,7 +282,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
 
         # 関数を再実行
         success=apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender)
-        if success==False:
+        if not success:
             # 処理に失敗したら処理前のデータを復元して終了
             select_object(source_obj, True)
             set_active_object(tempobj)
@@ -294,16 +311,16 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         # 関数を再実行して終了
         return apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender)
 
-    if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks)==1:
+    if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks) == 1:
         # Basisしかなければシェイプキー削除
         print("remove basis: " + source_obj.name)
         bpy.ops.object.shape_key_remove(all=True)
 
-    if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks)==0:
+    if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
         # シェイプキーがなければモディファイア適用処理だけ実行
         print("only apply_modifiers: " + source_obj.name)
         apply_modifiers(remove_nonrender=remove_nonrender)
-        if duplicate == True:
+        if duplicate:
             bpy.ops.object.duplicate()
         return True
 
@@ -340,10 +357,10 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         print("Source: " + source_obj.name)
         print("------ Merge Separated Objects ------\n" + '\n'.join([obj.name for obj in separated_objects]) + "\n----------------------------------")
     
-        prev_obj_name=source_obj.name
-        prev_vert_count=len(source_obj.data.vertices)
+        prev_obj_name = source_obj.name
+        prev_vert_count = len(source_obj.data.vertices)
     
-        shape_objects=[]
+        shape_objects = []
         # オブジェクトを1つにまとめなおす
         select_object(source_obj, True)
         set_active_object(source_obj)
@@ -385,7 +402,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
             shapekey.name = shapekey_name_and_values[i][0]
             shapekey.value = shapekey_name_and_values[i][1]
     
-        if duplicate==False:
+        if not duplicate:
             # 処理が正常に終了したら複製オブジェクトを削除する
             select_object(source_obj_dup, True)
             remove_objects()
@@ -396,6 +413,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
     set_active_object(source_obj)
     return True
 
+
 # シェイプキーをそれぞれ別のオブジェクトにする
 def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True):
     source_obj = get_active_object()
@@ -403,7 +421,7 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     
     deselect_all_objects()
     
-    if duplicate == True:
+    if duplicate:
         select_object(source_obj, True)
         set_active_object(source_obj)
         bpy.ops.object.duplicate()
@@ -433,7 +451,7 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
         new_name=source_obj_name + "." + shapekey.name
         # Basisは無視
         if i == 0:
-            if duplicate == True:
+            if duplicate:
                 set_object_name(source_obj,  new_name)
             continue
         
@@ -472,7 +490,7 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     set_active_object(source_obj)
     bpy.ops.object.shape_key_remove(all=True)
     
-    if enable_apply_modifiers == True:
+    if enable_apply_modifiers:
         apply_modifiers(remove_nonrender=remove_nonrender)
         for obj in separated_objects:
             set_active_object(obj)
@@ -485,16 +503,17 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     print("Finish Separate ShapeKeys: ["+source_obj.name+"]")
     return separated_objects
 
+
 def separate_lr_shapekey(soruce_shape_key_index, duplicate, enable_sort):
     obj = get_active_object()
     source_shape_key = obj.data.shape_keys.key_blocks[soruce_shape_key_index]
     
-    #print("before: "+source_shape_key.name)
+    # print("before: "+source_shape_key.name)
     source_shape_key.name = source_shape_key.name.replace(ENABLE_LR_TAG, '')
     source_shape_key.name = source_shape_key.name.replace(ENABLE_DUPLICATE_TAG, '')
     source_shape_key.name = source_shape_key.name.replace(ENABLE_SORT_TAG, '')
     result_shape_key_name = source_shape_key.name
-    #print("after: "+source_shape_key.name)
+    # print("after: "+source_shape_key.name)
     
     point = (0,0,0)
     
@@ -634,7 +653,7 @@ def select_axis_from_point(point=(0,0,0), mode='POSITIVE', axis='X', threshold=0
     bmesh.ops.delete(bm, geom=[v], context='VERTS')
     
     bm.select_mode = temp_select_mode
-    
+
     bmesh.update_edit_mesh(mesh=me, loop_triangles=False, destructive=True)
     #bpy.ops.object.mode_set(mode='OBJECT')
 
