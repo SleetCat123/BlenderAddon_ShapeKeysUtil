@@ -188,7 +188,7 @@ def apply_modifiers(remove_nonrender=True):
     print("apply_modifiers")
     obj = get_active_object()
 
-    if obj.users!=1 or (obj.data and obj.data.users!=1):
+    if obj.users != 1 or (obj.data and obj.data.users != 1):
         # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
         bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
     
@@ -249,22 +249,22 @@ def apply_modifiers_with_shapekeys_for_automerge_addon(self, source_obj):
 def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender=True):
     print("apply_modifiers_with_shapekeys: [{0}] [{1}]".format(source_obj.name, source_obj.type))
     # Apply as shapekey用モディファイアのインデックスを検索
-    apply_as_shape_index=-1
-    apply_as_shape_modifier=None
+    apply_as_shape_index = -1
+    apply_as_shape_modifier = None
     for i, modifier in enumerate(source_obj.modifiers):
         if modifier.name.startswith(APPLY_AS_SHAPEKEY_PREFIX):
             apply_as_shape_index = i
             apply_as_shape_modifier = modifier
             print(f"apply as shape: {modifier.name}[{str(apply_as_shape_index)}]")
             break
-    if apply_as_shape_index==0:
+    if apply_as_shape_index == 0:
         # Apply as shapekey用のモディファイアが一番上にあったらApply as shapekeyを実行
         print("apply_as_shapekey__B1")
         apply_as_shapekey(apply_as_shape_modifier)
         print("apply_as_shapekey__B2")
         # 関数を再実行して終了
         return apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender)
-    elif apply_as_shape_index!=-1:
+    elif apply_as_shape_index != -1:
         # 2番目以降にApply as shape用のモディファイアがあったら
         # 一時オブジェクトを作成
         bpy.ops.object.duplicate()
@@ -430,20 +430,20 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     source_obj_matrix_world_inverted = source_obj.matrix_world.inverted()
     
     print("Separate ShapeKeys: ["+source_obj.name+"]")
-    wait_counter=0
+    wait_counter = 0
     separated_objects = []
-    shape_keys_length=len(source_obj.data.shape_keys.key_blocks)
+    shape_keys_length = len(source_obj.data.shape_keys.key_blocks)
     
     addon_prefs = get_addon_prefs()
-    wait_interval=addon_prefs.wait_interval
-    wait_sleep=addon_prefs.wait_sleep
+    wait_interval = addon_prefs.wait_interval
+    wait_sleep = addon_prefs.wait_sleep
     
     select_object(source_obj, True)
     for i, shapekey in enumerate(source_obj.data.shape_keys.key_blocks):
         print("Shape key ["+shapekey.name+"] ["+str(i)+" / "+str(shape_keys_length)+"]")
         
         # CPU負荷が高いっぽいので何回かに一回ウェイトをかける
-        wait_counter+=1
+        wait_counter += 1
         if wait_counter % wait_interval == 0:
             print("wait")
             time.sleep(wait_sleep)
@@ -839,12 +839,12 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
     def invoke(self, context, event):
         obj = context.object
         shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
-        self.target_name=obj.name
-        self.target_shape_name=shapekey.name
+        self.target_name = obj.name
+        self.target_shape_name = shapekey.name
         
-        self.enable = shapekey.name.find(ENABLE_LR_TAG)!=-1
-        self.duplicate = shapekey.name.find(ENABLE_DUPLICATE_TAG)!=-1
-        self.enable_sort = shapekey.name.find(ENABLE_SORT_TAG)!=-1
+        self.enable = shapekey.name.find(ENABLE_LR_TAG) != -1
+        self.duplicate = shapekey.name.find(ENABLE_DUPLICATE_TAG) != -1
+        self.enable_sort = shapekey.name.find(ENABLE_SORT_TAG) != -1
         return self.execute(context)
     
     def draw(self, context):
@@ -862,8 +862,8 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
         shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
         
         if self.enable:
-            if shapekey.name.find(ENABLE_LR_TAG)==-1:
-                shapekey.name+=ENABLE_LR_TAG
+            if shapekey.name.find(ENABLE_LR_TAG) == -1:
+                shapekey.name += ENABLE_LR_TAG
         else:
             shapekey.name=shapekey.name.replace(ENABLE_LR_TAG, '')
         
