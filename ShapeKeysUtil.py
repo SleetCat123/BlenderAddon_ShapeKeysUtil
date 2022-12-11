@@ -169,14 +169,22 @@ def remove_objects(targets=None):
     for data in data_list:
         blocks = None
         data_type = type(data)
-        if data_type == bpy.types.Mesh: blocks = bpy.data.meshes
-        elif data_type == bpy.types.Armature: blocks = bpy.data.armatures
-        elif data_type == bpy.types.Curve: blocks = bpy.data.curves
-        elif data_type == bpy.types.Lattice: blocks = bpy.data.lattices
-        elif data_type == bpy.types.Light: blocks = bpy.data.lights
-        elif data_type == bpy.types.Camera: blocks = bpy.data.cameras
-        elif data_type == bpy.types.MetaBall: blocks = bpy.data.metaballs
-        elif data_type == bpy.types.GreasePencil: blocks = bpy.data.grease_pencils
+        if data_type == bpy.types.Mesh:
+            blocks = bpy.data.meshes
+        elif data_type == bpy.types.Armature:
+            blocks = bpy.data.armatures
+        elif data_type == bpy.types.Curve:
+            blocks = bpy.data.curves
+        elif data_type == bpy.types.Lattice:
+            blocks = bpy.data.lattices
+        elif data_type == bpy.types.Light:
+            blocks = bpy.data.lights
+        elif data_type == bpy.types.Camera:
+            blocks = bpy.data.cameras
+        elif data_type == bpy.types.MetaBall:
+            blocks = bpy.data.metaballs
+        elif data_type == bpy.types.GreasePencil:
+            blocks = bpy.data.grease_pencils
 
         if blocks and data.users == 0:
             print("remove: " + str(data))
@@ -448,7 +456,7 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
             print("wait")
             time.sleep(wait_sleep)
 
-        new_name=source_obj_name + "." + shapekey.name
+        new_name = source_obj_name + "." + shapekey.name
         # Basisは無視
         if i == 0:
             if duplicate:
@@ -477,8 +485,8 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
         bpy.ops.object.shape_key_transfer()
         
         # シェイプキーを削除し形状を固定
-        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0]) # Basisを消す
-        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0]) # 固定するシェイプキーを消す
+        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0])  # Basisを消す
+        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0])  # 固定するシェイプキーを消す
         
         separated_objects.append(dup_obj)
         
@@ -832,7 +840,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
             shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
             # 名前の最後が_leftまたは_rightのシェイプキーには使えないように
             if shapekey.name.endswith("_left") or shapekey.name.endswith("_right"):
-                b=False
+                b = False
         
         return b
     
@@ -877,7 +885,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
             if shapekey.name.find(ENABLE_SORT_TAG) == -1:
                 shapekey.name += ENABLE_SORT_TAG
         else:
-            shapekey.name=shapekey.name.replace(ENABLE_SORT_TAG, '')
+            shapekey.name = shapekey.name.replace(ENABLE_SORT_TAG, '')
         
         return {'FINISHED'}
 # endregion
