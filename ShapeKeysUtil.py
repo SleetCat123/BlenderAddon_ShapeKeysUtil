@@ -24,7 +24,7 @@ from bpy.props import *
 bl_info = {
     "name": "ShapeKeys Util",
     "author": "@sleetcat123(Twitter)",
-    "version": (1,1,6),
+    "version": (1, 1, 6),
     "blender": (2, 80, 0),
     "location": "",
     "description": "",
