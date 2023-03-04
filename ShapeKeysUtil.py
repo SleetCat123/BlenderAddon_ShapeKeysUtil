@@ -21,16 +21,6 @@ import bmesh
 import time
 from bpy.props import *
 
-bl_info = {
-    "name": "ShapeKeys Util",
-    "author": "@sleetcat123(Twitter)",
-    "version": (1, 1, 6),
-    "blender": (2, 80, 0),
-    "location": "",
-    "description": "",
-    "category": "Object"
-}
-
 # Create Left and Right Shape Keys の自動判定で使うやつ
 ENABLE_LR_TAG = "%LR%"
 ENABLE_DUPLICATE_TAG = "%D%"
@@ -1010,6 +1000,3 @@ def unregister():
 
     bpy.types.VIEW3D_MT_object_context_menu.remove(INFO_MT_object_specials_shapekeys_util_menu)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(INFO_MT_edit_mesh_specials_shapekeys_util_menu)
-
-if __name__ == "__main__":
-    register()
