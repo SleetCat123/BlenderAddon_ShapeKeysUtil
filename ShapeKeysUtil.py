@@ -32,48 +32,6 @@ APPLY_AS_SHAPEKEY_PREFIX = "%AS%"  # モディファイア名が%AS%で始まっ
 FORCE_APPLY_MODIFIER_PREFIX = "%A%"  # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
 
 
-def remove_objects(targets=None):
-    print("remove_objects")
-    if targets is None:
-        targets = bpy.context.selected_objects
-
-    data_list = []
-    # オブジェクトを削除
-    for obj in targets:
-        try:
-            if obj.data:
-                data_list.append(obj.data)
-            print("remove: " + str(obj))
-            bpy.data.objects.remove(obj)
-        except ReferenceError:
-            continue
-
-    # オブジェクトのデータを削除
-    for data in data_list:
-        blocks = None
-        data_type = type(data)
-        if data_type == bpy.types.Mesh:
-            blocks = bpy.data.meshes
-        elif data_type == bpy.types.Armature:
-            blocks = bpy.data.armatures
-        elif data_type == bpy.types.Curve:
-            blocks = bpy.data.curves
-        elif data_type == bpy.types.Lattice:
-            blocks = bpy.data.lattices
-        elif data_type == bpy.types.Light:
-            blocks = bpy.data.lights
-        elif data_type == bpy.types.Camera:
-            blocks = bpy.data.cameras
-        elif data_type == bpy.types.MetaBall:
-            blocks = bpy.data.metaballs
-        elif data_type == bpy.types.GreasePencil:
-            blocks = bpy.data.grease_pencils
-
-        if blocks and data.users == 0:
-            print("remove: " + str(data))
-            blocks.remove(data)
-
-
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
     print("apply_modifiers")
@@ -189,7 +147,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         # 一時オブジェクトを削除
         utils.select_object(source_obj, False)
         utils.select_object(tempobj, True)
-        remove_objects()
+        utils.remove_objects()
         utils.select_object(source_obj, True)
         utils.set_active_object(source_obj)
 
@@ -261,7 +219,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
                 utils.select_object(source_obj, True)
                 for child in source_obj.children:
                     utils.select_object(child, True)
-                remove_objects()
+                utils.remove_objects()
                 utils.select_object(source_obj_dup, True)
                 utils.set_active_object(source_obj_dup)
                 return False
@@ -279,7 +237,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         utils.select_object(source_obj, False)
         # 使い終わったオブジェクトを削除
         utils.select_objects(shape_objects, True)
-        remove_objects()
+        utils.remove_objects()
 
         # シェイプキーの名前と数値を復元
         source_obj.active_shape_key_index = active_shape_key_index
@@ -290,7 +248,7 @@ def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender
         if not duplicate:
             # 処理が正常に終了したら複製オブジェクトを削除する
             utils.select_object(source_obj_dup, True)
-            remove_objects()
+            utils.remove_objects()
 
     print("Shapekey Count (Include Basis Shapekey): " + str(len(source_obj.data.shape_keys.key_blocks)))
 
