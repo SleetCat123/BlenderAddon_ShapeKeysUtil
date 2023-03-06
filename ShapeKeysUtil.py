@@ -75,7 +75,7 @@ def select_axis(mode='POSITIVE', axis='X', threshold=0.0001):
 
 
 def get_addon_prefs():
-    return bpy.context.preferences.addons[__name__].preferences
+    return bpy.context.preferences.addons[__package__].preferences
 
 # region Translation #
 
@@ -670,7 +670,7 @@ def update_mesh():
 
 # AddonPreferences #
 class addon_preferences(bpy.types.AddonPreferences):
-    bl_idname = __name__
+    bl_idname = __package__
     
     wait_interval: IntProperty(name="Wait Interval", default=5, min=1, soft_min=1)
     wait_sleep: FloatProperty(name="Wait Sleep", default=0.5, min=0, soft_min=0, max=2, soft_max=2)
@@ -986,7 +986,7 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.app.translations.register(__name__, translations_dict)
+    bpy.app.translations.register(__package__, translations_dict)
 
     bpy.types.VIEW3D_MT_object_context_menu.append(INFO_MT_object_specials_shapekeys_util_menu)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(INFO_MT_edit_mesh_specials_shapekeys_util_menu)
@@ -996,7 +996,7 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    bpy.app.translations.unregister(__name__)
+    bpy.app.translations.unregister(__package__)
 
     bpy.types.VIEW3D_MT_object_context_menu.remove(INFO_MT_object_specials_shapekeys_util_menu)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(INFO_MT_edit_mesh_specials_shapekeys_util_menu)
