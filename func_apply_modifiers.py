@@ -1,11 +1,11 @@
 import bpy
-from . import utils, consts
+from . import func_utils, consts
 
 
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
     print("apply_modifiers")
-    obj = utils.get_active_object()
+    obj = func_utils.get_active_object()
 
     if obj.users != 1 or (obj.data and obj.data.users != 1):
         # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく

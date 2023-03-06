@@ -45,6 +45,7 @@ def select_axis(mode='POSITIVE', axis='X', threshold=0.0001):
 def get_addon_prefs():
     return bpy.context.preferences.addons[__package__].preferences
 
+
 def remove_objects(targets=None):
     print("remove_objects")
     if targets is None:
@@ -85,3 +86,14 @@ def remove_objects(targets=None):
         if blocks and data.users == 0:
             print("remove: " + str(data))
             blocks.remove(data)
+
+
+def update_mesh():
+    obj = get_active_object()
+    if obj.mode == 'OBJECT':
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+    else:
+        mode_cache = obj.mode
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode=mode_cache)

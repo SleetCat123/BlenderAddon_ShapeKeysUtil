@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .ShapeKeysUtil import apply_modifiers_with_shapekeys
+from .func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用

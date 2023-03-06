@@ -33,6 +33,10 @@ imports = [
     "ShapeKeysUtil",
     "link_with_automerge",
     "translations",
+    "OT_separate_shapekeys",
+    "OT_apply_modifiers",
+    "menu_object_context",
+    "menu_edit_mesh_context",
 ]
 
 
