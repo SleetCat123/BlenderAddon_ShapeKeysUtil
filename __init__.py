@@ -31,12 +31,13 @@ bl_info = {
 
 imports = [
     "ShapeKeysUtil",
-    "link_with_AutoMerge",
     "translations",
     "OT_separate_shapekeys",
     "OT_apply_modifiers",
     "menu_object_context",
     "menu_edit_mesh_context",
+    "link_with_AutoMerge",
+    "link_with_MizoresCustomExporter",
 ]
 
 
