@@ -16,10 +16,38 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from ShapeKeysUtil import apply_modifiers_with_shapekeys
+import bpy
+from .ShapeKeysUtil import apply_modifiers_with_shapekeys
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
 # AutoMerge連携用
-def apply_modifiers_with_shapekeys_for_automerge_addon(self, source_obj):
-    return apply_modifiers_with_shapekeys(self=self, source_obj=source_obj, duplicate=False, remove_nonrender=True)
+class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Operator):
+    bl_idname = "object.shapekeys_util_apply_mod_with_shapekeys_automerge"
+    bl_label = "[Internal] Apply Modifiers With Shapekeys For AutoMerge Addon"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        print("ShapekeysUtil")
+        obj = bpy.context.view_layer.objects.active
+        b = apply_modifiers_with_shapekeys(self=self, source_obj=obj, duplicate=False, remove_nonrender=True)
+        if b:
+            return {'FINISHED'}
+        else:
+            return {'CANCELLED'}
+
+
+classes = [
+    OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon,
+]
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+
