@@ -238,12 +238,6 @@ def apply_as_shapekey(modifier):
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
-# AutoMerge連携用
-def apply_modifiers_with_shapekeys_for_automerge_addon(self, source_obj):
-    return apply_modifiers_with_shapekeys(self=self, source_obj=source_obj, duplicate=False, remove_nonrender=True)
-
-
-# シェイプキーをもつオブジェクトのモディファイアを適用
 def apply_modifiers_with_shapekeys(self, source_obj, duplicate, remove_nonrender=True):
     print("apply_modifiers_with_shapekeys: [{0}] [{1}]".format(source_obj.name, source_obj.type))
     # Apply as shapekey用モディファイアのインデックスを検索
