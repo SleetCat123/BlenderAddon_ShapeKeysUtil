@@ -32,6 +32,7 @@ bl_info = {
 imports = [
     "ShapeKeysUtil",
     "link_with_automerge",
+    "translations",
 ]
 
 
