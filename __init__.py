@@ -31,7 +31,7 @@ bl_info = {
 
 imports = [
     "ShapeKeysUtil",
-    "link_with_automerge",
+    "link_with_AutoMerge",
     "translations",
     "OT_separate_shapekeys",
     "OT_apply_modifiers",
