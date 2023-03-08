@@ -18,7 +18,7 @@
 
 import bpy
 from .func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
-from .ShapeKeysUtil import separate_lr_shapekey_all
+from .func_separate_lr_shapekey_all import separate_lr_shapekey_all
 
 
 # MizoresCustomExporter連携用
