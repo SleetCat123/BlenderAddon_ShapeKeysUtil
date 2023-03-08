@@ -43,7 +43,7 @@ imports = [
 
 def reload_modules():
     for name in imports:
-        module_full_name = f"{__package__}.{name}"
+        module_full_name = f"{__package__}.scripts.{name}"
         if module_full_name in sys.modules:
             importlib.reload(sys.modules[module_full_name])
         else:
@@ -52,18 +52,18 @@ def reload_modules():
 
 def register():
     reload_modules()
-    for script in imports:
-        module_name = f"{__package__}.{script}"
-        module = sys.modules[module_name]
+    for name in imports:
+        module_full_name = f"{__package__}.scripts.{name}"
+        module = sys.modules[module_full_name]
         func = getattr(module, "register", None)
         if callable(func):
             func()
 
 
 def unregister():
-    for script in imports:
-        module_name = f"{__package__}.{script}"
-        module = sys.modules[module_name]
+    for name in imports:
+        module_full_name = f"{__package__}.scripts.{name}"
+        module = sys.modules[module_full_name]
         func = getattr(module, "unregister", None)
         if callable(func):
             func()
