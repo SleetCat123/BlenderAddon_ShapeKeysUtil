@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+from . import func_package_utils
 
 
 def select_object(obj, value=True):
@@ -33,7 +34,7 @@ def get_active_object():
 
 
 def set_active_object(obj):
-    bpy.context.view_layer.objects.active=obj
+    bpy.context.view_layer.objects.active = obj
 
 
 def deselect_all_objects():
@@ -61,7 +62,7 @@ def select_axis(mode='POSITIVE', axis='X', threshold=0.0001):
 
 
 def get_addon_prefs():
-    return bpy.context.preferences.addons[__package__].preferences
+    return bpy.context.preferences.addons[func_package_utils.get_package_root()].preferences
 
 
 def remove_objects(targets=None):

@@ -18,12 +18,12 @@
 
 import bpy
 from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, FloatVectorProperty
-from . import func_utils, consts, func_separate_lr_shapekey, func_select_axis_from_point
+from . import func_utils, consts, func_separate_lr_shapekey, func_select_axis_from_point, func_package_utils
 
 
 # AddonPreferences #
 class addon_preferences(bpy.types.AddonPreferences):
-    bl_idname = __package__
+    bl_idname = func_package_utils.get_package_root()
     
     wait_interval: IntProperty(name="Wait Interval", default=5, min=1, soft_min=1)
     wait_sleep: FloatProperty(name="Wait Sleep", default=0.5, min=0, soft_min=0, max=2, soft_max=2)

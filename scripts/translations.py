@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+from . import func_package_utils
 
 translations_dict = {
     "en_US": {
@@ -74,8 +75,8 @@ translations_dict = {
 
 
 def register():
-    bpy.app.translations.register(__package__, translations_dict)
+    bpy.app.translations.register(func_package_utils.get_package_root(), translations_dict)
 
 
 def unregister():
-    bpy.app.translations.unregister(__package__)
+    bpy.app.translations.unregister(func_package_utils.get_package_root())
