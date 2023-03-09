@@ -19,6 +19,7 @@
 import bpy
 from .func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
 from .func_separate_lr_shapekey_all import separate_lr_shapekey_all
+from . import func_utils
 
 
 # MizoresCustomExporter連携用
@@ -29,8 +30,7 @@ class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Oper
 
     def execute(self, context):
         print("ShapekeysUtil - Apply Modifiers With Shapekeys")
-        obj = bpy.context.view_layer.objects.active
-        b = apply_modifiers_with_shapekeys(self=self, source_obj=obj, duplicate=False, remove_nonrender=False)
+        b = apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=False)
         if b:
             return {'FINISHED'}
         else:

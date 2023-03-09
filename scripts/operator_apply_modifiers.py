@@ -42,7 +42,7 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
         targets = [d for d in selected_objects if d.type == 'MESH']
         for obj in targets:
             func_utils.set_active_object(obj)
-            b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, context.object, self.duplicate, self.remove_nonrender)
+            b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, self.duplicate, self.remove_nonrender)
             if not b:
                 return {'CANCELLED'}
         func_utils.select_objects(selected_objects, True)

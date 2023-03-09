@@ -18,6 +18,7 @@
 
 import bpy
 from .func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
+from . import func_utils
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
@@ -29,8 +30,7 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
 
     def execute(self, context):
         print("ShapekeysUtil")
-        obj = bpy.context.view_layer.objects.active
-        b = apply_modifiers_with_shapekeys(self=self, source_obj=obj, duplicate=False, remove_nonrender=True)
+        b = apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=True)
         if b:
             return {'FINISHED'}
         else:
