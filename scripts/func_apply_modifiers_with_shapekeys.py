@@ -44,6 +44,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
         # 2番目以降にApply as shape用のモディファイアがあったら
         # 一時オブジェクトを作成
         tempobj = func_utils.duplicate_object(source_obj)
+        func_utils.deselect_all_objects()
         func_utils.select_object(tempobj, True)
         print("duplicate: " + tempobj.name)
         func_utils.set_active_object(source_obj)
@@ -59,6 +60,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
         success = apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
         if not success:
             # 処理に失敗したら処理前のデータを復元して終了
+            func_utils.deselect_all_objects()
             func_utils.select_object(source_obj, True)
             func_utils.set_active_object(tempobj)
             bpy.ops.object.make_links_data(type='OBDATA')
@@ -66,6 +68,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             return False
 
         # 削除していたモディファイアを一時オブジェクトから復元
+        func_utils.deselect_all_objects()
         func_utils.select_object(source_obj, True)
         func_utils.set_active_object(tempobj)
         print("restore: make_links_data(type='MODIFIERS')")
