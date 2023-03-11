@@ -39,7 +39,7 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
         layout.separator()
         layout.operator(ShapeKeysUtil.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey.bl_idname)
         layout.operator(operator_separate_lr_shapekey_all.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all.bl_idname)
-        layout.operator(operator_separate_lr_shapekey_all_tag_detect.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tagdetect.bl_idname)
+        layout.operator(operator_separate_lr_shapekey_all_tag_detect.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect.bl_idname)
         layout.operator(ShapeKeysUtil.OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname)
 
 
