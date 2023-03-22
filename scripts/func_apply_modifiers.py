@@ -32,6 +32,9 @@ def apply_modifiers(remove_nonrender=True):
 
     print("Apply Modifiers: [" + obj.name + "]")
     for modifier in obj.modifiers:
+        if modifier.name.startswith(consts.FORCE_KEEP_MODIFIER_PREFIX):
+            # モディファイア名がFORCE_KEEP_MODIFIER_PREFIXで始まっているなら無視
+            continue
         if not modifier.show_render:
             # モディファイアがレンダリング対象ではない（モディファイア一覧のカメラアイコンが押されていない）なら無視
             if remove_nonrender:
