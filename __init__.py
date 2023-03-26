@@ -39,6 +39,7 @@ try:
     reload()
 except NameError:
     from .scripts import (
+        addon_preferences,
         consts,
         func_apply_as_shapekey,
         func_apply_modifiers,
@@ -54,14 +55,17 @@ except NameError:
         menu_edit_mesh_context,
         menu_object_context,
         operator_apply_modifiers,
+        operator_assign_lr_shapekey_tag,
+        operator_separate_lr_shapekey,
         operator_separate_lr_shapekey_all,
         operator_separate_lr_shapekey_all_tag_detect,
         operator_separate_shapekeys,
-        ShapeKeysUtil,
+        operator_sideofactive_point,
         translations,
     )
 
 files = [
+    addon_preferences,
     consts,
     func_apply_as_shapekey,
     func_apply_modifiers,
@@ -77,10 +81,12 @@ files = [
     menu_edit_mesh_context,
     menu_object_context,
     operator_apply_modifiers,
+    operator_assign_lr_shapekey_tag,
+    operator_separate_lr_shapekey,
     operator_separate_lr_shapekey_all,
     operator_separate_lr_shapekey_all_tag_detect,
     operator_separate_shapekeys,
-    ShapeKeysUtil,
+    operator_sideofactive_point,
     translations,
 ]
 

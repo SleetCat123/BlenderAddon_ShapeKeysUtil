@@ -19,7 +19,7 @@
 import bpy
 from . import operator_separate_shapekeys, operator_apply_modifiers
 from . import operator_separate_lr_shapekey_all, operator_separate_lr_shapekey_all_tag_detect
-from . import ShapeKeysUtil
+from . import operator_separate_lr_shapekey, operator_assign_lr_shapekey_tag
 
 
 # オブジェクトモード　Special → ShapeKeys Util を登録する
@@ -37,10 +37,10 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
         layout.operator(operator_apply_modifiers.OBJECT_OT_specials_shapekeys_util_apply_modifiers.bl_idname)
         layout.operator(operator_separate_shapekeys.OBJECT_OT_specials_shapekeys_util_separateobj.bl_idname)
         layout.separator()
-        layout.operator(ShapeKeysUtil.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey.bl_idname)
+        layout.operator(operator_separate_lr_shapekey.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey.bl_idname)
         layout.operator(operator_separate_lr_shapekey_all.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all.bl_idname)
         layout.operator(operator_separate_lr_shapekey_all_tag_detect.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect.bl_idname)
-        layout.operator(ShapeKeysUtil.OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname)
+        layout.operator(operator_assign_lr_shapekey_tag.OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname)
 
 
 def register():
