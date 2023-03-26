@@ -16,8 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import sys
-import importlib
 
 bl_info = {
     "name": "ShapeKeys Util",
@@ -29,44 +27,80 @@ bl_info = {
     "category": "Object"
 }
 
-imports = [
-    "ShapeKeysUtil",
-    "translations",
-    "operator_separate_shapekeys",
-    "operator_apply_modifiers",
-    "operator_separate_lr_shapekey_all",
-    "operator_separate_lr_shapekey_all_tag_detect",
-    "menu_object_context",
-    "menu_edit_mesh_context",
-    "link_with_AutoMerge",
-    "link_with_MizoresCustomExporter",
+
+def reload():
+    import importlib
+    for file in files:
+        importlib.reload(file)
+
+
+try:
+    is_loaded
+    reload()
+except NameError:
+    from .scripts import (
+        consts,
+        func_apply_as_shapekey,
+        func_apply_modifiers,
+        func_apply_modifiers_with_shapekeys,
+        func_package_utils,
+        func_select_axis_from_point,
+        func_separate_lr_shapekey,
+        func_separate_lr_shapekey_all,
+        func_separate_shapekeys,
+        func_utils,
+        link_with_AutoMerge,
+        link_with_MizoresCustomExporter,
+        menu_edit_mesh_context,
+        menu_object_context,
+        operator_apply_modifiers,
+        operator_separate_lr_shapekey_all,
+        operator_separate_lr_shapekey_all_tag_detect,
+        operator_separate_shapekeys,
+        ShapeKeysUtil,
+        translations,
+    )
+
+files = [
+    consts,
+    func_apply_as_shapekey,
+    func_apply_modifiers,
+    func_apply_modifiers_with_shapekeys,
+    func_package_utils,
+    func_select_axis_from_point,
+    func_separate_lr_shapekey,
+    func_separate_lr_shapekey_all,
+    func_separate_shapekeys,
+    func_utils,
+    link_with_AutoMerge,
+    link_with_MizoresCustomExporter,
+    menu_edit_mesh_context,
+    menu_object_context,
+    operator_apply_modifiers,
+    operator_separate_lr_shapekey_all,
+    operator_separate_lr_shapekey_all_tag_detect,
+    operator_separate_shapekeys,
+    ShapeKeysUtil,
+    translations,
 ]
 
-
-def reload_modules():
-    for name in imports:
-        module_full_name = f"{__package__}.scripts.{name}"
-        if module_full_name in sys.modules:
-            importlib.reload(sys.modules[module_full_name])
-        else:
-            importlib.import_module(module_full_name)
+is_loaded = False
 
 
 def register():
-    reload_modules()
-    for name in imports:
-        module_full_name = f"{__package__}.scripts.{name}"
-        module = sys.modules[module_full_name]
-        func = getattr(module, "register", None)
+    global is_loaded
+    if is_loaded:
+        reload()
+    for file in files:
+        func = getattr(file, "register", None)
         if callable(func):
             func()
+    is_loaded = True
 
 
 def unregister():
-    for name in imports:
-        module_full_name = f"{__package__}.scripts.{name}"
-        module = sys.modules[module_full_name]
-        func = getattr(module, "unregister", None)
+    for file in files:
+        func = getattr(file, "unregister", None)
         if callable(func):
             func()
 
