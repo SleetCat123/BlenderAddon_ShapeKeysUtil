@@ -17,13 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_utils, func_separate_lr_shapekey_all
+from . import consts, func_utils, func_separate_lr_shapekey_all
 
 
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_separate_lr_shapekey_all_tag_detect"
     bl_label = "(Tag) Separate All Shape Key Left and Right"
-    bl_description = bpy.app.translations.pgettext(bl_idname + "_desc")
+    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod

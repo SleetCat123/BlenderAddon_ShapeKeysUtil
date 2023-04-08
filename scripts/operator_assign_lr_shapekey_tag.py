@@ -24,7 +24,7 @@ from . import consts
 class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_assign_lr_shapekey_tag"
     bl_label = "Assign Tag"
-    bl_description = bpy.app.translations.pgettext(bl_idname + "_desc")
+    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
     enable: BoolProperty(name="Enable", description=bpy.app.translations.pgettext(bl_idname + "_enable"))

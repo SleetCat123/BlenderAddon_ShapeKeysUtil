@@ -25,3 +25,5 @@ ENABLE_SORT_TAG = "%S%"
 APPLY_AS_SHAPEKEY_PREFIX = "%AS%"  # モディファイア名が%AS%で始まっているならApply as shapekey
 FORCE_APPLY_MODIFIER_PREFIX = "%A%"  # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
 FORCE_KEEP_MODIFIER_PREFIX = "%KEEP%"  # モディファイア名が"%KEEP%"で始まっているならモディファイアを適用せずに処理を続行する
+
+DESC = ".desc"

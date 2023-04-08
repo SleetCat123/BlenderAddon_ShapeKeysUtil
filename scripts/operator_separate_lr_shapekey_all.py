@@ -18,13 +18,13 @@
 
 import bpy
 from bpy.props import BoolProperty
-from . import func_utils, func_separate_lr_shapekey_all
+from . import consts, func_utils, func_separate_lr_shapekey_all
 
 
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_separate_lr_shapekey_all"
     bl_label = "Separate All Shape Key Left and Right"
-    bl_description = bpy.app.translations.pgettext(bl_idname + "_desc")
+    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
     duplicate: BoolProperty(name="Duplicate", default=False,
