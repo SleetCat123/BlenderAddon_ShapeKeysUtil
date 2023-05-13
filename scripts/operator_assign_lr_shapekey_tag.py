@@ -27,7 +27,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
     bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
-    enable: BoolProperty(name="Enable", description=bpy.app.translations.pgettext(bl_idname + "_enable"))
+    enable: BoolProperty(name="Enable", description=bpy.app.translations.pgettext(bl_idname + "enable"))
     duplicate: BoolProperty(name="Duplicate",
                             description=bpy.app.translations.pgettext("separate_lr_shapekey_duplicate"))
     enable_sort: BoolProperty(name="Enable Sort",

@@ -28,9 +28,9 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     duplicate: BoolProperty(name="Duplicate", default=False,
-                            description=bpy.app.translations.pgettext(bl_idname + "_duplicate"))
+                            description=bpy.app.translations.pgettext(bl_idname + "duplicate"))
     remove_nonrender: BoolProperty(name="Remove NonRender", default=True,
-                                   description=bpy.app.translations.pgettext("remove_nonrender"))
+                                   description=bpy.app.translations.pgettext(bl_idname + "remove_nonrender"))
 
     @classmethod
     def poll(cls, context):

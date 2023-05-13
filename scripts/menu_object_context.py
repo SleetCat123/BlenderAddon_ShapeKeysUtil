@@ -35,7 +35,7 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator(operator_apply_modifiers.OBJECT_OT_specials_shapekeys_util_apply_modifiers.bl_idname)
-        layout.operator(operator_separate_shapekeys.OBJECT_OT_specials_shapekeys_util_separateobj.bl_idname)
+        layout.operator(operator_separate_shapekeys.OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects.bl_idname)
         layout.separator()
         layout.operator(operator_separate_lr_shapekey.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey.bl_idname)
         layout.operator(operator_separate_lr_shapekey_all.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all.bl_idname)

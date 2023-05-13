@@ -28,9 +28,9 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all(bpy.types.Opera
     bl_options = {'REGISTER', 'UNDO'}
 
     duplicate: BoolProperty(name="Duplicate", default=False,
-                            description=bpy.app.translations.pgettext("separate_lr_shapekey_duplicate"))
+                            description=bpy.app.translations.pgettext(bl_idname + "duplicate"))
     enable_sort: BoolProperty(name="Enable Sort", default=False,
-                              description=bpy.app.translations.pgettext("separate_lr_shapekey_all_enable_sort"))
+                              description=bpy.app.translations.pgettext(bl_idname + "enable_sort"))
 
     @classmethod
     def poll(cls, context):
