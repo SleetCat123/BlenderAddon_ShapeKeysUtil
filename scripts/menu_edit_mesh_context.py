@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import operator_sideofactive_point
+from . import op_sideofactive_point
 
 
 # エディットモード　Special → ShapeKeys Util を登録する

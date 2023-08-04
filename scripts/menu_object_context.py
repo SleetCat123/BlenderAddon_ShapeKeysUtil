@@ -17,9 +17,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import operator_separate_shapekeys, operator_apply_modifiers
-from . import operator_separate_lr_shapekey_all, operator_separate_lr_shapekey_all_tag_detect
-from . import operator_separate_lr_shapekey, operator_assign_lr_shapekey_tag
+from . import op_separate_shapekeys, op_apply_modifiers
+from . import op_separate_lr_shapekey_all, op_separate_lr_shapekey_all_tag_detect
+from . import op_separate_lr_shapekey, op_assign_lr_shapekey_tag
 
 
 # オブジェクトモード　Special → ShapeKeys Util を登録する
