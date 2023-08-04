@@ -18,7 +18,6 @@
 
 import bpy
 from .func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
-from . import func_utils
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用

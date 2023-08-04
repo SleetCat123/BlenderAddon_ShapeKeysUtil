@@ -18,7 +18,7 @@
 
 import bpy
 from bpy.props import BoolProperty
-from . import consts
+from .. import consts
 
 
 class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operator):

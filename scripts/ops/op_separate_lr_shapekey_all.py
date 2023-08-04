@@ -18,18 +18,18 @@
 
 import bpy
 from bpy.props import BoolProperty
-from . import consts, func_utils, func_separate_lr_shapekey
+from .. import consts, func_utils, func_separate_lr_shapekey_all
 
 
-class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator):
-    bl_idname = "object.shapekeys_util_separate_lr_shapekey"
-    bl_label = "Separate Shape Key Left and Right"
+class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all(bpy.types.Operator):
+    bl_idname = "object.shapekeys_util_separate_lr_shapekey_all"
+    bl_label = "Separate All Shape Key Left and Right"
     bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
     duplicate: BoolProperty(name="Duplicate", default=False,
                             description=bpy.app.translations.pgettext(bl_idname + "duplicate"))
-    enable_sort: BoolProperty(name="Enable Sort", default=True,
+    enable_sort: BoolProperty(name="Enable Sort", default=False,
                               description=bpy.app.translations.pgettext(bl_idname + "enable_sort"))
 
     @classmethod
@@ -40,20 +40,13 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
     def execute(self, context):
         obj = context.object
         func_utils.set_active_object(obj)
-
-        # 頂点を全て表示
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.reveal()
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        func_separate_lr_shapekey.separate_lr_shapekey(soruce_shape_key_index=obj.active_shape_key_index,
-                                                       duplicate=self.duplicate, enable_sort=self.enable_sort)
+        func_separate_lr_shapekey_all.separate_lr_shapekey_all(duplicate=self.duplicate, enable_sort=self.enable_sort, auto_detect=False)
         return {'FINISHED'}
 
 
 def register():
-    bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey)
+    bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all)
 
 
 def unregister():
-    bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey)
+    bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all)

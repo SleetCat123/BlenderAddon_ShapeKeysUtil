@@ -18,7 +18,7 @@
 
 import bpy
 from bpy.props import FloatVectorProperty, EnumProperty, FloatProperty
-from . import consts, func_select_axis_from_point
+from .. import consts, func_select_axis_from_point
 
 
 class MESH_OT_specials_shapekeys_util_sideofactive_point(bpy.types.Operator):
