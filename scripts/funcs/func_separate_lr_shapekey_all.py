@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_utils, consts, func_separate_lr_shapekey
+from BlenderAddon_ShapeKeysUtil.scripts import consts
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils, func_separate_lr_shapekey
 
 
 def separate_lr_shapekey_all(duplicate, enable_sort, auto_detect):

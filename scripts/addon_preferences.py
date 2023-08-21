@@ -18,7 +18,7 @@
 
 import bpy
 from bpy.props import FloatProperty, IntProperty
-from . import func_package_utils
+from .funcs import func_package_utils
 
 
 class addon_preferences(bpy.types.AddonPreferences):

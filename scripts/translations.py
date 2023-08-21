@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import consts, func_package_utils
+from . import consts
+from .funcs import func_package_utils
 from .consts import DESC
 from .ops.op_separate_lr_shapekey import OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey as separate_lr_shapekey
 from .ops.op_assign_lr_shapekey_tag import OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag as assign_lr_shapekey_tag

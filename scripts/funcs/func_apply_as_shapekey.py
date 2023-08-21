@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import consts
+from BlenderAddon_ShapeKeysUtil.scripts import consts
 
 
 def apply_as_shapekey(modifier):

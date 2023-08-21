@@ -18,7 +18,8 @@
 
 import bpy
 from bpy.props import BoolProperty
-from .. import consts, func_utils, func_apply_modifiers_with_shapekeys
+from .. import consts
+from ..funcs import func_apply_modifiers_with_shapekeys, func_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):

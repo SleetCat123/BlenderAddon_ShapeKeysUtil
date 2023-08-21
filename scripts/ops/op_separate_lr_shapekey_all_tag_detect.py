@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .. import consts, func_utils, func_separate_lr_shapekey_all
+from .. import consts
+from ..funcs import func_separate_lr_shapekey_all, func_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.types.Operator):

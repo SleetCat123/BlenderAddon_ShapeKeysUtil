@@ -18,7 +18,7 @@
 
 import bpy
 import time
-from . import func_utils, func_apply_modifiers
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils, func_apply_modifiers
 
 
 # シェイプキーをそれぞれ別のオブジェクトにする

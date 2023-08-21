@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_utils, consts
+from BlenderAddon_ShapeKeysUtil.scripts import consts
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils
 
 
 # オブジェクトのモディファイアを適用

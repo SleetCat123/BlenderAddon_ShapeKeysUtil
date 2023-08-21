@@ -18,7 +18,7 @@
 
 import bpy
 import bmesh
-from . import func_utils
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils
 
 
 # 指定座標を基準にSide of Active

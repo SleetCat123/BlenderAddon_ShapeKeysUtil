@@ -17,7 +17,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_utils, consts, func_apply_modifiers, func_apply_as_shapekey, func_separate_shapekeys
+from BlenderAddon_ShapeKeysUtil.scripts import consts
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_separate_shapekeys, func_utils, func_apply_as_shapekey, \
+    func_apply_modifiers
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
@@ -130,7 +132,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
 
         # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
         separated_objects = func_separate_shapekeys.separate_shapekeys(duplicate=False, enable_apply_modifiers=True,
-                                               remove_nonrender=remove_nonrender)
+                                                                       remove_nonrender=remove_nonrender)
 
         print("Source: " + source_obj.name)
         print("------ Merge Separated Objects ------\n" + '\n'.join(

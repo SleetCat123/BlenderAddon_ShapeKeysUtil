@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_package_utils
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_package_utils
 
 
 def select_object(obj, value=True):

@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from . import func_utils, consts, func_select_axis_from_point
+from BlenderAddon_ShapeKeysUtil.scripts import consts
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_select_axis_from_point, func_utils
 
 
 def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
