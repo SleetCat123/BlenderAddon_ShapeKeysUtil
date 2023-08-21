@@ -19,7 +19,8 @@
 import bpy
 from bpy.props import BoolProperty
 from .. import consts
-from ..funcs import func_apply_modifiers_with_shapekeys, func_utils
+from ..funcs import func_apply_modifiers_with_shapekeys
+from ..funcs.utils import func_object_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
@@ -38,16 +39,16 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
         return any(obj.type == 'MESH' for obj in bpy.context.selected_objects)
 
     def execute(self, context):
-        active = func_utils.get_active_object()
+        active = func_object_utils.get_active_object()
         selected_objects = bpy.context.selected_objects
         targets = [d for d in selected_objects if d.type == 'MESH']
         for obj in targets:
-            func_utils.set_active_object(obj)
+            func_object_utils.set_active_object(obj)
             b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, self.duplicate, self.remove_nonrender)
             if not b:
                 return {'CANCELLED'}
-        func_utils.select_objects(selected_objects, True)
-        func_utils.set_active_object(active)
+        func_object_utils.select_objects(selected_objects, True)
+        func_object_utils.set_active_object(active)
         return {'FINISHED'}
 
 

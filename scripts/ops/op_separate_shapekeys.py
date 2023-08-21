@@ -19,7 +19,8 @@
 import bpy
 from bpy.props import BoolProperty
 from .. import consts
-from ..funcs import func_separate_shapekeys, func_utils
+from ..funcs import func_separate_shapekeys
+from ..funcs.utils import func_object_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator):
@@ -47,9 +48,9 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
         if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
             return {'CANCELLED'}
 
-        func_utils.deselect_all_objects()
-        func_utils.select_object(source_obj, True)
-        func_utils.set_active_object(source_obj)
+        func_object_utils.deselect_all_objects()
+        func_object_utils.select_object(source_obj, True)
+        func_object_utils.set_active_object(source_obj)
 
         # シェイプキーをそれぞれ別オブジェクトにする
         func_separate_shapekeys.separate_shapekeys(self.duplicate, self.apply_modifiers, self.remove_nonrender)

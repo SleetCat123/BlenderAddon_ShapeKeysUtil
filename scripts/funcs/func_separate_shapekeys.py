@@ -18,21 +18,22 @@
 
 import bpy
 import time
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils, func_apply_modifiers
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_apply_modifiers
+from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils, func_mesh_utils, func_package_utils
 
 
 # シェイプキーをそれぞれ別のオブジェクトにする
 def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True):
-    source_obj = func_utils.get_active_object()
+    source_obj = func_object_utils.get_active_object()
     source_obj_name = source_obj.name
 
-    func_utils.deselect_all_objects()
+    func_object_utils.deselect_all_objects()
 
     if duplicate:
-        func_utils.select_object(source_obj, True)
-        func_utils.set_active_object(source_obj)
+        func_object_utils.select_object(source_obj, True)
+        func_object_utils.set_active_object(source_obj)
         bpy.ops.object.duplicate()
-        source_obj = func_utils.get_active_object()
+        source_obj = func_object_utils.get_active_object()
 
     source_obj_matrix_world_inverted = source_obj.matrix_world.inverted()
 
@@ -41,11 +42,11 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     separated_objects = []
     shape_keys_length = len(source_obj.data.shape_keys.key_blocks)
 
-    addon_prefs = func_utils.get_addon_prefs()
+    addon_prefs = func_package_utils.get_addon_prefs()
     wait_interval = addon_prefs.wait_interval
     wait_sleep = addon_prefs.wait_sleep
 
-    func_utils.select_object(source_obj, True)
+    func_object_utils.select_object(source_obj, True)
     for i, shapekey in enumerate(source_obj.data.shape_keys.key_blocks):
         print("Shape key [" + shapekey.name + "] [" + str(i) + " / " + str(shape_keys_length) + "]")
 
@@ -59,13 +60,13 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
         # Basisは無視
         if i == 0:
             if duplicate:
-                func_utils.set_object_name(source_obj, new_name)
+                func_object_utils.set_object_name(source_obj, new_name)
             continue
 
         # オブジェクトを複製
-        func_utils.set_active_object(source_obj)
+        func_object_utils.set_active_object(source_obj)
         bpy.ops.object.duplicate()
-        dup_obj = func_utils.get_active_object()
+        dup_obj = func_object_utils.get_active_object()
 
         # 元オブジェクトの子にする
         # bpy.ops.object.parent_setだと更新処理が走って重くなるのでLowLevelな方法を採用
@@ -73,10 +74,10 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
         dup_obj.matrix_parent_inverse = source_obj_matrix_world_inverted
 
         # シェイプキーの名前を設定
-        func_utils.set_object_name(dup_obj, new_name)
+        func_object_utils.set_object_name(dup_obj, new_name)
 
         # シェイプキーをsource_objからdup_objにコピー
-        func_utils.select_object(source_obj, True)
+        func_object_utils.select_object(source_obj, True)
         source_obj.active_shape_key_index = i
         # shapekey = source_obj.data.shape_keys.key_blocks[i]
         shapekey.value = 1
@@ -89,23 +90,23 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
 
         separated_objects.append(dup_obj)
 
-        func_utils.select_object(dup_obj, False)
+        func_object_utils.select_object(dup_obj, False)
 
     # 元オブジェクトのシェイプキーを全削除
-    func_utils.deselect_all_objects()
-    func_utils.select_object(source_obj, True)
-    func_utils.set_active_object(source_obj)
+    func_object_utils.deselect_all_objects()
+    func_object_utils.select_object(source_obj, True)
+    func_object_utils.set_active_object(source_obj)
     bpy.ops.object.shape_key_remove(all=True)
 
     if enable_apply_modifiers:
         func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
         for obj in separated_objects:
-            func_utils.set_active_object(obj)
+            func_object_utils.set_active_object(obj)
             func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
-        func_utils.set_active_object(source_obj)
+        func_object_utils.set_active_object(source_obj)
 
     # 表示を更新
-    func_utils.update_mesh()
+    func_mesh_utils.update_mesh()
 
     print("Finish Separate ShapeKeys: [" + source_obj.name + "]")
     return separated_objects

@@ -18,13 +18,13 @@
 
 import bpy
 from BlenderAddon_ShapeKeysUtil.scripts import consts
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils
+from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils
 
 
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender=True):
     print("apply_modifiers")
-    obj = func_utils.get_active_object()
+    obj = func_object_utils.get_active_object()
 
     if obj.users != 1 or (obj.data and obj.data.users != 1):
         # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく

@@ -19,7 +19,8 @@
 import bpy
 from bpy.props import BoolProperty
 from .. import consts
-from ..funcs import func_utils, func_separate_lr_shapekey
+from ..funcs import func_separate_lr_shapekey
+from ..funcs.utils import func_object_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator):
@@ -40,7 +41,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
 
     def execute(self, context):
         obj = context.object
-        func_utils.set_active_object(obj)
+        func_object_utils.set_active_object(obj)
 
         # 頂点を全て表示
         bpy.ops.object.mode_set(mode='EDIT')

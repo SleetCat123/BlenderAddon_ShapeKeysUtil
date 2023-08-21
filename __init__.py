@@ -48,15 +48,20 @@ except NameError:
         translations,
     )
     from BlenderAddon_ShapeKeysUtil.scripts.funcs import (
-        func_package_utils,
         func_select_axis_from_point,
         func_apply_modifiers_with_shapekeys,
         func_separate_shapekeys,
         func_separate_lr_shapekey_all,
-        func_utils,
         func_separate_lr_shapekey,
         func_apply_as_shapekey,
         func_apply_modifiers,
+    )
+    from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import (
+        func_object_utils,
+        func_package_utils,
+        func_mesh_utils,
+        func_collection_utils,
+        func_ui_utils,
     )
     from BlenderAddon_ShapeKeysUtil.scripts.ops import (
         op_apply_modifiers, op_separate_lr_shapekey,
@@ -76,7 +81,11 @@ files = [
     func_separate_lr_shapekey,
     func_separate_lr_shapekey_all,
     func_separate_shapekeys,
-    func_utils,
+    func_object_utils,
+    func_package_utils,
+    func_mesh_utils,
+    func_collection_utils,
+    func_ui_utils,
     link_with_AutoMerge,
     link_with_MizoresCustomExporter,
     menu_edit_mesh_context,

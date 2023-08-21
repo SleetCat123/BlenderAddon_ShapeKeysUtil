@@ -18,11 +18,12 @@
 
 import bpy
 from BlenderAddon_ShapeKeysUtil.scripts import consts
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_utils, func_separate_lr_shapekey
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_separate_lr_shapekey
+from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils
 
 
 def separate_lr_shapekey_all(duplicate, enable_sort, auto_detect):
-    obj = func_utils.get_active_object()
+    obj = func_object_utils.get_active_object()
     print("Create LR Shapekey All: [" + obj.name + "]")
 
     # 頂点を全て表示
@@ -52,7 +53,7 @@ def separate_lr_shapekey_all(duplicate, enable_sort, auto_detect):
                 # 名前に"%SORT%"を含むなら強制的にソートON
                 if shapekey.name.find(consts.ENABLE_SORT_TAG) != -1:
                     sort_temp = True
-            func_separate_lr_shapekey.separate_lr_shapekey(soruce_shape_key_index=i, duplicate=dup_temp,
+            func_separate_lr_shapekey.separate_lr_shapekey(source_shape_key_index=i, duplicate=dup_temp,
                                                            enable_sort=sort_temp)
 
     print("Finish Create LR Shapekey All: [" + obj.name + "]")

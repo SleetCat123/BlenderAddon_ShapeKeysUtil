@@ -18,7 +18,8 @@
 
 import bpy
 from .. import consts
-from ..funcs import func_separate_lr_shapekey_all, func_utils
+from ..funcs import func_separate_lr_shapekey_all
+from ..funcs.utils import func_object_utils
 
 
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.types.Operator):
@@ -34,7 +35,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.
 
     def execute(self, context):
         obj = context.object
-        func_utils.set_active_object(obj)
+        func_object_utils.set_active_object(obj)
         func_separate_lr_shapekey_all.separate_lr_shapekey_all(duplicate=False, enable_sort=False, auto_detect=True)
         return {'FINISHED'}
 

@@ -17,16 +17,21 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_package_utils
 
 
 def select_object(obj, value=True):
-    obj.select_set(value)
+    try:
+        obj.select_set(value)
+    except RuntimeError as e:
+        print(e)
 
 
 def select_objects(objects, value=True):
     for obj in objects:
-        select_object(obj, value)
+        try:
+            obj.select_set(value)
+        except RuntimeError as e:
+            print(e)
 
 
 def get_active_object():
@@ -34,35 +39,61 @@ def get_active_object():
 
 
 def set_active_object(obj):
+    # try:
     bpy.context.view_layer.objects.active = obj
+    # except ReferenceError:
+    #    print("removed")
+
+
+def get_children_objects(obj, only_current_view_layer: bool = True):
+    all_objects = bpy.data.objects
+    if only_current_view_layer:
+        current_layer_objects_name = bpy.context.window.view_layer.objects.keys()
+        return [child for child in all_objects if
+                child.parent == obj and child.name in current_layer_objects_name]
+    else:
+        return [child for child in all_objects if child.parent == obj]
+
+
+def get_children_recursive(targets, only_current_view_layer: bool = True):
+    result = []
+
+    def recursive(t):
+        result.append(t)
+        children = get_children_objects(t, only_current_view_layer)
+        for child in children:
+            recursive(child)
+
+    for obj in targets:
+        recursive(obj)
+    return result
+
+
+def select_children_recursive(targets=None):
+    def recursive(t):
+        select_object(t, True)
+        children = get_children_objects(t)
+        for child in children:
+            recursive(child)
+
+    if targets is None:
+        targets = bpy.context.selected_objects
+    for obj in targets:
+        recursive(obj)
+
+
+def select_all_objects():
+    targets = bpy.context.scene.collection.all_objects
+    for obj in targets:
+        select_object(obj, True)
 
 
 def deselect_all_objects():
     print("deselect_all_objects")
-    targets = bpy.context.selected_objects
+    targets = bpy.context.scene.collection.all_objects
     for obj in targets:
         select_object(obj, False)
     # bpy.context.view_layer.objects.active = None
-
-
-def set_object_name(obj, name):
-    obj.name = name
-    if obj.data:
-        obj.data.name = name
-
-
-def select_axis(mode='POSITIVE', axis='X', threshold=0.0001):
-    if mode == 'POSITIVE':
-        mode = 'POS'
-    elif mode == 'NEGATIVE':
-        mode = 'NEG'
-    elif mode == 'ALIGNED':
-        mode = 'ALIGN'
-    bpy.ops.mesh.select_axis(sign=mode, axis=axis, threshold=threshold)
-
-
-def get_addon_prefs():
-    return bpy.context.preferences.addons[func_package_utils.get_package_root()].preferences
 
 
 def remove_object(target: bpy.types.Object = None):
@@ -116,15 +147,25 @@ def remove_objects(targets=None):
         remove_object(target=obj)
 
 
-def update_mesh():
-    obj = get_active_object()
-    if obj.mode == 'OBJECT':
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.object.mode_set(mode='OBJECT')
-    else:
-        mode_cache = obj.mode
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.mode_set(mode=mode_cache)
+def get_selected_root_objects():
+    selected_objects = bpy.context.selected_objects
+    not_root = []
+    root_objects = []
+    for obj in selected_objects:
+        if obj in not_root:
+            continue
+        parent = obj
+        while True:
+            parent = parent.parent
+            print(parent)
+            if parent is None:
+                # 親以上のオブジェクトに選択中オブジェクトが存在しなければ、そのオブジェクトはrootとなる
+                root_objects.append(obj)
+                break
+            if parent in selected_objects:
+                not_root.append(parent)
+                break
+    return root_objects
 
 
 def duplicate_object(obj: bpy.types.Object):
@@ -138,3 +179,8 @@ def duplicate_object(obj: bpy.types.Object):
     select_objects(temp_objects, True)
     return result
 
+
+def set_object_name(obj, name):
+    obj.name = name
+    if obj.data:
+        obj.data.name = name

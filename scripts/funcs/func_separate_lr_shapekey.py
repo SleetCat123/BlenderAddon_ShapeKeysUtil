@@ -18,11 +18,12 @@
 
 import bpy
 from BlenderAddon_ShapeKeysUtil.scripts import consts
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_select_axis_from_point, func_utils
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_select_axis_from_point
+from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils, func_mesh_utils
 
 
 def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
-    obj = func_utils.get_active_object()
+    obj = func_object_utils.get_active_object()
     source_shape_key = obj.data.shape_keys.key_blocks[source_shape_key_index]
 
     # print("before: "+source_shape_key.name)
@@ -47,11 +48,11 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     func_select_axis_from_point.select_axis_from_point(point=point, mode='NEGATIVE', axis='X')
     # 中心位置を含ませないために選択範囲を反転する
     bpy.ops.mesh.select_all(action='INVERT')
-    func_utils.update_mesh()
+    func_mesh_utils.update_mesh()
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
     func_select_axis_from_point.select_axis_from_point(point=point, mode='ALIGNED', axis='X')
-    func_utils.update_mesh()
+    func_mesh_utils.update_mesh()
     if any([v.select for v in obj.data.vertices]):
         # 中心位置はシェイプを0.5でブレンド。
         # これをしないと、leftとright両方を同時に使ったときに中心位置の頂点が二倍動いてしまう
@@ -66,12 +67,12 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     right_shape.name = result_shape_key_name + "_right"
     func_select_axis_from_point.select_axis_from_point(point=point, mode='POSITIVE', axis='X')
     bpy.ops.mesh.select_all(action='INVERT')
-    func_utils.update_mesh()
+    func_mesh_utils.update_mesh()
     if any([v.select for v in obj.data.vertices]):
         print(any([v.select for v in obj.data.vertices]))
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
     func_select_axis_from_point.select_axis_from_point(point=point, mode='ALIGNED', axis='X')
-    func_utils.update_mesh()
+    func_mesh_utils.update_mesh()
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=0.5, add=False)
 
