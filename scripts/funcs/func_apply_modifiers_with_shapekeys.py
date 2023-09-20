@@ -167,6 +167,11 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             prev_obj_name = obj.name
 
             # 一気にjoin_shapesするとシェイプキーの順番がおかしくなるので1つずつ
+            # Armatureによる変形を無効化
+            for modifier in obj.modifiers:
+                if modifier.type == 'ARMATURE':
+                    modifier.show_viewport = False
+                    modifier.show_render = False
             func_object_utils.select_object(obj, True)
             print("Join: [{2}]({3}) -> [{0}]({1})".format(source_obj.name, str(len(source_obj.data.vertices)), obj.name,
                                                           str(vert_count)))
