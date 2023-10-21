@@ -151,6 +151,9 @@ def assign_object_group(group_name, assign=True):
             if obj.name in collection.objects:
                 # コレクションから外す
                 collection.objects.unlink(obj)
+                if not obj.users_collection:
+                    # 属しているコレクションが一つもなかったらシーンコレクションに所属させる
+                    bpy.context.scene.collection.objects.link(obj)
 
     if not collection.objects:
         # コレクションが空なら削除する
