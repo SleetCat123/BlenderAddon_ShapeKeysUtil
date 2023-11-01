@@ -27,7 +27,7 @@ def separate_shapekeys(
         duplicate: bool,
         enable_apply_modifiers: bool,
         remove_nonrender: bool = True,
-        remove_original_shapekeys: bool = True
+        keep_original_shapekeys: bool = False
 ):
     source_obj = func_object_utils.get_active_object()
     source_obj_name = source_obj.name
@@ -92,14 +92,14 @@ def separate_shapekeys(
 
         func_object_utils.select_object(dup_obj, False)
 
-    if remove_original_shapekeys:
+    if not keep_original_shapekeys:
         # 元オブジェクトのシェイプキーを全削除
         source_obj.shape_key_clear()
 
     func_object_utils.deselect_all_objects()
 
     if enable_apply_modifiers:
-        if not remove_original_shapekeys:
+        if not keep_original_shapekeys:
             func_object_utils.set_active_object(source_obj)
             func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
         for obj in separated_objects:

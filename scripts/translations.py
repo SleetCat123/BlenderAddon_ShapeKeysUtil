@@ -71,7 +71,7 @@ translations_dict = {
         ("*", assign_lr_shapekey_tag.bl_idname + DESC): "See \"Read-me.txt\"",
         ("*", assign_lr_shapekey_tag.bl_idname + "enable"): "Assign this shape key to separation target",
 
-        ("*", "verts_count_difference"): "Warn: vertices count has different:\n[{0}]({2}), [{1}]({3})",
+        ("*", "verts_count_difference"): "Warn: vertices count are different:\n[{0}]({2}), [{1}]({3})",
 
         # sideofactive_point
         ("*", sideofactive_point.bl_idname + DESC):

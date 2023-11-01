@@ -46,7 +46,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
     elif apply_as_shape_index != -1:
         # 2番目以降にApply as shape用のモディファイアがあったら
         # 一時オブジェクトを作成
-        tempobj = func_object_utils.duplicate_object(source_obj)
+        tempobj = func_object_utils.duplicate_object(source_obj, collection_mode='SCENE')
         func_object_utils.deselect_all_objects()
         func_object_utils.select_object(tempobj, True)
         print("duplicate: " + tempobj.name)
@@ -136,7 +136,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             duplicate=False,
             enable_apply_modifiers=True,
             remove_nonrender=remove_nonrender,
-            remove_original_shapekeys=True
+            keep_original_shapekeys=False
         )
 
         print("Source: " + source_obj.name)
@@ -158,7 +158,8 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             if vert_count != prev_vert_count:
                 warn = bpy.app.translations.pgettext("verts_count_difference").format(prev_obj_name, obj.name,
                                                                                       prev_vert_count, vert_count)
-                if self: self.report({'ERROR'}, warn)
+                if self:
+                    self.report({'ERROR'}, warn)
                 print("!!!!! " + warn + "!!!!!")
                 # 処理中オブジェクトを削除
                 func_object_utils.remove_objects(source_obj.children)

@@ -172,28 +172,64 @@ def get_selected_root_objects():
     return root_objects
 
 
-def duplicate_object(objects=None, linked: bool = False):
+def duplicate_object(
+        source=None,
+        linked: bool = False,
+        collection: bpy.types.Collection = None,
+        collection_mode='SET',
+):
+    if source is None:
+        source = bpy.context.selected_objects
+    print("Duplicate Source: " + str(source))
     deselect_all_objects()
-    if not objects:
-        objects = bpy.context.selected_objects
-    if objects is bpy.types.Object:
-        copied = objects.copy()
+    if type(source) == bpy.types.Object:
+        obj = source
+        copied = obj.copy()
         if not linked and copied.data:
             copied.data = copied.data.copy()
+
+        # コレクションにリンク
+        if collection and collection_mode == 'SET':
+            collection.objects.link(copied)
+        elif collection_mode == 'SCENE':
+            bpy.context.scene.collection.objects.link(copied)
+        else:
+            # メモ：users_collectionは検索処理が重いらしいので使わずに済む場所では回避したい
+            for co in obj.users_collection:
+                co.objects.link(copied)
+            if collection:
+                collection.objects.link(copied)
+        if collection:
+            collection.objects.link(copied)
+
         set_active_object(copied)
-        select_objects(copied, True)
+        select_object(copied, True)
         return copied
     else:
         active_obj = get_active_object()
-        set_active_object(None)
         result = []
-        for obj in objects:
+        for obj in source:
             copied = obj.copy()
             if not linked and copied.data:
                 copied.data = copied.data.copy()
+
+            # コレクションにリンク
+            if collection and collection_mode == 'SET':
+                collection.objects.link(copied)
+            elif collection_mode == 'SCENE':
+                bpy.context.scene.collection.objects.link(copied)
+            else:
+                # メモ：users_collectionは検索処理が重いらしいので使わずに済む場所では回避したい
+                for co in obj.users_collection:
+                    co.objects.link(copied)
+                if collection:
+                    collection.objects.link(copied)
+            if collection:
+                collection.objects.link(copied)
+
             if active_obj == obj:
                 set_active_object(copied)
-            select_objects(copied, True)
+            select_object(copied, True)
             result.append(obj)
         return result
 
