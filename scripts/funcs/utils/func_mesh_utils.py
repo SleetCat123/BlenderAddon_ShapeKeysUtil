@@ -34,10 +34,3 @@ def update_mesh():
     obj = func_object_utils.get_active_object()
     if obj and obj.data:
         obj.data.update()
-    # if obj.mode == 'OBJECT':
-    #     bpy.ops.object.mode_set(mode='EDIT')
-    #     bpy.ops.object.mode_set(mode='OBJECT')
-    # else:
-    #     mode_cache = obj.mode
-    #     bpy.ops.object.mode_set(mode='OBJECT')
-    #     bpy.ops.object.mode_set(mode=mode_cache)

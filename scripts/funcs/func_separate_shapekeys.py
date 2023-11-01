@@ -23,7 +23,12 @@ from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils, fu
 
 
 # シェイプキーをそれぞれ別のオブジェクトにする
-def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True):
+def separate_shapekeys(
+        duplicate: bool,
+        enable_apply_modifiers: bool,
+        remove_nonrender: bool = True,
+        remove_original_shapekeys: bool = True
+):
     source_obj = func_object_utils.get_active_object()
     source_obj_name = source_obj.name
 
@@ -32,7 +37,7 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
     if duplicate:
         func_object_utils.select_object(source_obj, True)
         func_object_utils.set_active_object(source_obj)
-        bpy.ops.object.duplicate()
+        func_object_utils.duplicate_object()
         source_obj = func_object_utils.get_active_object()
 
     source_obj_matrix_world_inverted = source_obj.matrix_world.inverted()
@@ -63,16 +68,11 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
                 func_object_utils.set_object_name(source_obj, new_name)
             continue
 
-        # オブジェクトを複製
-        func_object_utils.set_active_object(source_obj)
-        bpy.ops.object.duplicate()
-        dup_obj = func_object_utils.get_active_object()
-
-        # 元オブジェクトの子にする
+        # オブジェクトを複製し、元オブジェクトの子にする
         # bpy.ops.object.parent_setだと更新処理が走って重くなるのでLowLevelな方法を採用
+        dup_obj = func_object_utils.duplicate_object(source_obj)
         dup_obj.parent = source_obj
         dup_obj.matrix_parent_inverse = source_obj_matrix_world_inverted
-
         # シェイプキーの名前を設定
         func_object_utils.set_object_name(dup_obj, new_name)
 
@@ -92,14 +92,16 @@ def separate_shapekeys(duplicate, enable_apply_modifiers, remove_nonrender=True)
 
         func_object_utils.select_object(dup_obj, False)
 
-    # 元オブジェクトのシェイプキーを全削除
+    if remove_original_shapekeys:
+        # 元オブジェクトのシェイプキーを全削除
+        source_obj.shape_key_clear()
+
     func_object_utils.deselect_all_objects()
-    func_object_utils.select_object(source_obj, True)
-    func_object_utils.set_active_object(source_obj)
-    bpy.ops.object.shape_key_remove(all=True)
 
     if enable_apply_modifiers:
-        func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
+        if not remove_original_shapekeys:
+            func_object_utils.set_active_object(source_obj)
+            func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
         for obj in separated_objects:
             func_object_utils.set_active_object(obj)
             func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)

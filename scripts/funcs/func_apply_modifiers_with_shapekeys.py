@@ -132,8 +132,12 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             shapekey_name_and_values.append((shapekey.name, shapekey.value))
 
         # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
-        separated_objects = func_separate_shapekeys.separate_shapekeys(duplicate=False, enable_apply_modifiers=True,
-                                                                       remove_nonrender=remove_nonrender)
+        separated_objects = func_separate_shapekeys.separate_shapekeys(
+            duplicate=False,
+            enable_apply_modifiers=True,
+            remove_nonrender=remove_nonrender,
+            remove_original_shapekeys=True
+        )
 
         print("Source: " + source_obj.name)
         print("------ Merge Separated Objects ------\n" + '\n'.join(

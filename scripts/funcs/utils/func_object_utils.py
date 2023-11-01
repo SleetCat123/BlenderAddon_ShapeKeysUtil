@@ -64,20 +64,24 @@ def get_children_recursive(targets, only_current_view_layer: bool = True):
         for child in children:
             recursive(child)
 
+    if targets is bpy.types.Object:
+        targets = [targets]
     for obj in targets:
         recursive(obj)
     return result
 
 
-def select_children_recursive(targets=None):
+def select_children_recursive(targets=None, only_current_view_layer: bool = True):
     def recursive(t):
         select_object(t, True)
-        children = get_children_objects(t)
+        children = get_children_objects(obj=t, only_current_view_layer=only_current_view_layer)
         for child in children:
             recursive(child)
 
     if targets is None:
         targets = bpy.context.selected_objects
+    elif targets is bpy.types.Object:
+        targets = [targets]
     for obj in targets:
         recursive(obj)
 
@@ -168,16 +172,30 @@ def get_selected_root_objects():
     return root_objects
 
 
-def duplicate_object(obj: bpy.types.Object):
-    temp_objects = bpy.context.selected_objects
-    temp_active = get_active_object()
+def duplicate_object(objects=None, linked: bool = False):
     deselect_all_objects()
-    select_object(obj, True)
-    bpy.ops.object.duplicate()
-    result = get_active_object()
-    set_active_object(temp_active)
-    select_objects(temp_objects, True)
-    return result
+    if not objects:
+        objects = bpy.context.selected_objects
+    if objects is bpy.types.Object:
+        copied = objects.copy()
+        if not linked and copied.data:
+            copied.data = copied.data.copy()
+        set_active_object(copied)
+        select_objects(copied, True)
+        return copied
+    else:
+        active_obj = get_active_object()
+        set_active_object(None)
+        result = []
+        for obj in objects:
+            copied = obj.copy()
+            if not linked and copied.data:
+                copied.data = copied.data.copy()
+            if active_obj == obj:
+                set_active_object(copied)
+            select_objects(copied, True)
+            result.append(obj)
+        return result
 
 
 def set_object_name(obj, name):

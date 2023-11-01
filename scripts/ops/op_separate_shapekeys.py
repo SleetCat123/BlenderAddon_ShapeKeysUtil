@@ -29,12 +29,26 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
     bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
     bl_options = {'REGISTER', 'UNDO'}
 
-    duplicate: BoolProperty(name="Duplicate", default=False,
-                            description=bpy.app.translations.pgettext(bl_idname + "duplicate"))
-    apply_modifiers: BoolProperty(name="Apply Modifiers", default=False,
-                                  description=bpy.app.translations.pgettext(bl_idname + "apply_modifiers"))
-    remove_nonrender: BoolProperty(name="Remove NonRender", default=True,
-                                   description=bpy.app.translations.pgettext("remove_nonrender"))
+    duplicate: BoolProperty(
+        name="Duplicate",
+        default=False,
+        description=bpy.app.translations.pgettext(bl_idname + "duplicate")
+    )
+    apply_modifiers: BoolProperty(
+        name="Apply Modifiers",
+        default=False,
+        description=bpy.app.translations.pgettext(bl_idname + "apply_modifiers")
+    )
+    remove_nonrender: BoolProperty(
+        name="Remove NonRender",
+        default=True,
+        description=bpy.app.translations.pgettext("remove_nonrender")
+    )
+    remove_original_shapekeys: BoolProperty(
+        name="Remove Original Shapekeys",
+        default=True,
+        description=bpy.app.translations.pgettext("remove_original_shapekeys")
+    )
 
     @classmethod
     def poll(cls, context):
@@ -53,7 +67,12 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
         func_object_utils.set_active_object(source_obj)
 
         # シェイプキーをそれぞれ別オブジェクトにする
-        func_separate_shapekeys.separate_shapekeys(self.duplicate, self.apply_modifiers, self.remove_nonrender)
+        func_separate_shapekeys.separate_shapekeys(
+            duplicate=self.duplicate,
+            enable_apply_modifiers=self.apply_modifiers,
+            remove_nonrender=self.remove_nonrender,
+            remove_original_shapekeys=self.remove_original_shapekeys
+        )
 
         return {'FINISHED'}
 
