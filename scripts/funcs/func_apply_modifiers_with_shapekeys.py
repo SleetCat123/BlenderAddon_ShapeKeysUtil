@@ -46,7 +46,7 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
     elif apply_as_shape_index != -1:
         # 2番目以降にApply as shape用のモディファイアがあったら
         # 一時オブジェクトを作成
-        tempobj = func_object_utils.duplicate_object(source_obj, collection_mode='SCENE')
+        tempobj = func_object_utils.duplicate_object(source_obj)
         func_object_utils.deselect_all_objects()
         func_object_utils.select_object(tempobj, True)
         print("duplicate: " + tempobj.name)
