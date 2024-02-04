@@ -141,6 +141,7 @@ def assign_object_group(group_name, assign=True):
 
     active = func_object_utils.get_active_object()
     targets = bpy.context.selected_objects
+    targets.append(active)
     for obj in targets:
         if assign:
             func_object_utils.set_active_object(obj)
@@ -168,3 +169,11 @@ def hide_collection(context, group_name, hide=True):
     layer_col = find_layer_collection(group_name)
     if layer_col:
         layer_col.hide_viewport = hide
+
+def get_root_objects(collection):
+    result = []
+    for obj in collection.objects:
+        # 親が無いか、Collectionに属していないオブジェクトを取得
+        if (obj.parent is None) or (obj.parent.name not in collection.objects):
+            result.append(obj)
+    return result

@@ -44,10 +44,10 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
         default=True,
         description=bpy.app.translations.pgettext("remove_nonrender")
     )
-    remove_original_shapekeys: BoolProperty(
-        name="Remove Original Shapekeys",
-        default=True,
-        description=bpy.app.translations.pgettext("remove_original_shapekeys")
+    keep_original_shapekeys: BoolProperty(
+        name="Keep Original Shapekeys",
+        default=False,
+        description=bpy.app.translations.pgettext("keep_original_shapekeys")
     )
 
     @classmethod
@@ -71,7 +71,7 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
             duplicate=self.duplicate,
             enable_apply_modifiers=self.apply_modifiers,
             remove_nonrender=self.remove_nonrender,
-            remove_original_shapekeys=self.remove_original_shapekeys
+            keep_original_shapekeys=self.keep_original_shapekeys
         )
 
         return {'FINISHED'}

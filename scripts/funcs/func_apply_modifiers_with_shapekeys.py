@@ -188,6 +188,8 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
         # 使い終わったオブジェクトを削除
         func_object_utils.remove_objects(shape_objects)
 
+        print(shapekey_name_and_values)
+        print([v.name for v in source_obj.data.shape_keys.key_blocks])
         # シェイプキーの名前と数値を復元
         source_obj.active_shape_key_index = active_shape_key_index
         for i, shapekey in enumerate(source_obj.data.shape_keys.key_blocks):
