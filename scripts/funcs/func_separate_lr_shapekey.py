@@ -82,9 +82,10 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
 
     if enable_sort:
         # 分割したシェイプキーが分割元シェイプキーのすぐ下に来るように移動
-        left_shape = func_shapekey_utils.move_shape_key(left_shape_index, source_shape_key_index + 1)
-        right_shape = func_shapekey_utils.move_shape_key(right_shape_index, source_shape_key_index + 2)
-        #source_shape_key_index += 1
+        moved_shapekeys = func_shapekey_utils.move_shape_key(left_shape_index, source_shape_key_index + 1, length=2)
+        if moved_shapekeys is not None:
+            left_shape = moved_shapekeys[0]
+            right_shape =  moved_shapekeys[1]
 
     # 左右分割後のシェイプキーに分割元シェイプキーのvalueをコピー
     left_shape.value = source_shape_key.value

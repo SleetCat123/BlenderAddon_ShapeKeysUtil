@@ -70,32 +70,51 @@ def set_shape_key_props_from_dict(shapekey, props: dict):
         v.co = co[i]
 
 
-def move_shape_key(source_index: int, dest_index: int):
+def move_shape_key(source_index: int, dest_index: int, length: int = 1):
     if source_index == dest_index:
-        return
+        return None 
+    if length < 1:
+        raise ValueError("length must be 1 or more")
     obj = func_object_utils.get_active_object()
     key_blocks = obj.data.shape_keys.key_blocks
-    source_shapekey = key_blocks[source_index]
-    source_shapekey_props = shape_key_props_to_dict(source_shapekey)
-    print(f"source_shapekey_props: {source_shapekey_props}")
+    source_shapekey_props_list = []
+    for i in range(source_index, source_index + length):
+        source_shapekey = key_blocks[i]
+        source_shapekey_props = shape_key_props_to_dict(source_shapekey)
+        source_shapekey.name += "%temp%"
+        source_shapekey_props_list.append(source_shapekey_props)
+    #print(f"source_shapekey_props: {source_shapekey_props}")
     if source_index < dest_index:
-        # source+1～destのシェイプキーを一つ前にずらす
+        #print("source_index < dest_index")
+        #print([shape.name for shape in key_blocks])
+        # source+1～destのシェイプキーをn個前にずらす
         for i in range(source_index + 1, dest_index):
             this_shapekey = key_blocks[i]
             this_shapekey_props = shape_key_props_to_dict(this_shapekey)
-            prev_shapekey = key_blocks[i - 1]
+            this_shapekey.name += "%temp%"
+            prev_shapekey = key_blocks[i - length]
             set_shape_key_props_from_dict(prev_shapekey, this_shapekey_props)
+            #print([shape.name for shape in key_blocks])
     else:
-        # dest+1～sourceのシェイプキーを一つ後ろにずらす
+        #print("source_index > dest_index")
+        #print([shape.name for shape in key_blocks])
+        # dest～sourceのシェイプキーをn個後ろにずらす
         for i in reversed(range(dest_index, source_index)):
             this_shapekey = key_blocks[i]
             this_shapekey_props = shape_key_props_to_dict(this_shapekey)
-            next_shapekey = key_blocks[i + 1]
+            this_shapekey.name += "%temp%"
+            next_shapekey = key_blocks[i + length]
             set_shape_key_props_from_dict(next_shapekey, this_shapekey_props)
+            #print([shape.name for shape in key_blocks])
     # sourceのシェイプキーをdestに移動
-    dest_shapekey = key_blocks[dest_index]
-    set_shape_key_props_from_dict(dest_shapekey, source_shapekey_props)
-    return dest_shapekey
+    dest_shapekeys = []
+    for i, source_shapekey_props in enumerate(source_shapekey_props_list):
+        dest_shapekey = key_blocks[dest_index + i]
+        #print(f"dest_shapekey: {dest_shapekey.name}")
+        set_shape_key_props_from_dict(dest_shapekey, source_shapekey_props)
+        dest_shapekeys.append(dest_shapekey)
+        #print([shape.name for shape in key_blocks])
+    return dest_shapekeys
 
 
 
