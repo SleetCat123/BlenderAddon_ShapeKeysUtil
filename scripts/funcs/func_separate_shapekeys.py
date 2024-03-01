@@ -18,8 +18,8 @@
 
 import bpy
 import time
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_apply_modifiers
-from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils, func_mesh_utils, func_package_utils
+from . import func_apply_modifiers, func_shapekey_utils
+from .utils import func_object_utils, func_mesh_utils, func_package_utils
 
 
 # シェイプキーをそれぞれ別のオブジェクトにする
@@ -73,20 +73,10 @@ def separate_shapekeys(
         dup_obj = func_object_utils.duplicate_object(source_obj)
         dup_obj.parent = source_obj
         dup_obj.matrix_parent_inverse = source_obj_matrix_world_inverted
-        # シェイプキーの名前を設定
+        # シェイプキーの名前をオブジェクト名として設定
         func_object_utils.set_object_name(dup_obj, new_name)
-
-        # シェイプキーをsource_objからdup_objにコピー
-        func_object_utils.select_object(source_obj, True)
-        source_obj.active_shape_key_index = i
-        # shapekey = source_obj.data.shape_keys.key_blocks[i]
-        shapekey.value = 1
-        dup_obj.shape_key_clear()
-        bpy.ops.object.shape_key_transfer()
-
-        # シェイプキーを削除し形状を固定
-        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0])  # Basisを消す
-        dup_obj.shape_key_remove(dup_obj.data.shape_keys.key_blocks[0])  # 固定するシェイプキーを消す
+        # シェイプキーの形状を固定
+        func_shapekey_utils.bake_shape_key(shapekey.name)
 
         separated_objects.append(dup_obj)
 
