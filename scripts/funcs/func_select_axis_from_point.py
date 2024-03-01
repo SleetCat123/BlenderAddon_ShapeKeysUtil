@@ -28,23 +28,44 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
         return
 
     bpy.ops.object.mode_set(mode='EDIT')
-    me = obj.data
-    bm = bmesh.from_edit_mesh(me)
+    bm = bmesh.from_edit_mesh(obj.data)
 
     # 頂点選択を有効化
     temp_select_mode = bm.select_mode
     bm.select_mode = {'VERT'}
 
-    bpy.ops.mesh.select_all(action='DESELECT')
-    # 一時的に頂点を追加し、それを基準にSide of Activeを使う
-    v = bm.verts.new(point)
-    func_object_utils.select_object(v, True)
-    bm.select_history.add(v)
-    func_mesh_utils.select_axis(mode=mode, axis=axis, threshold=threshold)
-    # 追加した頂点を削除
-    bmesh.ops.delete(bm, geom=[v], context='VERTS')
+    axis_index = 0
+    if axis == 'X':
+        axis_index = 0
+    elif axis == 'Y':
+        axis_index = 1
+    elif axis == 'Z':
+        axis_index = 2
 
+    point = [point[0], point[1], point[2]]
+    if mode == 'POSITIVE':
+        point[axis_index] += -threshold
+        for v in bm.verts:
+            if v.co[axis_index] >= point[axis_index]:
+                v.select = True
+            else:
+                v.select = False
+    elif mode == 'NEGATIVE':
+        point[axis_index] += threshold
+        for v in bm.verts:
+            if v.co[axis_index] <= point[axis_index]:
+                v.select = True
+            else:
+                v.select = False
+    elif mode == 'ALIGNED':
+        for v in bm.verts:
+            if (
+                point[axis_index] - threshold <= v.co[axis_index] 
+                and
+                v.co[axis_index] <= point[axis_index] + threshold
+            ):
+                v.select = True
+            else:
+                v.select = False
     bm.select_mode = temp_select_mode
-
-    bmesh.update_edit_mesh(mesh=me, loop_triangles=False, destructive=True)
-    # bpy.ops.object.mode_set(mode='OBJECT')
+    obj.data.update()
