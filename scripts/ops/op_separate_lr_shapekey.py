@@ -48,7 +48,7 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
         bpy.ops.mesh.reveal()
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        func_separate_lr_shapekey.separate_lr_shapekey(soruce_shape_key_index=obj.active_shape_key_index,
+        func_separate_lr_shapekey.separate_lr_shapekey(source_shape_key_index=obj.active_shape_key_index,
                                                        duplicate=self.duplicate, enable_sort=self.enable_sort)
         return {'FINISHED'}
 
