@@ -82,10 +82,26 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
 
     if enable_sort:
         # 分割したシェイプキーが分割元シェイプキーのすぐ下に来るように移動
-        moved_shapekeys = func_shapekey_utils.move_shape_key(left_shape_index, source_shape_key_index + 1, length=2)
-        if moved_shapekeys is not None:
-            left_shape = moved_shapekeys[0]
-            right_shape =  moved_shapekeys[1]
+        length = len(obj.data.shape_keys.key_blocks)
+        if length * 0.5 <= source_shape_key_index:
+            # print("Bottom to Top")
+            obj.active_shape_key_index = left_shape_index
+            while source_shape_key_index + 1 != obj.active_shape_key_index:
+                bpy.ops.object.shape_key_move(type='UP')
+            obj.active_shape_key_index = right_shape_index
+            while source_shape_key_index + 2 != obj.active_shape_key_index:
+                bpy.ops.object.shape_key_move(type='UP')
+        else:
+            # 移動先の位置が上から数えたほうが早いとき
+            # print("Top to Bottom")
+            obj.active_shape_key_index = left_shape_index
+            bpy.ops.object.shape_key_move(type='TOP')
+            while source_shape_key_index + 1 != obj.active_shape_key_index:
+                bpy.ops.object.shape_key_move(type='DOWN')
+            obj.active_shape_key_index = right_shape_index
+            bpy.ops.object.shape_key_move(type='TOP')
+            while source_shape_key_index + 2 != obj.active_shape_key_index:
+                bpy.ops.object.shape_key_move(type='DOWN')
 
     # 左右分割後のシェイプキーに分割元シェイプキーのvalueをコピー
     left_shape.value = source_shape_key.value
