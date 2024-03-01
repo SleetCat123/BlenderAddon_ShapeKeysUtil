@@ -30,10 +30,6 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
     bpy.ops.object.mode_set(mode='EDIT')
     bm = bmesh.from_edit_mesh(obj.data)
 
-    # 頂点選択を有効化
-    temp_select_mode = bm.select_mode
-    bm.select_mode = {'VERT'}
-
     axis_index = 0
     if axis == 'X':
         axis_index = 0
@@ -41,6 +37,8 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
         axis_index = 1
     elif axis == 'Z':
         axis_index = 2
+    else:
+        raise ValueError('axis must be [X, Y, Z]')
 
     point = [point[0], point[1], point[2]]
     if mode == 'POSITIVE':
@@ -67,5 +65,7 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
                 v.select = True
             else:
                 v.select = False
-    bm.select_mode = temp_select_mode
+    else:
+        raise ValueError('mode must be [POSITIVE, NEGATIVE, ALIGNED]')
+    bm.select_flush_mode()
     obj.data.update()

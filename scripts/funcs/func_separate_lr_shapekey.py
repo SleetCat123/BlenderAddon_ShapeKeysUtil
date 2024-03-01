@@ -18,7 +18,7 @@
 
 import bpy
 from BlenderAddon_ShapeKeysUtil.scripts import consts
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_select_axis_from_point
+from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_select_axis_from_point, func_shapekey_utils
 from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils, func_mesh_utils
 
 
@@ -33,30 +33,28 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     result_shape_key_name = source_shape_key.name
     # print("after: "+source_shape_key.name)
 
-    point = (0, 0, 0)
-
-    # この後で行う選択範囲反転を正常に処理するため、頂点選択だけが有効になるようにしておく
-    # temp_mesh_select_mode = bpy.context.tool_settings.mesh_select_mode
-    bpy.context.tool_settings.mesh_select_mode = (True, False, False)
-
     # 左
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.shape_key_add(from_mix=False)
     left_shape_index = obj.active_shape_key_index
     left_shape = obj.data.shape_keys.key_blocks[left_shape_index]
     left_shape.name = result_shape_key_name + "_left"
-    func_select_axis_from_point.select_axis_from_point(point=point, mode='NEGATIVE', axis='X')
-    # 中心位置を含ませないために選択範囲を反転する
-    bpy.ops.mesh.select_all(action='INVERT')
-    func_mesh_utils.update_mesh()
+    func_select_axis_from_point.select_axis_from_point(
+        point=(0, 0, 0),
+        mode='NEGATIVE', 
+        axis='X', 
+        )
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
-    func_select_axis_from_point.select_axis_from_point(point=point, mode='ALIGNED', axis='X')
-    func_mesh_utils.update_mesh()
+    func_select_axis_from_point.select_axis_from_point(
+        point=(0, 0, 0), 
+        mode='ALIGNED',
+        axis='X'
+        )
     if any([v.select for v in obj.data.vertices]):
         # 中心位置はシェイプを0.5でブレンド。
         # これをしないと、leftとright両方を同時に使ったときに中心位置の頂点が二倍動いてしまう
-        bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=0.5, add=False)
+        bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=-0.5, add=True)
 
     # 右
     # 参照する座標の正負が逆なの以外、やってることは左と同じ
@@ -65,16 +63,20 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     right_shape_index = obj.active_shape_key_index
     right_shape = obj.data.shape_keys.key_blocks[right_shape_index]
     right_shape.name = result_shape_key_name + "_right"
-    func_select_axis_from_point.select_axis_from_point(point=point, mode='POSITIVE', axis='X')
-    bpy.ops.mesh.select_all(action='INVERT')
-    func_mesh_utils.update_mesh()
+    func_select_axis_from_point.select_axis_from_point(
+        point=(0, 0, 0), 
+        mode='POSITIVE', 
+        axis='X', 
+        )
     if any([v.select for v in obj.data.vertices]):
-        print(any([v.select for v in obj.data.vertices]))
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
-    func_select_axis_from_point.select_axis_from_point(point=point, mode='ALIGNED', axis='X')
-    func_mesh_utils.update_mesh()
+    func_select_axis_from_point.select_axis_from_point(
+        point=(0, 0, 0), 
+        mode='ALIGNED', 
+        axis='X'
+        )
     if any([v.select for v in obj.data.vertices]):
-        bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=0.5, add=False)
+        bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=-0.5, add=True)
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
