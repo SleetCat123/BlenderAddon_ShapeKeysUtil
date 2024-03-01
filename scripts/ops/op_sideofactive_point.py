@@ -52,8 +52,8 @@ class MESH_OT_specials_shapekeys_util_sideofactive_point(bpy.types.Operator):
 
     threshold: FloatProperty(
         name="Threshold",
-        min=0.000001, max=50.0,
-        soft_min=0.00001, soft_max=10.0,
+        min=-50, max=50.0,
+        soft_min=-10, soft_max=10.0,
         default=0.0001,
     )
 
