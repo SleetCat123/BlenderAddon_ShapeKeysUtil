@@ -34,12 +34,8 @@ def apply_as_shapekey(modifier):
         already_exists_index = func_shapekey_utils.get_shape_key_index(obj, shape_name)
         if already_exists_index == -1:
             if not obj.data.shape_keys and shape_name == 'Basis':
-                # シェイプキーが存在せず、新規シェイプキー名がBasisの場合はBasisを上書きする
-                print(f"override Basis shapekey: {shape_name}")
-                # Apply As Shape
-                bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier.name)
-                obj.shape_key_remove(obj.data.shape_keys.key_blocks[0])
-                obj.data.shape_keys.key_blocks[0].name = shape_name
+                # シェイプキーが存在せず、新規シェイプキー名がBasisの場合は通常のモディファイア適用
+                bpy.ops.object.modifier_apply(modifier=modifier.name)
             else:
                 print(f"add shapekey: {shape_name}")
                 # Apply As Shape
