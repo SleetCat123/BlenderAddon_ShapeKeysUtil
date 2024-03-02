@@ -15,22 +15,36 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
+import bpy
 from ..funcs.utils import func_object_utils
 
 
-# 指定されたシェイプキーの形状を適用する。他のシェイプキーは削除される
+def get_shape_key_index(shape_name:str):
+    obj = func_object_utils.get_active_object()
+    return get_shape_key_index(obj, shape_name)
+
+def get_shape_key_index(obj: bpy.types.Object, shape_name:str):
+    if not obj.data.shape_keys:
+        return -1
+    key_blocks = obj.data.shape_keys.key_blocks
+    for i, shapekey in enumerate(key_blocks):
+        if shapekey.name == shape_name:
+            return i
+    return -1
+
+
 def bake_shape_key(shape_name: str):
     obj = func_object_utils.get_active_object()
-    key_blocks = obj.data.shape_keys.key_blocks
-    target_shapekey = None
-    # シェイプキーを検索
-    for shapekey in key_blocks:
-        if shapekey.name == shape_name:
-            shapekey.value = 1
-            target_shapekey = shapekey
-            break
-    if target_shapekey is None:
+    shape_index = get_shape_key_index(obj, shape_name)
+    if shape_index == -1:
         raise ValueError(f"shape_name not found: {shape_name}")
+    bake_shape_key(shape_index)
+
+# 指定されたシェイプキーの形状を適用する。他のシェイプキーは削除される
+def bake_shape_key(shape_index: int):
+    obj = func_object_utils.get_active_object()
+    key_blocks = obj.data.shape_keys.key_blocks
+    target_shapekey = key_blocks[shape_index]
     
     # シェイプキーの頂点座標を適用
     shape_co = [v.co for v in target_shapekey.data]
