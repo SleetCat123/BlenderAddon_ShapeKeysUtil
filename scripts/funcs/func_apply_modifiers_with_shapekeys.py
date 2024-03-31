@@ -94,6 +94,8 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
     if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks) == 1:
         # Basisしかなければシェイプキー削除
         print("remove basis: " + source_obj.name)
+        # 0番目のシェイプキーをアクティブにする（これが無いとエラーが出る場合がある）
+        source_obj.active_shape_key_index = 0
         bpy.ops.object.shape_key_remove(all=True)
 
     if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
