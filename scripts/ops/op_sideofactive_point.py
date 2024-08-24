@@ -18,14 +18,13 @@
 
 import bpy
 from bpy.props import FloatVectorProperty, EnumProperty, FloatProperty
-from .. import consts
 from ..funcs import func_select_axis_from_point
 
 
 class MESH_OT_specials_shapekeys_util_sideofactive_point(bpy.types.Operator):
     bl_idname = "edit_mesh.shapekeys_util_sideofactive_point"
     bl_label = "Select Side of Active from Point"
-    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
+    bl_description = "Performs a select Side of Active based on the specified coordinates"
     bl_options = {'REGISTER', 'UNDO'}
 
     point: FloatVectorProperty(name="Point")
@@ -68,9 +67,18 @@ class MESH_OT_specials_shapekeys_util_sideofactive_point(bpy.types.Operator):
         return {'FINISHED'}
 
 
+translations_dict = {
+    "ja_JP": {
+        ("*", "Performs a select Side of Active based on the specified coordinates"): "指定した座標を基準にSelect Side of activeを実行します",
+    },
+}
+
+
 def register():
     bpy.utils.register_class(MESH_OT_specials_shapekeys_util_sideofactive_point)
+    bpy.app.translations.register(__name__, translations_dict)
 
 
 def unregister():
     bpy.utils.unregister_class(MESH_OT_specials_shapekeys_util_sideofactive_point)
+    bpy.app.translations.unregister(__name__)

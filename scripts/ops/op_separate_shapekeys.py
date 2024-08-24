@@ -18,7 +18,6 @@
 
 import bpy
 from bpy.props import BoolProperty
-from .. import consts
 from ..funcs import func_separate_shapekeys
 from ..funcs.utils import func_object_utils
 
@@ -26,28 +25,28 @@ from ..funcs.utils import func_object_utils
 class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_shapekeys_to_objects"
     bl_label = "Separate Objects"
-    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
+    bl_description = "Separate objects for each shape keys.\nWarning: It may take a while"
     bl_options = {'REGISTER', 'UNDO'}
 
-    duplicate: BoolProperty(
-        name="Duplicate",
+    keep_original: BoolProperty(
+        name="Keep Original",
         default=False,
-        description=bpy.app.translations.pgettext(bl_idname + "duplicate")
+        description="Execute the function on the copied object"
     )
     apply_modifiers: BoolProperty(
         name="Apply Modifiers",
         default=False,
-        description=bpy.app.translations.pgettext(bl_idname + "apply_modifiers")
+        description="Apply modifiers after separation"
     )
     remove_nonrender: BoolProperty(
-        name="Remove NonRender",
+        name="Remove Non-Render Modifiers",
         default=True,
-        description=bpy.app.translations.pgettext("remove_nonrender")
+        description="A non-render modifier will be removed."
     )
     keep_original_shapekeys: BoolProperty(
         name="Keep Original Shapekeys",
         default=False,
-        description=bpy.app.translations.pgettext("keep_original_shapekeys")
+        description="Keep the original shape keys"
     )
 
     @classmethod
@@ -68,7 +67,7 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
 
         # シェイプキーをそれぞれ別オブジェクトにする
         func_separate_shapekeys.separate_shapekeys(
-            duplicate=self.duplicate,
+            duplicate=self.keep_original,
             enable_apply_modifiers=self.apply_modifiers,
             remove_nonrender=self.remove_nonrender,
             keep_original_shapekeys=self.keep_original_shapekeys
@@ -77,9 +76,28 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
         return {'FINISHED'}
 
 
+translations_dict = {
+    "ja_JP": {
+        ("*", "Separate objects for each shape keys.\nWarning: It may take a while"):
+            "シェイプキーをそれぞれ別オブジェクトにします。\n注意：少し時間がかかります",
+        ("*", "Keep Original"): "元のオブジェクトを残す",
+        ("*", "Execute the function on the copied object"): "分割前のオブジェクトを残します",
+        ("*", "Apply Modifiers"): "モディファイア適用",
+        ("*", "Apply modifiers after separation"): "分割後にオブジェクトのモディファイアを適用します",
+        ("*", "Remove Non-Render Modifiers"): "レンダリング無効は削除",
+        ("*", "A non-render modifier will be removed."):
+            "レンダリング無効化状態のモディファイア\n（モディファイア一覧でカメラアイコンが押されていない）\nを削除します。",
+        ("*", "Keep Original Shapekeys"): "元のシェイプキーを残す",
+        ("*", "Keep the original shape keys"): "分割前のシェイプキーを残します",
+    },
+}
+
+
 def register():
     bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects)
+    bpy.app.translations.register(__name__, translations_dict)
 
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects)
+    bpy.app.translations.unregister(__name__)

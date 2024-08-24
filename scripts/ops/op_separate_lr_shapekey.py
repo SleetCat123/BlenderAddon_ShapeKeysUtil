@@ -18,7 +18,6 @@
 
 import bpy
 from bpy.props import BoolProperty
-from .. import consts
 from ..funcs import func_separate_lr_shapekey
 from ..funcs.utils import func_object_utils
 
@@ -26,13 +25,19 @@ from ..funcs.utils import func_object_utils
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_separate_lr_shapekey"
     bl_label = "Separate Shape Key Left and Right"
-    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
+    bl_description = "A selected shape key separate left and right based on object origin."
     bl_options = {'REGISTER', 'UNDO'}
 
-    duplicate: BoolProperty(name="Duplicate", default=False,
-                            description=bpy.app.translations.pgettext(bl_idname + "duplicate"))
-    enable_sort: BoolProperty(name="Enable Sort", default=True,
-                              description=bpy.app.translations.pgettext(bl_idname + "enable_sort"))
+    keep_original: BoolProperty(
+        name="Keep Original",
+        default=False,
+        description="Keep the shape key before the left-right split"
+    )
+    enable_sort: BoolProperty(
+        name="Enable Sort",
+        default=True,
+        description="Result shape keys move to below target shape key"
+    )
 
     @classmethod
     def poll(cls, context):
@@ -48,14 +53,32 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
         bpy.ops.mesh.reveal()
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        func_separate_lr_shapekey.separate_lr_shapekey(source_shape_key_index=obj.active_shape_key_index,
-                                                       duplicate=self.duplicate, enable_sort=self.enable_sort)
+        func_separate_lr_shapekey.separate_lr_shapekey(
+            source_shape_key_index=obj.active_shape_key_index,
+            duplicate=self.keep_original, 
+            enable_sort=self.enable_sort
+            )
         return {'FINISHED'}
+
+
+translations_dict = {
+    "ja_JP": {
+        ( "*", "A selected shape key separate left and right based on object origin." ): "現在のシェイプキーを\nオブジェクト原点基準で左右別々のシェイプキーにします",
+        ( "*", "Keep Original" ): "元のシェイプキーを残す",
+        ( "*", "Keep the shape key before the left-right split" ): "左右分割前のシェイプキーを残します。\n"
+        "注意：左右分割する前とした後のシェイプキーを同時に有効化するとモデルが意図しない見た目になる可能性があります。\n"
+        "（シェイプキーが二重にかかるため）",
+        ( "*", "Enable Sort" ): "分割後の並び替え",
+        ( "*", "Result shape keys move to below target shape key" ): "左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します",
+    },
+}
 
 
 def register():
     bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey)
+    bpy.app.translations.register(__name__, translations_dict)
 
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey)
+    bpy.app.translations.unregister(__name__)

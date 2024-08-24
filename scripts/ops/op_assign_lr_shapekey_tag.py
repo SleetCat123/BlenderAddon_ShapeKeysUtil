@@ -24,14 +24,21 @@ from .. import consts
 class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_assign_lr_shapekey_tag"
     bl_label = "Assign Tag"
-    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
+    bl_description = "Assign or remove the tag for \"(Tag) Separate All Shape Key Left and Right\""
     bl_options = {'REGISTER', 'UNDO'}
 
-    enable: BoolProperty(name="Enable", description=bpy.app.translations.pgettext(bl_idname + "enable"))
-    duplicate: BoolProperty(name="Duplicate",
-                            description=bpy.app.translations.pgettext("separate_lr_shapekey_duplicate"))
-    enable_sort: BoolProperty(name="Enable Sort",
-                              description=bpy.app.translations.pgettext("separate_lr_shapekey_all_enable_sort"))
+    enable: BoolProperty(
+        name="Enable",
+        description="Assign this shape key to separation target"
+    )
+    keep_original: BoolProperty(
+        name="Keep Orignal",
+        description="Keep the shape key before the left-right split"
+    )
+    enable_sort: BoolProperty(
+        name="Enable Sort",
+        description="Move the result shape keys to below target shape key"
+    )
 
     target_name = ""
     target_shape_name = ""
@@ -56,18 +63,19 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
         self.target_shape_name = shapekey.name
 
         self.enable = shapekey.name.find(consts.ENABLE_LR_TAG) != -1
-        self.duplicate = shapekey.name.find(consts.ENABLE_DUPLICATE_TAG) != -1
+        self.keep_original = shapekey.name.find(consts.ENABLE_DUPLICATE_TAG) != -1
         self.enable_sort = shapekey.name.find(consts.ENABLE_SORT_TAG) != -1
         return self.execute(context)
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Target: " + self.target_name)
-        layout.label(text="Shape: " + self.target_shape_name)
+        idname = OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname
+        layout.label(text=bpy.app.translations.pgettext("target_object").format(self.target_name))
+        layout.label(text=bpy.app.translations.pgettext("target_shape").format(self.target_shape_name))
         layout.prop(self, "enable")
         col = layout.column()
         col.enabled = self.enable
-        col.prop(self, "duplicate")
+        col.prop(self, "keep_original")
         col.prop(self, "enable_sort")
 
     def execute(self, context):
@@ -80,7 +88,7 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
         else:
             shapekey.name = shapekey.name.replace(consts.ENABLE_LR_TAG, '')
 
-        if self.enable and self.duplicate:
+        if self.enable and self.keep_original:
             if shapekey.name.find(consts.ENABLE_DUPLICATE_TAG) == -1:
                 shapekey.name += consts.ENABLE_DUPLICATE_TAG
         else:
@@ -95,9 +103,35 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
         return {'FINISHED'}
 
 
+translations_dict = {
+    "en_US": {
+        ("*", "target_object"): "Object: {}",
+        ("*", "target_shape"): "Shape: {}",
+    },
+
+    "ja_JP": {
+        ("*", "target_object"): "オブジェクト: {}",
+        ("*", "target_shape"): "シェイプキー: {}",
+
+        ("*", "Assign or remove the tag for \"(Tag) Separate All Shape Key Left and Right\""):
+            "現在のシェイプキーに対し、\"(Tag) Separate All Shape Key Left and Right\" の処理用テキストを追加／削除します",
+        ("*", "Enable"): "有効",
+        ("*", "Assign this shape key to separation target"): "シェイプキーを左右分割処理の対象とします",
+        ("*", "Keep Orignal"): "元のシェイプキーを残す",
+        ("*", "Keep the shape key before the left-right split"): "左右分割前のシェイプキーを残します",
+        ("*", "Enable Sort"): "分割後の並び替え",
+        ("*", "Move the result shape keys to below target shape key"): "左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します",
+    },
+}
+
+
 def register():
     bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag)
+    bpy.app.translations.register(__name__, translations_dict)
+
 
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag)
+    bpy.app.translations.unregister(__name__)
+

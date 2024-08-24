@@ -17,7 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .. import consts
 from ..funcs import func_separate_lr_shapekey_all
 from ..funcs.utils import func_object_utils
 
@@ -25,7 +24,7 @@ from ..funcs.utils import func_object_utils
 class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_separate_lr_shapekey_all_tag_detect"
     bl_label = "(Tag) Separate All Shape Key Left and Right"
-    bl_description = bpy.app.translations.pgettext(bl_idname + consts.DESC)
+    bl_description = "Separate shape keys with '%LR%' tag into left and right.\nApply Mirror modifier before use.\n\nAdditional tags:\n'%D%' to keep original\n'%S%' to sort below original.\nWarning: Sorting may take time for many shape keys.\n\nControl tags are removed from result shape key names"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -40,9 +39,19 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.
         return {'FINISHED'}
 
 
+translations_dict = {
+    "ja_JP": {
+        ( "*", "Separate shape keys with '%LR%' tag into left and right.\nApply Mirror modifier before use.\n\nAdditional tags:\n'%D%' to keep original\n'%S%' to sort below original.\nWarning: Sorting may take time for many shape keys.\n\nControl tags are removed from result shape key names" ):
+            "'%LR%'タグの付いたシェイプキーを左右に分割します。\n使用前にミラーモディファイアを適用してください。\n\n追加タグ：\n'%D%'で元のキーを保持\n'%S%'で分割後のキーを元のキーの下に移動。\n注：シェイプキー数が多い場合、ソートに時間がかかる可能性があります。\n\n制御用タグは結果のシェイプキー名から削除されます",
+    },
+}
+
+
 def register():
     bpy.utils.register_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect)
+    bpy.app.translations.register(__name__, translations_dict)
 
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect)
+    bpy.app.translations.unregister(__name__)
