@@ -28,6 +28,8 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
         return
 
     bpy.ops.object.mode_set(mode='EDIT')
+    temp_mesh_select_mode = bpy.context.tool_settings.mesh_select_mode 
+    bpy.context.tool_settings.mesh_select_mode  = (True, False, False)
     bm = bmesh.from_edit_mesh(obj.data)
 
     axis_index = 0
@@ -68,4 +70,10 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
     else:
         raise ValueError('mode must be [POSITIVE, NEGATIVE, ALIGNED]')
     bm.select_flush_mode()
-    obj.data.update()
+    # bmesh.update_edit_mesh(obj.data)
+    obj.update_from_editmode()
+    bpy.context.tool_settings.mesh_select_mode  = temp_mesh_select_mode
+    bm.free()
+    del bm
+
+
