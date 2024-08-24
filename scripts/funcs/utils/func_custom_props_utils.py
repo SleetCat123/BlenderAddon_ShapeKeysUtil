@@ -59,3 +59,28 @@ def assign_bool_prop(target, prop_name: str, value: bool, remove_if_false: bool)
         t[prop_name] = value
         if remove_if_false and not value:
             del t[prop_name]
+        
+    
+# targetsの子の中でprop_nameプロパティがTrueで最も上位階層にあるオブジェクト群を取得
+def get_prop_root_objects(prop_name: str, targets):
+    children_name_table = func_object_utils.get_children_name_table()
+    result = []
+
+    def recursive(obj: bpy.types.Object):
+        print(f"get_prop_root_objects.recursive: {obj}")
+        print(f"children: {children_name_table[obj.name]}")
+        if prop_is_true(obj, prop_name):
+            print(f"Has prop: {obj}")
+            result.append(obj)
+            return True
+        for child_name in children_name_table[obj.name]:
+            child = bpy.data.objects[child_name]
+            recursive(child)
+        return False
+
+    targets = func_object_utils.get_top_level_objects(targets)
+    print(f"get_prop_root_objects targets: {prop_name} {targets}")
+    for target in targets:
+        recursive(target)
+    print(f"get_prop_root_objects results: {prop_name} {result}")
+    return result

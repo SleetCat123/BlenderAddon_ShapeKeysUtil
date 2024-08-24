@@ -17,8 +17,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .ops import op_apply_modifiers, op_separate_lr_shapekey, op_separate_lr_shapekey_all_tag_detect, \
-    op_assign_lr_shapekey_tag, op_separate_lr_shapekey_all, op_separate_shapekeys
+from .ops import (
+    op_apply_modifiers, 
+    op_separate_lr_shapekey,
+    op_separate_lr_shapekey_all_tag_detect, 
+    op_assign_lr_shapekey_tag, 
+    op_separate_lr_shapekey_all,
+    op_separate_shapekeys,
+    op_apply_selected_modifiers,
+)
 
 
 # オブジェクトモード　Special → ShapeKeys Util を登録する
@@ -34,6 +41,7 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator(op_apply_modifiers.OBJECT_OT_specials_shapekeys_util_apply_modifiers.bl_idname)
+        layout.operator(op_apply_selected_modifiers.OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers.bl_idname)
         layout.operator(op_separate_shapekeys.OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects.bl_idname)
         layout.separator()
         layout.operator(op_separate_lr_shapekey.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey.bl_idname)

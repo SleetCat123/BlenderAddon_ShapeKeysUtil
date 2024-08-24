@@ -127,6 +127,14 @@ def deselect_collection(collection):
         func_object_utils.set_active_object(active)
 
 
+def find_or_create_collection(name):
+    collection = find_collection(name)
+    if not collection:
+        collection = bpy.data.collections.new(name=name)
+        bpy.context.scene.collection.children.link(collection)
+    return collection
+
+
 # 選択オブジェクトを指定名のグループに入れたり外したり
 def assign_object_group(group_name, assign=True):
     collection = find_collection(group_name)
@@ -137,11 +145,13 @@ def assign_object_group(group_name, assign=True):
             bpy.context.scene.collection.children.link(collection)
         else:
             # コレクションが存在せず、割り当てがfalseなら何もせず終了
-            return
+            print("Ignore: Collection not found: " + group_name)
+            return None
 
     active = func_object_utils.get_active_object()
     targets = bpy.context.selected_objects
-    targets.append(active)
+    if active:
+        targets.append(active)
     for obj in targets:
         if assign:
             func_object_utils.set_active_object(obj)
@@ -158,11 +168,14 @@ def assign_object_group(group_name, assign=True):
 
     if not collection.objects:
         # コレクションが空なら削除する
+        print("Remove Collection: " + collection.name)
         bpy.context.scene.collection.children.unlink(collection)
         bpy.data.collections.remove(collection)
+        collection = None
 
     # アクティブオブジェクトを元に戻す
     func_object_utils.set_active_object(active)
+    return collection
 
 
 def hide_collection(context, group_name, hide=True):
