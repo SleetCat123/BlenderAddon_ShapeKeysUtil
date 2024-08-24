@@ -25,6 +25,7 @@ from .ops import (
     op_separate_lr_shapekey_all,
     op_separate_shapekeys,
     op_apply_selected_modifiers,
+    op_copy_shapekey_to_others,
 )
 
 
@@ -50,6 +51,9 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
         layout.operator(
             op_separate_lr_shapekey_all_tag_detect.OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect.bl_idname)
         layout.operator(op_assign_lr_shapekey_tag.OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname)
+
+        layout.separator()
+        layout.operator(op_copy_shapekey_to_others.OBJECT_OT_mizore_copy_shapekey_to_others.bl_idname)
 
 
 def register():
