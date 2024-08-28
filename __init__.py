@@ -58,10 +58,12 @@ else:
         op_sideofactive_point,
     )
 
+import bpy
+
 
 classes = [
     addon_preferences,
-    
+
     link_with_AutoMerge,
     link_with_MizoresCustomExporter,
 
