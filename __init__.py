@@ -15,10 +15,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
-import importlib
-import os
-import re
-from glob import glob
+from .scripts.funcs.utils import func_package_utils
 
 
 bl_info = {
@@ -31,45 +28,70 @@ bl_info = {
     "category": "Object"
 }
 
-loaded_modules = {}
+if 'bpy' in locals():
+    from importlib import reload
+    import sys
+    for k, v in list(sys.modules.items()):
+        if k.startswith(func_package_utils.get_package_root()):
+            reload(v)
+else:
+    from .scripts import (
+        addon_preferences,
+    )
+    from .scripts.link import (
+        link_with_AutoMerge,
+        link_with_MizoresCustomExporter
+    )
+    from .scripts.menu import (
+        menu_edit_mesh_context,
+        menu_object_context
+    )
+    from .scripts.ops import (
+        op_apply_modifiers,
+        op_apply_selected_modifiers,
+        op_assign_lr_shapekey_tag,
+        op_copy_shapekey_to_others,
+        op_separate_lr_shapekey,
+        op_separate_lr_shapekey_all,
+        op_separate_lr_shapekey_all_tag_detect,
+        op_separate_shapekeys,
+        op_sideofactive_point,
+    )
 
 
-def register_module(module):
-    func = getattr(module, "register", None)
-    if callable(func):
-        func()
+classes = [
+    addon_preferences,
+    
+    link_with_AutoMerge,
+    link_with_MizoresCustomExporter,
 
+    menu_edit_mesh_context,
+    menu_object_context,
 
-def unregister_module(module):
-    func = getattr(module, "unregister", None)
-    if callable(func):
-        func()
+    op_apply_modifiers,
+    op_apply_selected_modifiers,
+    op_assign_lr_shapekey_tag,
+    op_copy_shapekey_to_others,
+    op_separate_lr_shapekey,
+    op_separate_lr_shapekey_all,
+    op_separate_lr_shapekey_all_tag_detect,
+    op_separate_shapekeys,
+    op_sideofactive_point,
+]
 
 
 def register():
-    path = os.path.dirname(__file__)
-    # print(path)
-    module_files = glob(f'{path}/scripts/**/*.py', recursive=True)
-    regex = re.compile(r"[\\/]")
-    module_names = [regex.sub('.', p[len(path):-3]) for p in module_files]
-    # print(module_names)
-    for module_name in module_names:
-        if module_name in loaded_modules:
-            module = loaded_modules[module_name]
-            module = importlib.reload(module)
-            # print("reload: " + str(module))
-        else:
-            module = importlib.import_module(module_name, package=__package__)
-            loaded_modules[module_name] = module
-        register_module(module)
+    for cls in classes:
+        try:
+            getattr(cls, "register", None)()
+        except Exception as e:
+            print(e)
 
 
 def unregister():
-    global loaded_modules
-    for module in loaded_modules.values():
-        unregister_module(module)
+    for cls in classes:
         try:
-            importlib.reload(module)
+            getattr(cls, "unregister", None)()
         except Exception as e:
             print(e)
 

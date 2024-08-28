@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .ops import (
+from ..ops import (
     op_apply_modifiers, 
     op_separate_lr_shapekey,
     op_separate_lr_shapekey_all_tag_detect, 

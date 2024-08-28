@@ -181,6 +181,11 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 　　注意：Enableにチェックが入っていないと操作できません  
 　　注意：シェイプキーの数が多いオブジェクトで有効にすると移動処理に時間がかかります  
 
+### Copy Shapekeys
+`オブジェクトモードで右クリック → ShapeKeys Util → Copy Shapekeys`  
+
+アクティブオブジェクトの形状を他の選択オブジェクトにbpy.ops.object.join_shapes()でコピーします。  
+
 ### Side of Active from Point
 `編集モードで右クリック → ShapeKeys Util → Side of Active from Point`  
 
