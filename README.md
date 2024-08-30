@@ -45,7 +45,7 @@ https://sleetcatshop.booth.pm/items/1166452
 （使用前に Window → Toggle System Console でログ画面を表示しておくと進行状況が確認できます）  
 
 ## ◆機能説明
-### Apply Modifiers
+### ◆Apply Modifiers
 `オブジェクトモードで右クリック → ShapeKeys Util → Apply Modifiers`  
 
 Armature以外の全モディファイアを適用します。
@@ -86,7 +86,7 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 　　チェックを入れると、レンダリング無効化状態のモディファイアを削除します。
 　　（レンダリング無効化 ＝ モディファイア一覧でカメラアイコンが押されていないもの）
 
-### Separate Objects
+### ◆Separate Objects
 `オブジェクトモードで右クリック → ShapeKeys Util → Separate Objects`  
 
 シェイプキーをそれぞれ別オブジェクトにします。  
@@ -103,7 +103,7 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 　　Apply Modifiers有効時にチェックを入れると、レンダリング無効化状態のモディファイアを削除します。
 　　（レンダリング無効化 ＝ モディファイア一覧でカメラアイコンが押されていないもの）
 
-### Separate Shape Key Left and Right
+### ◆Separate Shape Key Left and Right
 現在のシェイプキーをオブジェクト原点基準で左右別々のシェイプキーにします。  
   
 注意：ミラーモディファイアをつけている場合、適用してからでないとうまくいきません  
@@ -117,7 +117,7 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
     - Enable Sort
 　　チェックを入れると、左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します。
 
-### Separate All Shape Key Left and Right
+### ◆Separate All Shape Key Left and Right
 `オブジェクトモードで右クリック → ShapeKeys Util → Separate All Shape Key Left and Right`  
 
 全てのシェイプキーをオブジェクト原点基準で左右別々にします。
@@ -135,7 +135,7 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 　　チェックを入れると、左右分割後のシェイプキーを分割前シェイプキーのすぐ下に移動します。
 　　注意：時間がかかります
 
-### (Tag) Separate All Shape Key Left and Right
+### ◆(Tag) Separate All Shape Key Left and Right
 `オブジェクトモードで右クリック → ShapeKeys Util → (Tag) Separate All Shape Key Left and Right`  
 
 選択中オブジェクトのシェイプキーのうち、
@@ -160,7 +160,7 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 この機能は同作者のアドオン“Auto Merge”との連携用に作られています。  
 “Auto Merge”側で設定をすることにより、専用エクスポート機能使用時にこの機能を自動で使用させることができます。
 
-### Assign Tag
+### ◆Assign Tag
 `オブジェクトモードで右クリック → ShapeKeys Util → Assign Tag`  
 
 現在のシェイプキーに対し、(Tag) Separate All Shape Key Left and Right の処理用テキストを追加／削除します。
@@ -181,12 +181,12 @@ Mirrorモディファイアが原因だと思われる場合、以下の対処�
 　　注意：Enableにチェックが入っていないと操作できません  
 　　注意：シェイプキーの数が多いオブジェクトで有効にすると移動処理に時間がかかります  
 
-### Copy Shapekeys
+### ◆Copy Shapekeys
 `オブジェクトモードで右クリック → ShapeKeys Util → Copy Shapekeys`  
 
 アクティブオブジェクトの形状を他の選択オブジェクトにbpy.ops.object.join_shapes()でコピーします。  
 
-### Side of Active from Point
+### ◆Side of Active from Point
 `編集モードで右クリック → ShapeKeys Util → Side of Active from Point`  
 
 アドオン製作時の副産物として生まれた機能です。  
