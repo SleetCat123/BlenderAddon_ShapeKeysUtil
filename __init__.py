@@ -37,6 +37,7 @@ if 'bpy' in locals():
 else:
     from .scripts import (
         addon_preferences,
+        translations,
     )
     from .scripts.link import (
         link_with_AutoMerge,
@@ -63,7 +64,8 @@ import bpy
 
 classes = [
     addon_preferences,
-
+    translations,
+    
     link_with_AutoMerge,
     link_with_MizoresCustomExporter,
 

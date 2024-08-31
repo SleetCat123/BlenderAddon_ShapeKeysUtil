@@ -86,11 +86,11 @@ class OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers(bpy.types.Operato
                     )
                 if vert_count != prev_vert_count:
                     # 前回のシェイプキーと頂点数が違ったら警告して処理を取り消し
-                    warn = bpy.app.translations.pgettext("verts_count_difference").format(
-                        prev_obj_name, 
-                        obj.name,
-                        prev_vert_count, 
-                        vert_count
+                    warn = bpy.app.translations.pgettext("mizore_error_apply_mod_with_shapekey_verts_count_difference").format(
+                        obj_1 = prev_obj_name, 
+                        obj_verts_1 = prev_vert_count,
+                        obj_2 = obj.name,
+                        obj_verts_2 = vert_count
                         )
                     self.report({'ERROR'}, warn)
                     print("!!!!! " + warn + "!!!!!")
@@ -139,15 +139,7 @@ class OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers(bpy.types.Operato
 
 
 translations_dict = {
-    "en_US": {
-        ("*", "verts_count_difference"): "Could not execute the process because the number of vertices of the shape key is different.\n"
-        "It may be because the number of vertices is changed by Boolean or Merge of the Mirror modifier.\n[{0}]({2}), [{1}]({3})",
-    },
-    "ja_JP": {
-        ("*", "verts_count_difference"):
-            "シェイプキーの頂点数が異なっているため処理を実行できませんでした。\n"
-            "ブーリアンやミラーモディファイアの\"結合\"で頂点数が変化しているなどの原因が考えられます。\n[{0}]({2}), [{1}]({3})",
-            
+    "ja_JP": {       
         ("*", "Apply Selected Modifiers"):
             "詳細はRead-me.txtを参照。\n名前の最後が_leftまたは_rightのシェイプキーには使えません",
     },

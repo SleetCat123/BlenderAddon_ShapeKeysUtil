@@ -158,8 +158,12 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             print("current: [{1}]({3})   prev: [{0}]({2})".format(prev_obj_name, obj.name, str(prev_vert_count),
                                                                   str(vert_count)))
             if vert_count != prev_vert_count:
-                warn = bpy.app.translations.pgettext("verts_count_difference").format(prev_obj_name, obj.name,
-                                                                                      prev_vert_count, vert_count)
+                warn = bpy.app.translations.pgettext("mizore_error_apply_mod_with_shapekey_verts_count_difference").format(
+                    obj_1 = prev_obj_name, 
+                    obj_verts_1 = prev_vert_count,
+                    obj_2 = obj.name, 
+                    obj_verts_2 = vert_count
+                    )
                 if self:
                     self.report({'ERROR'}, warn)
                 print("!!!!! " + warn + "!!!!!")

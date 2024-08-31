@@ -72,9 +72,14 @@ def apply_as_shapekey(modifier):
 
     except RuntimeError as e:
         # 無効なModifier（対象オブジェクトが指定されていないなどの状態）は適用しない
-        print("!!! Apply as shapekey failed !!!: [{0}]".format(modifier.name))
+        warn = bpy.app.translations.pgettext("mizore_error_apply_as_shapekey_invalid_modifier").format(
+            obj_name = obj.name,
+            modifier_name = modifier.name,
+            modifier_type = modifier.type
+        )
         print(e)
-        bpy.ops.object.modifier_remove(modifier=modifier.name)
+        # bpy.ops.object.modifier_remove(modifier=modifier.name)
+        raise Exception(warn)
     else:
         try:
             print("Apply as shapekey: [{0}]".format(modifier.name))
