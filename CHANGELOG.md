@@ -1,15 +1,18 @@
 
 ## ◆更新履歴
-### test
+### 2024-09-03 v2.0.0
 - add: %AS%接頭辞によるモディファイアのApply as shapeで、すでに同名のシェイプキーが存在する場合はそのシェイプキーの形状に対してモディファイアの変形を適用するようにした
 - add: %AS%接頭辞によるモディファイアのApply as shapeのとき、$以降の文字列を無視するようにした
 - add: Blender内での機能説明文を一部追加
 - add: アクティブなモディファイアのみを適用するオペレーターを追加
 - add:　アクティブオブジェクトの形状をシェイプキーとして他のオブジェクトに追加するオペレーターを追加
 - fix: x=0付近に頂点が無いメッシュに対してSeparate Shape Key Left and Rightを実行するとエラーが出ることがあったのを修正
+- change: **スクリプトを複数ファイルに分離。不具合回避のため、バージョンアップ時には古いバージョンを削除してから導入してください。**
 - change: Select Side of Active from PointのThresholdに負の値を設定できるように変更
 - change: シェイプキー分割の内部処理を変更
 - change: テキスト翻訳の内部処理を変更
+  - [MizoresCustomExporter](https://github.com/SleetCat123/BlenderAddon_MizoresCustomExporter): 1.0.0-
+  - [AutoMerge](https://github.com/SleetCat123/BlenderAddon-AutoMerge): 3.0.0-
 ---
 ### 2022-12-11　Ver_1.1.6
 - change: 右クリック→ShapeKeys Util→Apply Modifiers が選択中のオブジェクト全てに適用されるように（いままではアクティブオブジェクトだけに適用されていた）

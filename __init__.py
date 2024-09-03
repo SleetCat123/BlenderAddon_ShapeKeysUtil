@@ -21,7 +21,7 @@ from .scripts.funcs.utils import func_package_utils
 bl_info = {
     "name": "ShapeKeys Util",
     "author": "@sleetcat123(Twitter)",
-    "version": (1, 1, 6),
+    "version": (2, 0, 0),
     "blender": (2, 80, 0),
     "location": "",
     "description": "",
@@ -89,6 +89,7 @@ def register():
         try:
             getattr(cls, "register", None)()
         except Exception as e:
+            print(f"Error registering {cls.__name__}")
             print(e)
 
 
@@ -97,6 +98,7 @@ def unregister():
         try:
             getattr(cls, "unregister", None)()
         except Exception as e:
+            print(f"Error unregistering {cls.__name__}")
             print(e)
 
 

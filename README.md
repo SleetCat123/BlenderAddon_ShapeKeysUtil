@@ -1,25 +1,19 @@
 # BlenderAddon-ShapeKeysUtil
-- シェイプキーがあってもミラーを適用できる！
-- 両側で作ってある表情シェイプを左右別々にできる！
-
-そんなBlender用アドオンです。
 ## ◆はじめに
-このデータは、3Dモデリングソフト Blender 用のアドオンです。
+- シェイプキーがあってもミラーを適用できる！  
+- 両側で作ってある表情シェイプを左右別々にできる！  
+そんなBlender用アドオンです。  
 
-↓以下のBlenderバージョンで動作確認済みです。
-3.0
+ダウンロードはこちらから  
+https://github.com/SleetCat123/BlenderAddon_ShapeKeysUtil/releases  
 
-※ Blender 2.80以上であれば上記以外のバージョンにも導入可能ですが動作未検証です。
-
-※ 「blender279_ShapeKeysUtil_v1_1_4_c.zip」はBlender 2.79でも（おそらく）動作するバージョンです。このバージョンへの機能追加は基本的に行いません。
-
-以前のバージョンはGitHubに置いてあります。
-（v1.1.4～）
-https://github.com/SleetCat123/BlenderAddon_ShapeKeysUtil/releases
+Boothでもダウンロードできます。  
+（現在は古いバージョンのみ）  
+https://sleetcatshop.booth.pm/items/1224307  
 
 ---  
-https://sleetcatshop.booth.pm/items/1166452
-同作者のアドオン↑“Auto Merge”を導入して連携機能を有効にすることで、
+### 同作者の別アドオンとの連携
+[MizoresCustomExporter](https://github.com/SleetCat123/BlenderAddon_MizoresCustomExporter) を導入して連携機能を有効にすることで、
 
 1. ミラーを付けたまま編集
 2. エクスポートのときだけミラー適用（自動）
@@ -27,7 +21,7 @@ https://sleetcatshop.booth.pm/items/1166452
 4. エクスポート後は元通り！
 
 ということもできるようになります。  
-（詳しくはAuto MergeアドオンのRead-meを参照）  
+（詳しくは[MizoresCustomExporter](https://github.com/SleetCat123/BlenderAddon_MizoresCustomExporter)のReadmeを参照）  
 
 ---
 
@@ -43,6 +37,10 @@ https://sleetcatshop.booth.pm/items/1166452
 完了するまでしばらくお待ち下さい。  
   
 （使用前に Window → Toggle System Console でログ画面を表示しておくと進行状況が確認できます）  
+
+### ◆Ver_1.1.6またはそれより前のバージョンから移行する際の注意
+1. スクリプトの内部構造を変更しました。  
+   不具合回避のため、バージョンアップ時には古いバージョンを削除してから導入してください。
 
 ## ◆機能説明
 ### ◆Apply Modifiers
