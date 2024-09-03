@@ -17,10 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from BlenderAddon_ShapeKeysUtil.scripts import consts
-from BlenderAddon_ShapeKeysUtil.scripts.funcs import func_separate_shapekeys, func_apply_as_shapekey, \
+from .. import consts
+from ..funcs import (
+    func_separate_shapekeys, 
+    func_apply_as_shapekey, 
     func_apply_modifiers
-from BlenderAddon_ShapeKeysUtil.scripts.funcs.utils import func_object_utils
+)
+from ..funcs.utils import func_object_utils
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用

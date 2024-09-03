@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from BlenderAddon_ShapeKeysUtil.scripts.funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
+from ..funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用

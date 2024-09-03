@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from BlenderAddon_ShapeKeysUtil.scripts import consts
+from .. import consts
 from ..funcs.utils import func_object_utils
 from ..funcs import func_shapekey_utils
 
