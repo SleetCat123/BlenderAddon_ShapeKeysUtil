@@ -73,7 +73,7 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
     # bmesh.update_edit_mesh(obj.data)
     obj.update_from_editmode()
     bpy.context.tool_settings.mesh_select_mode  = temp_mesh_select_mode
-    bm.free()
+    # bm.free()
     del bm
 
 
