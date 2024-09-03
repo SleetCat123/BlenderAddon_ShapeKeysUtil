@@ -17,8 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from BlenderAddon_ShapeKeysUtil.scripts.funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
-from BlenderAddon_ShapeKeysUtil.scripts.funcs.func_separate_lr_shapekey_all import separate_lr_shapekey_all
+from ..funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
+from ..funcs.func_separate_lr_shapekey_all import separate_lr_shapekey_all
 
 
 # MizoresCustomExporter連携用
