@@ -78,7 +78,7 @@ def get_children_recursive(targets, only_current_view_layer: bool = True, contai
 
     if not hasattr(targets, '__iter__'):
         targets = [targets]
-    print("get_children_recursive  targets: " + str(targets))
+    # print("get_children_recursive  targets: " + str(targets))
     for obj in targets:
         recursive(obj)
     if not contains_self:
