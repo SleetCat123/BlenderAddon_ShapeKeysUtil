@@ -42,13 +42,22 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return any(obj.type == 'MESH' for obj in bpy.context.selected_objects)
+        active = func_object_utils.get_active_object()
+        return (active and active.type == 'MESH') or any(obj.type == 'MESH' for obj in bpy.context.selected_objects)
 
     def execute(self, context):
         try:
             active = func_object_utils.get_active_object()
             selected_objects = bpy.context.selected_objects
             targets = [d for d in selected_objects if d.type == 'MESH']
+            if active.type == 'MESH':
+                targets.append(active)
+
+            func_object_utils.deselect_all_objects()
+            func_object_utils.select_objects(targets, True)
+            # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
+            bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
+
             for obj in targets:
                 func_object_utils.set_active_object(obj)
                 b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, self.duplicate, self.remove_nonrender)

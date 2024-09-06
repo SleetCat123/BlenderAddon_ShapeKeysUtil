@@ -44,7 +44,16 @@ class OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers(bpy.types.Operato
     def execute(self, context):
         try:
             original_obj = context.object
+
+            temp_selected_objects = bpy.context.selected_objects
+            func_object_utils.deselect_all_objects()
+            func_object_utils.select_object(original_obj, True)
+            # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
+            bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
+
             func_apply_selected_modifier.apply_selected_modifier(original_obj)
+            # 元の選択状態に戻す
+            func_object_utils.select_objects(temp_selected_objects, True)
             return {'FINISHED'}
         except Exception as e:
             bpy.ops.ed.undo_push(message = "Restore point")
