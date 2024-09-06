@@ -29,11 +29,7 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
 
     def execute(self, context):
         print("ShapekeysUtil")
-        b = apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=True)
-        if b:
-            return {'FINISHED'}
-        else:
-            return {'CANCELLED'}
+        apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=True)
 
 
 classes = [

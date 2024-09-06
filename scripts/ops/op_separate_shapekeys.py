@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import traceback
 from bpy.props import BoolProperty
 from ..funcs import func_separate_shapekeys
 from ..funcs.utils import func_object_utils
@@ -55,25 +56,33 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
         return obj.type == 'MESH'
 
     def execute(self, context):
-        source_obj = context.object
+        try:
+            source_obj = context.object
 
-        # 実行する必要がなければキャンセル
-        if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
+            # 実行する必要がなければキャンセル
+            if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
+                return {'CANCELLED'}
+
+            func_object_utils.deselect_all_objects()
+            func_object_utils.select_object(source_obj, True)
+            func_object_utils.set_active_object(source_obj)
+            
+            # シェイプキーをそれぞれ別オブジェクトにする
+            func_separate_shapekeys.separate_shapekeys(
+                duplicate=self.keep_original,
+                enable_apply_modifiers=self.apply_modifiers,
+                remove_nonrender=self.remove_nonrender,
+                keep_original_shapekeys=self.keep_original_shapekeys
+            )
+
+            return {'FINISHED'}
+        except Exception as e:
+            bpy.ops.ed.undo_push(message = "Restore point")
+            bpy.ops.ed.undo()
+            bpy.ops.ed.undo_push(message = "Restore point")
+            traceback.print_exc()
+            self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
-
-        func_object_utils.deselect_all_objects()
-        func_object_utils.select_object(source_obj, True)
-        func_object_utils.set_active_object(source_obj)
-
-        # シェイプキーをそれぞれ別オブジェクトにする
-        func_separate_shapekeys.separate_shapekeys(
-            duplicate=self.keep_original,
-            enable_apply_modifiers=self.apply_modifiers,
-            remove_nonrender=self.remove_nonrender,
-            keep_original_shapekeys=self.keep_original_shapekeys
-        )
-
-        return {'FINISHED'}
 
 
 translations_dict = {

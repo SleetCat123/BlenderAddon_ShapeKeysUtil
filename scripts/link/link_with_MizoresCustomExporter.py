@@ -29,11 +29,7 @@ class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Oper
 
     def execute(self, context):
         print("ShapekeysUtil - Apply Modifiers With Shapekeys")
-        b = apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=False)
-        if b:
-            return {'FINISHED'}
-        else:
-            return {'CANCELLED'}
+        apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=False)
 
 
 class OBJECT_OT_separate_lr_shapekey_for_mizores_custom_exporter_addon(bpy.types.Operator):

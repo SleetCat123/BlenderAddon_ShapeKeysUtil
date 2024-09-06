@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import traceback
 from ..funcs import func_separate_lr_shapekey_all
 from ..funcs.utils import func_object_utils
 
@@ -33,10 +34,18 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all_tag_detect(bpy.
         return obj.type == 'MESH' and obj.data.shape_keys and len(obj.data.shape_keys.key_blocks) != 0
 
     def execute(self, context):
-        obj = context.object
-        func_object_utils.set_active_object(obj)
-        func_separate_lr_shapekey_all.separate_lr_shapekey_all(duplicate=False, enable_sort=False, auto_detect=True)
-        return {'FINISHED'}
+        try:
+            obj = context.object
+            func_object_utils.set_active_object(obj)
+            func_separate_lr_shapekey_all.separate_lr_shapekey_all(duplicate=False, enable_sort=False, auto_detect=True)
+            return {'FINISHED'}
+        except Exception as e:
+            bpy.ops.ed.undo_push(message = "Restore point")
+            bpy.ops.ed.undo()
+            bpy.ops.ed.undo_push(message = "Restore point")
+            traceback.print_exc()
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
 
 
 translations_dict = {
