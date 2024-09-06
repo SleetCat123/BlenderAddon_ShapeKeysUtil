@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import traceback
 from bpy.props import BoolProperty
 from ..funcs import func_apply_modifiers_with_shapekeys
 from ..funcs.utils import func_object_utils
@@ -44,17 +45,25 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
         return any(obj.type == 'MESH' for obj in bpy.context.selected_objects)
 
     def execute(self, context):
-        active = func_object_utils.get_active_object()
-        selected_objects = bpy.context.selected_objects
-        targets = [d for d in selected_objects if d.type == 'MESH']
-        for obj in targets:
-            func_object_utils.set_active_object(obj)
-            b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, self.duplicate, self.remove_nonrender)
-            if not b:
-                return {'CANCELLED'}
-        func_object_utils.select_objects(selected_objects, True)
-        func_object_utils.set_active_object(active)
-        return {'FINISHED'}
+        try:
+            active = func_object_utils.get_active_object()
+            selected_objects = bpy.context.selected_objects
+            targets = [d for d in selected_objects if d.type == 'MESH']
+            for obj in targets:
+                func_object_utils.set_active_object(obj)
+                b = func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(self, self.duplicate, self.remove_nonrender)
+                if not b:
+                    return {'CANCELLED'}
+            func_object_utils.select_objects(selected_objects, True)
+            func_object_utils.set_active_object(active)
+            return {'FINISHED'}
+        except Exception as e:
+            bpy.ops.ed.undo_push(message = "Restore point")
+            bpy.ops.ed.undo()
+            bpy.ops.ed.undo_push(message = "Restore point")
+            traceback.print_exc()
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
 
 
 translations_dict = {

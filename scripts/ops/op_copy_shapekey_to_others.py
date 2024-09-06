@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import traceback
 from ..funcs.utils import func_object_utils
 
 
@@ -33,20 +34,28 @@ class OBJECT_OT_mizore_copy_shapekey_to_others(bpy.types.Operator):
         return active_obj and active_obj.type == 'MESH' and len(selected_objs) > 1
 
     def execute(self, context):
-        active_obj = func_object_utils.get_active_object()
-        selected_objs = bpy.context.selected_objects
-        # active_objの形状を他の選択オブジェクトにbpy.ops.object.join_shapes()でコピー
-        for obj in selected_objs:
-            if obj == active_obj:
-                continue
-            func_object_utils.deselect_all_objects()
-            func_object_utils.set_active_object(obj)
-            func_object_utils.select_object(active_obj)
-            print(f"Copy Shapekey: {active_obj} -> {obj}")
-            bpy.ops.object.join_shapes()
+        try:
+            active_obj = func_object_utils.get_active_object()
+            selected_objs = bpy.context.selected_objects
+            # active_objの形状を他の選択オブジェクトにbpy.ops.object.join_shapes()でコピー
+            for obj in selected_objs:
+                if obj == active_obj:
+                    continue
+                func_object_utils.deselect_all_objects()
+                func_object_utils.set_active_object(obj)
+                func_object_utils.select_object(active_obj)
+                print(f"Copy Shapekey: {active_obj} -> {obj}")
+                bpy.ops.object.join_shapes()
 
-        self.report({'INFO'}, "Finished")
-        return {'FINISHED'}
+            self.report({'INFO'}, "Finished")
+            return {'FINISHED'}
+        except Exception as e:
+            bpy.ops.ed.undo_push(message = "Restore point")
+            bpy.ops.ed.undo()
+            bpy.ops.ed.undo_push(message = "Restore point")
+            traceback.print_exc()
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
 
 
 translations_dict = {

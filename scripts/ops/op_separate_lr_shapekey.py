@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import traceback
 from bpy.props import BoolProperty
 from ..funcs import func_separate_lr_shapekey
 from ..funcs.utils import func_object_utils
@@ -45,20 +46,28 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey(bpy.types.Operator)
         return obj.type == 'MESH' and obj.data.shape_keys and len(obj.data.shape_keys.key_blocks) != 0
 
     def execute(self, context):
-        obj = context.object
-        func_object_utils.set_active_object(obj)
+        try:
+            obj = context.object
+            func_object_utils.set_active_object(obj)
 
-        # 頂点を全て表示
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.reveal()
-        bpy.ops.object.mode_set(mode='OBJECT')
+            # 頂点を全て表示
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.reveal()
+            bpy.ops.object.mode_set(mode='OBJECT')
 
-        func_separate_lr_shapekey.separate_lr_shapekey(
-            source_shape_key_index=obj.active_shape_key_index,
-            duplicate=self.keep_original, 
-            enable_sort=self.enable_sort
-            )
-        return {'FINISHED'}
+            func_separate_lr_shapekey.separate_lr_shapekey(
+                source_shape_key_index=obj.active_shape_key_index,
+                duplicate=self.keep_original, 
+                enable_sort=self.enable_sort
+                )
+            return {'FINISHED'}
+        except Exception as e:
+            bpy.ops.ed.undo_push(message = "Restore point")
+            bpy.ops.ed.undo()
+            bpy.ops.ed.undo_push(message = "Restore point")
+            traceback.print_exc()
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
 
 
 translations_dict = {
