@@ -41,14 +41,17 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             break
     if apply_as_shape_index == 0:
         # Apply as shapekey用のモディファイアが一番上にあったらApply as shapekeyを実行
-        print("apply_as_shapekey__B1")
+        print("%AS% modifier is top")
         func_apply_as_shapekey.apply_as_shapekey(apply_as_shape_modifier)
-        print("apply_as_shapekey__B2")
         # 関数を再実行して終了
-        return apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
-    elif apply_as_shape_index != -1:
+        print("re-execute apply_modifiers_with_shapekeys")
+        apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
+        return
+    elif apply_as_shape_index >= 1:
         # 2番目以降にApply as shape用のモディファイアがあったら
+        print("%AS% modifier is not top")
         # 一時オブジェクトを作成
+        print("create tempobj")
         tempobj = func_object_utils.duplicate_object(source_obj)
         func_object_utils.deselect_all_objects()
         func_object_utils.select_object(tempobj, True)
@@ -63,17 +66,11 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             bpy.ops.object.modifier_remove(modifier=modifier.name)
 
         # 関数を再実行
-        success = apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
-        if not success:
-            # 処理に失敗したら処理前のデータを復元して終了
-            func_object_utils.deselect_all_objects()
-            func_object_utils.select_object(source_obj, True)
-            func_object_utils.set_active_object(tempobj)
-            bpy.ops.object.make_links_data(type='OBDATA')
-            bpy.ops.object.make_links_data(type='MODIFIERS')
-            return False
+        print("re-execute apply_modifiers_with_shapekeys (1)")
+        apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
 
         # 削除していたモディファイアを一時オブジェクトから復元
+        print("restore modifiers")
         func_object_utils.deselect_all_objects()
         func_object_utils.select_object(source_obj, True)
         func_object_utils.set_active_object(tempobj)
@@ -87,12 +84,15 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
             bpy.ops.object.modifier_remove(modifier=modifier.name)
 
         # 一時オブジェクトを削除
+        print("remove tempobj")
         func_object_utils.remove_object(tempobj)
         func_object_utils.select_object(source_obj, True)
         func_object_utils.set_active_object(source_obj)
 
         # 関数を再実行して終了
-        return apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
+        print("re-execute apply_modifiers_with_shapekeys (2)")
+        apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender)
+        return
 
     if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks) == 1:
         # Basisしかなければシェイプキー削除
@@ -106,8 +106,9 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
         print("only apply_modifiers: " + source_obj.name)
         func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
         if duplicate:
+            print("duplicate: " + source_obj.name)
             func_object_utils.duplicate_object(source_obj)
-        return True
+        return
 
     # 対象オブジェクトだけを選択
     func_object_utils.deselect_all_objects()
@@ -122,11 +123,12 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
                     modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type != 'ARMATURE'):
                 need_apply_modifier = True
                 break
-    print("{0}: Need Apply Modifiers: {1}".format(source_obj.name, str(need_apply_modifier)))
+    print(f"{source_obj.name}: Need Apply Modifiers: {str(need_apply_modifier)}")
     if need_apply_modifier:
-        # オブジェクトを複製
-        source_obj_dup = func_object_utils.duplicate_object(source_obj)
-        func_object_utils.select_object(source_obj_dup, False)
+        if duplicate:
+            # オブジェクトを複製
+            source_obj_dup = func_object_utils.duplicate_object(source_obj)
+            print(f"Duplicate: {source_obj_dup.name}")
         func_object_utils.select_object(source_obj, True)
         func_object_utils.set_active_object(source_obj)
 
@@ -197,10 +199,6 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
         for i, shapekey in enumerate(source_obj.data.shape_keys.key_blocks):
             shapekey.name = shapekey_name_and_values[i][0]
             shapekey.value = shapekey_name_and_values[i][1]
-
-        if not duplicate:
-            # 処理が正常に終了したら複製オブジェクトを削除する
-            func_object_utils.remove_object(source_obj_dup)
 
     print("Shapekey Count (Include Basis Shapekey): " + str(len(source_obj.data.shape_keys.key_blocks)))
 

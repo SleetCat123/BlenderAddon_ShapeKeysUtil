@@ -28,6 +28,7 @@ def apply_selected_modifier(original_obj):
     print(f"Active Mod: {active_mod_name}")
     # シェイプキーをもつオブジェクトのモディファイアを適用
     if original_obj.data.shape_keys and original_obj.data.shape_keys.key_blocks:
+        print("has shapekeys")
         basis_obj = func_object_utils.duplicate_object(original_obj, False)
         separated_objects = func_separate_shapekeys.separate_shapekeys(
             duplicate=False,
@@ -100,5 +101,6 @@ def apply_selected_modifier(original_obj):
         func_object_utils.set_active_object(original_obj)
     else:
         # シェイプキーを持たないオブジェクトのモディファイアを適用
+        print("no shapekeys")
         bpy.ops.object.modifier_apply(modifier=active_mod_name)
     return True

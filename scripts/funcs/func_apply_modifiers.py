@@ -35,10 +35,12 @@ def apply_modifiers(remove_nonrender=True):
     for modifier in obj.modifiers:
         if modifier.name.startswith(consts.FORCE_KEEP_MODIFIER_PREFIX):
             # モディファイア名がFORCE_KEEP_MODIFIER_PREFIXで始まっているなら無視
+            print(f"FORCE_KEEP_MODIFIER_PREFIX: [{modifier.name}]")
             continue
         if not modifier.show_render:
             # モディファイアがレンダリング対象ではない（モディファイア一覧のカメラアイコンが押されていない）なら無視
             if remove_nonrender:
+                print(f"remove_nonrender: [{modifier.name}]")
                 bpy.ops.object.modifier_remove(modifier=modifier.name)
             continue
 
@@ -50,15 +52,14 @@ def apply_modifiers(remove_nonrender=True):
             # 対象モディファイアが処理対象外モディファイアでないなら
             # または、モディファイアの名前欄が%A%で始まっているなら
             try:
+                try:
+                    # なんかここだけUnicodeEncodeErrorが出たり出なかったりする。なんで……？
+                    print(f"Apply: [{modifier.name}]")
+                except UnicodeDecodeError:
+                    print("Apply")
                 bpy.ops.object.modifier_apply(modifier=modifier.name)
             except RuntimeError:
                 # 無効なModifier（対象オブジェクトが指定されていないなどの状態）は適用しない
-                print("!!! Apply failed !!!: [{0}]".format(modifier.name))
+                print(f"!!! Apply failed !!!: [{modifier.name}]")
                 bpy.ops.object.modifier_remove(modifier=modifier.name)
-            else:
-                try:
-                    # なんかここだけUnicodeEncodeErrorが出たり出なかったりする。なんで……？
-                    print("Apply: [{0}]".format(modifier.name))
-                except UnicodeDecodeError:
-                    print("Apply")
-    print("Finish Apply Modifiers: [{0}]".format(obj.name))
+    print(f"Finish Apply Modifiers: [{obj.name}]")

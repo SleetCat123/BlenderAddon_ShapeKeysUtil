@@ -66,7 +66,7 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
             func_object_utils.deselect_all_objects()
             func_object_utils.select_object(source_obj, True)
             func_object_utils.set_active_object(source_obj)
-
+            
             # シェイプキーをそれぞれ別オブジェクトにする
             func_separate_shapekeys.separate_shapekeys(
                 duplicate=self.keep_original,
