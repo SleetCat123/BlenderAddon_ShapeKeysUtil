@@ -21,7 +21,7 @@ from ..funcs import func_separate_shapekeys
 from ..funcs.utils import func_object_utils
 
 
-def apply_selected_modifier(operator, original_obj):
+def apply_selected_modifier(original_obj):
     func_object_utils.set_active_object(original_obj)
     func_object_utils.deselect_all_objects()
     active_mod_name = original_obj.modifiers.active.name
@@ -36,21 +36,12 @@ def apply_selected_modifier(operator, original_obj):
             keep_original_shapekeys=False
         )
         print(f"Basis: {basis_obj.name}")
-        try:
-            func_object_utils.set_active_object(basis_obj)
+        func_object_utils.set_active_object(basis_obj)
+        bpy.ops.object.modifier_apply(modifier=active_mod_name)
+        for separated_obj in separated_objects:
+            print(separated_obj.name)
+            func_object_utils.set_active_object(separated_obj)
             bpy.ops.object.modifier_apply(modifier=active_mod_name)
-            for separated_obj in separated_objects:
-                print(separated_obj.name)
-                func_object_utils.set_active_object(separated_obj)
-                bpy.ops.object.modifier_apply(modifier=active_mod_name)
-        except Exception as e:
-            print(e)
-            operator.report({'ERROR'}, str(e))
-            # 処理中オブジェクトを削除
-            func_object_utils.remove_object(basis_obj)
-            func_object_utils.remove_objects(separated_objects)
-            func_object_utils.set_active_object(original_obj)
-            return {'CANCELLED'}
 
         prev_obj_name = basis_obj.name
         prev_vert_count = len(basis_obj.data.vertices)
@@ -72,13 +63,8 @@ def apply_selected_modifier(operator, original_obj):
                     obj_2 = obj.name,
                     obj_verts_2 = vert_count
                     )
-                operator.report({'ERROR'}, warn)
                 print("!!!!! " + warn + "!!!!!")
-                # 処理中オブジェクトを削除
-                func_object_utils.remove_object(basis_obj)
-                func_object_utils.remove_objects(separated_objects)
-                func_object_utils.set_active_object(original_obj)
-                return False
+                raise Exception(warn)
 
             prev_vert_count = vert_count
             prev_obj_name = obj.name

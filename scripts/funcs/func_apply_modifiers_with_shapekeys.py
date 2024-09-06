@@ -167,15 +167,8 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
                     obj_2 = obj.name, 
                     obj_verts_2 = vert_count
                     )
-                if self:
-                    self.report({'ERROR'}, warn)
                 print("!!!!! " + warn + "!!!!!")
-                # 処理中オブジェクトを削除
-                func_object_utils.remove_objects(source_obj.children)
-                func_object_utils.remove_object(source_obj)
-                func_object_utils.select_object(source_obj_dup, True)
-                func_object_utils.set_active_object(source_obj_dup)
-                return False
+                raise Exception(warn)
 
             prev_vert_count = vert_count
             prev_obj_name = obj.name
@@ -213,4 +206,3 @@ def apply_modifiers_with_shapekeys(self, duplicate, remove_nonrender=True):
 
     func_object_utils.select_object(source_obj, True)
     func_object_utils.set_active_object(source_obj)
-    return True

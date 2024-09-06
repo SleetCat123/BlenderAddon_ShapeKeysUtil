@@ -44,7 +44,7 @@ class OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers(bpy.types.Operato
     def execute(self, context):
         try:
             original_obj = context.object
-            func_apply_selected_modifier.apply_selected_modifier(self, original_obj)
+            func_apply_selected_modifier.apply_selected_modifier(original_obj)
             return {'FINISHED'}
         except Exception as e:
             bpy.ops.ed.undo_push(message = "Restore point")
