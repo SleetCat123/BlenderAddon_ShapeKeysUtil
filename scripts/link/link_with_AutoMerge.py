@@ -30,6 +30,7 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
     def execute(self, context):
         print("ShapekeysUtil")
         apply_modifiers_with_shapekeys(self=self, duplicate=False, remove_nonrender=True)
+        return {'FINISHED'}
 
 
 classes = [
