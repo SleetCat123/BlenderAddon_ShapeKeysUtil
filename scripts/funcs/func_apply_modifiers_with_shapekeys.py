@@ -81,7 +81,7 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True):
     apply_as_shape_index = -1
     apply_as_shape_modifier = None
     for i, modifier in enumerate(source_obj.modifiers):
-        if modifier.name.startswith(consts.APPLY_AS_SHAPEKEY_PREFIX):
+        if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
             apply_as_shape_index = i
             apply_as_shape_modifier = modifier
             print(f"%AS% modifier is found: {str(apply_as_shape_index)} - {modifier.name}")

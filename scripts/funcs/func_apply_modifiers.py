@@ -44,7 +44,7 @@ def apply_modifiers(remove_nonrender=True):
                 bpy.ops.object.modifier_remove(modifier=modifier.name)
             continue
 
-        if modifier.name.startswith(consts.APPLY_AS_SHAPEKEY_PREFIX):
+        if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
             # ここではApply as shapekeyさせたくない
             print("ERROR: apply_as_shapekey")
             bpy.ops.object.modifier_remove(modifier=modifier.name)

@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import mathutils
 from .. import consts
 from ..funcs.utils import func_object_utils
 from ..funcs import func_shapekey_utils
@@ -26,12 +27,7 @@ def apply_as_shapekey(modifier):
     try:
         obj = func_object_utils.get_active_object()
         print(f"ShapeKeysUtil - func_apply_as_shapekey: {modifier.name}")
-        if (modifier.type == "SURFACE_DEFORM" 
-            and modifier.is_bound 
-            and modifier.target 
-            and modifier.target.data.shape_keys 
-            and len(modifier.target.data.shape_keys.key_blocks) > 1 
-            and modifier.target.data.shape_keys.key_blocks[0].name == "All"):
+        if consts.use_apply_each_shapekeys(modifier):
             # SurfaceDeformモディファイアのターゲットオブジェクトにシェイプキーが2つ以上存在していて、最初のシェイプキーの名前が"All"ならshow_only_shape_keyをTrueにしてシェイプキーを個別にシェイプキーとして適用
             print("Add shapekeys from SurfaceDeform")
             mod_target = modifier.target
@@ -56,10 +52,30 @@ def apply_as_shapekey(modifier):
                 new_shapekey.name = key.name
             mod_target.show_only_shape_key = temp_show_only_shape_key
             mod_target.active_shape_key_index = temp_active_shape_key_index
+            # 特殊な処理なので以降の処理はスキップ
             return
 
+        use_inverted_bones = consts.use_inverted_bones_as_shapekey(modifier)
+        if use_inverted_bones:
+            # %AS:I%で始まっているならボーンの移動を反転した状態でApply as shapekey
+            print("Apply as shapekey with inverted bones")
+            mod_target = modifier.object
+            # ボーンの移動と回転とスケールを記憶
+            bone_locations = {}
+            bone_rotations = {}
+            bone_scales = {}
+            for pose_bone in mod_target.pose.bones:
+                bone_locations[pose_bone.name] = pose_bone.location.copy()
+                bone_rotations[pose_bone.name] = pose_bone.rotation_quaternion.copy()
+                bone_scales[pose_bone.name] = pose_bone.scale.copy()
+            # pose boneの移動と回転とスケールを反転
+            for pose_bone in mod_target.pose.bones:
+                pose_bone.location = mathutils.Vector((-pose_bone.location[0], -pose_bone.location[1], -pose_bone.location[2]))
+                pose_bone.rotation_quaternion = pose_bone.rotation_quaternion.inverted()
+                pose_bone.scale = mathutils.Vector((1 / pose_bone.scale[0], 1 / pose_bone.scale[1], 1 / pose_bone.scale[2]))
+
         # 名前の文字列から%AS%を削除する
-        shape_name = modifier.name[len(consts.APPLY_AS_SHAPEKEY_PREFIX):len(modifier.name)]
+        shape_name = consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.sub("", modifier.name)
         # 名前の文字列から$以降を削除する
         shape_name = shape_name.split("$")[0]
 
@@ -103,6 +119,12 @@ def apply_as_shapekey(modifier):
 
             func_object_utils.select_objects(temp_selected_objects)
 
+        if use_inverted_bones:
+            # ボーンの移動と回転とスケールを元に戻す
+            for pose_bone in mod_target.pose.bones:
+                pose_bone.location = bone_locations[pose_bone.name]
+                pose_bone.rotation_quaternion = bone_rotations[pose_bone.name]
+                pose_bone.scale = bone_scales[pose_bone.name]
     except RuntimeError as e:
         # 無効なModifier（対象オブジェクトが指定されていないなどの状態）は適用しない
         warn = bpy.app.translations.pgettext("mizore_error_apply_as_shapekey_invalid_modifier").format(
