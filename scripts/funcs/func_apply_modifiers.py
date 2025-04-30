@@ -19,10 +19,10 @@
 import bpy
 from .. import consts
 from ..funcs.utils import func_object_utils
-
+from ..funcs import func_update_mesh_deform_addon
 
 # オブジェクトのモディファイアを適用
-def apply_modifiers(remove_nonrender=True):
+def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
     print("apply_modifiers")
     obj = func_object_utils.get_active_object()
 
@@ -33,6 +33,11 @@ def apply_modifiers(remove_nonrender=True):
 
     print("Apply Modifiers: [" + obj.name + "]")
     for modifier in obj.modifiers:
+        if use_update_mesh_deform_addon:
+            func_update_mesh_deform_addon.update_mesh_deform_addon(
+                obj=obj, 
+                modifier=modifier, 
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         if modifier.name.startswith(consts.FORCE_KEEP_MODIFIER_PREFIX):
             # モディファイア名がFORCE_KEEP_MODIFIER_PREFIXで始まっているなら無視
             print(f"FORCE_KEEP_MODIFIER_PREFIX: [{modifier.name}]")

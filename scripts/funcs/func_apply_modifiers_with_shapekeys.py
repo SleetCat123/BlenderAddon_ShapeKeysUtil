@@ -21,12 +21,13 @@ from .. import consts
 from ..funcs import (
     func_separate_shapekeys, 
     func_apply_as_shapekey, 
-    func_apply_modifiers
+    func_apply_modifiers,
+    func_update_mesh_deform_addon
 )
 from ..funcs.utils import func_object_utils
 
 
-def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender):
+def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, use_update_mesh_deform_addon: bool):
     print("func_apply_modifiers_with_shapekeys - partial_apply_modifiers")
     # 2番目以降にmodifier_index用のモディファイアがあったら
     # 一時オブジェクトを作成
@@ -46,7 +47,9 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender):
 
     # 関数を再実行し、modifier_indexより前のモディファイアを適用
     print("re-execute apply_modifiers_with_shapekeys (1)")
-    apply_modifiers_with_shapekeys(remove_nonrender)
+    apply_modifiers_with_shapekeys(
+        remove_nonrender=remove_nonrender, 
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon)
 
     # 削除していたモディファイアを一時オブジェクトから復元
     print("restore modifiers")
@@ -70,11 +73,13 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender):
 
     # 関数を再実行して終了
     print("re-execute apply_modifiers_with_shapekeys (2)")
-    apply_modifiers_with_shapekeys(remove_nonrender)
+    apply_modifiers_with_shapekeys(
+        remove_nonrender=remove_nonrender, 
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon)
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
-def apply_modifiers_with_shapekeys(remove_nonrender=True):
+def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform_addon=False):
     source_obj = func_object_utils.get_active_object()
     print(f"apply_modifiers_with_shapekeys: [{source_obj.name}] [{source_obj.type}]  {len(source_obj.modifiers)} modifiers")
     # Apply as shapekey用モディファイアのインデックスを検索
@@ -88,16 +93,29 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True):
             break
     if apply_as_shape_index == 0:
         # Apply as shapekey用のモディファイアが一番上にあったらモディファイアをシェイプキーとして適用
+
+        if use_update_mesh_deform_addon:
+            func_update_mesh_deform_addon.update_mesh_deform_addon(
+                obj=source_obj, 
+                modifier=apply_as_shape_modifier, 
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+
         print("%AS% modifier is top")
         func_apply_as_shapekey.apply_as_shapekey(apply_as_shape_modifier)
         # 関数を再実行して終了
         print("re-execute apply_modifiers_with_shapekeys")
-        apply_modifiers_with_shapekeys(remove_nonrender)
+        apply_modifiers_with_shapekeys(
+            remove_nonrender=remove_nonrender, 
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         return
     elif apply_as_shape_index >= 1:
         # 2番目以降にApply as shape用のモディファイアがあったら
         print("%AS% modifier is not top")
-        partial_apply_modifiers(source_obj, apply_as_shape_index, remove_nonrender)
+        partial_apply_modifiers(
+            source_obj=source_obj, 
+            modifier_index=apply_as_shape_index, 
+            remove_nonrender=remove_nonrender,
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         return
     else:
         print("%AS% modifier is not found")
@@ -112,19 +130,30 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True):
     if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
         # シェイプキーがなければモディファイア適用処理だけ実行
         print("only apply_modifiers: " + source_obj.name)
-        func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
+        func_apply_modifiers.apply_modifiers(
+            remove_nonrender=remove_nonrender, 
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         return
     
     # シェイプキーがある場合、SurfaceDeformモディファイアはBasisシェイプに対して適用される
     surface_deform_index = -1
+    surface_deform_modifier = None
     for i, modifier in enumerate(source_obj.modifiers):
         if modifier.type == 'SURFACE_DEFORM':
             surface_deform_index = i
+            surface_deform_modifier = modifier
             print(f"SurfaceDeform modifier is found: {str(surface_deform_index)} - {modifier.name}")
             break
     if surface_deform_index == 0:
         # SurfaceDeformモディファイアが一番上にあったら
         print("SurfaceDeform modifier is top")
+
+        if use_update_mesh_deform_addon:
+            func_update_mesh_deform_addon.update_mesh_deform_addon(
+                obj=source_obj, 
+                modifier=surface_deform_modifier, 
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+
         # オブジェクトを複製
         temp_obj = func_object_utils.duplicate_object(source_obj)
         func_object_utils.deselect_all_objects()
@@ -171,12 +200,18 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True):
         bpy.ops.object.modifier_remove(modifier=source_obj.modifiers[0].name)
 
         # 関数を再実行して終了
-        apply_modifiers_with_shapekeys(remove_nonrender)
+        apply_modifiers_with_shapekeys(
+            remove_nonrender=remove_nonrender, 
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         return
     if surface_deform_index >= 1:
         # SurfaceDeformモディファイアが2番目以降にあったら
         print("SurfaceDeform modifier is not top")
-        partial_apply_modifiers(source_obj, surface_deform_index, remove_nonrender)
+        partial_apply_modifiers(
+            source_obj=source_obj, 
+            modifier_index=surface_deform_index, 
+            remove_nonrender=remove_nonrender,
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         return
     else:
         print("SurfaceDeform modifier is not found")
@@ -206,7 +241,8 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True):
             duplicate=False,
             enable_apply_modifiers=True,
             remove_nonrender=remove_nonrender,
-            keep_original_shapekeys=False
+            keep_original_shapekeys=False,
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon
         )
 
         print("Source: " + source_obj.name)

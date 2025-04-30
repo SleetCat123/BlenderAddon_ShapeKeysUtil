@@ -27,7 +27,8 @@ def separate_shapekeys(
         duplicate: bool,
         enable_apply_modifiers: bool,
         remove_nonrender: bool = True,
-        keep_original_shapekeys: bool = False
+        keep_original_shapekeys: bool = False,
+        use_update_mesh_deform_addon: bool = False
 ):
     source_obj = func_object_utils.get_active_object()
     source_obj_name = source_obj.name
@@ -91,10 +92,14 @@ def separate_shapekeys(
     if enable_apply_modifiers:
         if not keep_original_shapekeys:
             func_object_utils.set_active_object(source_obj)
-            func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
+            func_apply_modifiers.apply_modifiers(
+                remove_nonrender=remove_nonrender, 
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         for obj in separated_objects:
             func_object_utils.set_active_object(obj)
-            func_apply_modifiers.apply_modifiers(remove_nonrender=remove_nonrender)
+            func_apply_modifiers.apply_modifiers(
+                remove_nonrender=remove_nonrender, 
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
         func_object_utils.set_active_object(source_obj)
 
     # 表示を更新

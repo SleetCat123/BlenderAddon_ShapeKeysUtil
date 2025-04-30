@@ -21,7 +21,7 @@ import traceback
 from bpy.props import BoolProperty
 from ..funcs import func_apply_modifiers_with_shapekeys
 from ..funcs.utils import func_object_utils
-
+from ..link import func_link_with_MeshDeformUtils
 
 class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_apply_modifiers"
@@ -34,6 +34,20 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
         default=True,
         description="A non-render modifier will be removed."
     )
+
+    use_update_mesh_deform_addon: BoolProperty(
+        name="Use Update Mesh Deform Addon",
+        default=False,
+        description="Use MeshDeformUtils Addon"
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "remove_nonrender")
+        
+        row = layout.row()
+        row.prop(self, "use_update_mesh_deform_addon")
+        row.enabled = func_link_with_MeshDeformUtils.update_mesh_deform_addon_is_found()
 
     def execute(self, context):
         try:
@@ -50,7 +64,9 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
 
             for obj in targets:
                 func_object_utils.set_active_object(obj)
-                func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(remove_nonrender=self.remove_nonrender)
+                func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(
+                    remove_nonrender=self.remove_nonrender,
+                    use_update_mesh_deform_addon=self.use_update_mesh_deform_addon)
             func_object_utils.select_objects(selected_objects, True)
             func_object_utils.set_active_object(active)
             return {'FINISHED'}

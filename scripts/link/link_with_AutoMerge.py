@@ -27,9 +27,17 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
     bl_label = "[Internal] Apply Modifiers With Shapekeys For AutoMerge Addon"
     bl_options = {'REGISTER', 'UNDO'}
 
+    use_update_mesh_deform_addon: bpy.props.BoolProperty(
+        name="Use Update Mesh Deform Addon", 
+        default=False,
+        description="Use MeshDeformUtils Addon"
+    )
+
     def execute(self, context):
         print("ShapekeysUtil - link_with_AutoMerge")
-        func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(remove_nonrender=True)
+        func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(
+            remove_nonrender=True, 
+            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon)
         return {'FINISHED'}
 
 

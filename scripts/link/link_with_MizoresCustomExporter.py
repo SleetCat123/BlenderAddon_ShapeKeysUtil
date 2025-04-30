@@ -27,9 +27,17 @@ class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Oper
     bl_label = "[Internal] Apply Modifiers With Shapekeys For MizoresCustomExporter Addon"
     bl_options = {'REGISTER', 'UNDO'}
 
+    use_update_mesh_deform_addon: bpy.props.BoolProperty(
+        name="Use Update Mesh Deform Addon", 
+        default=False,
+        description="Use MeshDeformUtils Addon"
+    )
+
     def execute(self, context):
         print("ShapekeysUtil - Apply Modifiers With Shapekeys")
-        apply_modifiers_with_shapekeys(remove_nonrender=False)
+        apply_modifiers_with_shapekeys(
+            remove_nonrender=False, 
+            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon)
         return {'FINISHED'}
 
 
