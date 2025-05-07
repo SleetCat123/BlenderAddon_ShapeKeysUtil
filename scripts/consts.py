@@ -67,7 +67,7 @@ def use_apply_each_shapekeys(modifier):
 
     # %AS:ALL%で始まっているならシェイプキーを個別にシェイプキーとして適用
     match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name)
-    if get_tag(match).lower() == "all":
+    if match and get_tag(match).lower() == "all":
         return True
     return False
 
