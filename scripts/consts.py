@@ -61,13 +61,13 @@ def use_apply_each_shapekeys(modifier):
     target_data = target_object.data
     if (target_data.shape_keys 
         and len(target_data.shape_keys.key_blocks) > 1 
-        and target_data.shape_keys.key_blocks[0].name == "All"):
+        and target_data.shape_keys.key_blocks[0].name.lower() == "all"):
         # SurfaceDeformモディファイアのターゲットオブジェクトにシェイプキーが2つ以上存在していて、最初のシェイプキーの名前が"All"ならshow_only_shape_keyをTrueにしてシェイプキーを個別にシェイプキーとして適用
         return True
 
     # %AS:ALL%で始まっているならシェイプキーを個別にシェイプキーとして適用
     match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name)
-    if get_tag(match) == "ALL":
+    if get_tag(match).lower() == "all":
         return True
     return False
 
