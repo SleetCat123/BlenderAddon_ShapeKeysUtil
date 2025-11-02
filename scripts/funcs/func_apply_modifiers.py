@@ -17,9 +17,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from .. import consts
-from ..funcs.utils import func_object_utils
 from ..funcs import func_update_mesh_deform_addon
+from ..funcs.utils import func_object_utils
+
 
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):

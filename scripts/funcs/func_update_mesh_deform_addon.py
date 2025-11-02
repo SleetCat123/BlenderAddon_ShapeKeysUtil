@@ -1,5 +1,6 @@
 import bpy
 
+
 def update_mesh_deform_addon(obj, modifier, use_update_mesh_deform_addon):
     if use_update_mesh_deform_addon and(modifier.type == 'MESH_DEFORM' or modifier.type == 'SURFACE_DEFORM'):
         temp_active_modifier = obj.modifiers.active

@@ -18,6 +18,7 @@
 
 import bpy
 from bpy.props import BoolProperty
+
 from .. import consts
 
 

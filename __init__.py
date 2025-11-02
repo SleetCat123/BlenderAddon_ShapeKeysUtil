@@ -17,11 +17,10 @@
 # ##### END GPL LICENSE BLOCK #####
 from .scripts.funcs.utils import func_package_utils
 
-
 bl_info = {
     "name": "ShapeKeys Util",
     "author": "@sleetcat123(Twitter)",
-    "version": (2, 1, 0),
+    "version": (2, 2, 0),
     "blender": (2, 80, 0),
     "location": "",
     "description": "",
@@ -29,8 +28,8 @@ bl_info = {
 }
 
 if 'bpy' in locals():
-    from importlib import reload
     import sys
+    from importlib import reload
     for k, v in list(sys.modules.items()):
         if k.startswith(func_package_utils.get_package_root()):
             reload(v)
@@ -39,13 +38,9 @@ else:
         addon_preferences,
         translations,
     )
-    from .scripts.link import (
-        link_with_AutoMerge,
-        link_with_MizoresCustomExporter
-    )
-    from .scripts.menu import (
-        menu_edit_mesh_context,
-        menu_object_context
+    from .scripts.link import link_with_AutoMerge, link_with_MizoresCustomExporter
+    from .scripts.menu import menu_edit_mesh_context, menu_object_context
+
     )
     from .scripts.ops import (
         op_apply_modifiers,

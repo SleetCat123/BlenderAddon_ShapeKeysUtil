@@ -188,7 +188,7 @@ def remove_objects(targets=None):
 def get_top_level_objects(targets):
     print("get_top_level_objects targets: " + str(targets))
     top_level_objects = []
-    for obj in bpy.context.selected_objects:
+    for obj in targets:
         parent = obj.parent
         is_root = True
         while parent:
