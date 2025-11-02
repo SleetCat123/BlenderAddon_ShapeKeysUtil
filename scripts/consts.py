@@ -18,6 +18,8 @@
 
 import re
 
+from .funcs.utils import func_modifier_utils
+
 # Create Left and Right Shape Keys の自動判定で使うやつ
 ENABLE_LR_TAG = "%LR%"
 ENABLE_DUPLICATE_TAG = "%D%"
@@ -35,11 +37,53 @@ def get_tag(match):
             return groups[0]
     return None
 
+def get_base_shapekey_name(modifier):
+    """モディファイア名からベースシェイプキー名を取得"""
+    try:
+        mod_name = func_modifier_utils.get_modifier_name_safe(modifier)
+    except (RuntimeError, UnicodeDecodeError, AttributeError) as e:
+        # モディファイアが無効な状態の場合はログを出してNoneを返す
+        print(f"WARNING: Could not get modifier name in get_base_shapekey_name: {e}")
+        return None
+    
+    match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(mod_name)
+    if not match:
+        return None
+    
+    tag = get_tag(match)
+    if not tag:
+        return None
+    
+    # BASE:xxx形式のタグを解析
+    if tag.startswith('BASE:'):
+        return tag[5:]  # 'BASE:'以降を返す
+    
+    # ALL:BASE:xxx形式のタグを解析
+    if tag.startswith('ALL:BASE:'):
+        return tag[9:]  # 'ALL:BASE:'以降を返す
+    
+    return None
+
+def is_composite_shapekey(modifier):
+    """複合シェイプキーかどうかを判定"""
+    return get_base_shapekey_name(modifier) is not None
+
+def parse_shapekey_name_for_base(shapekey_name):
+    """シェイプキー名から@BASE:xxx形式のベース指定を解析"""
+    if '@BASE:' in shapekey_name:
+        parts = shapekey_name.split('@BASE:')
+        if len(parts) == 2:
+            clean_name = parts[0]
+            base_name = parts[1]
+            return clean_name, base_name
+    return shapekey_name, None
+
 def use_inverted_bones_as_shapekey(modifier):
     if modifier.type != 'ARMATURE':
         return False
     # %AS:I%で始まっているならボーンの移動を反転した状態でApply as shapekey
-    match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name)
+    mod_name = func_modifier_utils.get_modifier_name_safe(modifier)
+    match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(mod_name)
     if get_tag(match) == 'I':
         return True
     return False
@@ -66,9 +110,14 @@ def use_apply_each_shapekeys(modifier):
         return True
 
     # %AS:ALL%で始まっているならシェイプキーを個別にシェイプキーとして適用
-    match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name)
+    mod_name = func_modifier_utils.get_modifier_name_safe(modifier)
+    
+    match = REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(mod_name)
     tag = get_tag(match)
     if tag and tag.lower() == "all":
+        return True
+    # %AS:ALL:BASE:xxx%で始まっているならシェイプキーを個別にシェイプキーとして適用
+    if tag and tag.lower().startswith("all:base:"):
         return True
     return False
 

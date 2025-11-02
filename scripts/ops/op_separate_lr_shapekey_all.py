@@ -16,9 +16,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import traceback
+
+import bpy
 from bpy.props import BoolProperty
+
 from ..funcs import func_separate_lr_shapekey_all
 from ..funcs.utils import func_object_utils
 

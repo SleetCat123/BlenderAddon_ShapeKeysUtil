@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from .. import consts
 from ..funcs import func_select_axis_from_point
 from ..funcs.utils import func_object_utils
@@ -33,6 +34,10 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     result_shape_key_name = source_shape_key.name
     # print("after: "+source_shape_key.name)
 
+    # Mirror Topologyを無効化（編集時の自動ミラーを防ぐ）
+    original_use_mirror_x = obj.data.use_mirror_x
+    obj.data.use_mirror_x = False
+
     # 左
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.shape_key_add(from_mix=False)
@@ -41,13 +46,13 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     left_shape.name = result_shape_key_name + "_left"
     func_select_axis_from_point.select_axis_from_point(
         point=(0, 0, 0),
-        mode='NEGATIVE', 
-        axis='X', 
+        mode='NEGATIVE',
+        axis='X',
         )
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
     func_select_axis_from_point.select_axis_from_point(
-        point=(0, 0, 0), 
+        point=(0, 0, 0),
         mode='ALIGNED',
         axis='X'
         )
@@ -64,21 +69,24 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     right_shape = obj.data.shape_keys.key_blocks[right_shape_index]
     right_shape.name = result_shape_key_name + "_right"
     func_select_axis_from_point.select_axis_from_point(
-        point=(0, 0, 0), 
-        mode='POSITIVE', 
-        axis='X', 
+        point=(0, 0, 0),
+        mode='POSITIVE',
+        axis='X',
         )
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=1, add=False)
     func_select_axis_from_point.select_axis_from_point(
-        point=(0, 0, 0), 
-        mode='ALIGNED', 
+        point=(0, 0, 0),
+        mode='ALIGNED',
         axis='X'
         )
     if any([v.select for v in obj.data.vertices]):
         bpy.ops.mesh.blend_from_shape(shape=source_shape_key.name, blend=-0.5, add=True)
 
     bpy.ops.object.mode_set(mode='OBJECT')
+
+    # Mirror Topologyを元に戻す
+    bpy.context.object.data.use_mirror_x = original_use_mirror_x
 
     if enable_sort:
         # 分割したシェイプキーが分割元シェイプキーのすぐ下に来るように移動

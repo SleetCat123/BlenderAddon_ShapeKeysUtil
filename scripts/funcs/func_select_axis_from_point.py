@@ -16,8 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import bmesh
+import bpy
+
 from ..funcs.utils import func_object_utils
 
 
@@ -28,7 +29,7 @@ def select_axis_from_point(point=(0, 0, 0), mode='POSITIVE', axis='X', threshold
         return
 
     bpy.ops.object.mode_set(mode='EDIT')
-    temp_mesh_select_mode = bpy.context.tool_settings.mesh_select_mode 
+    temp_mesh_select_mode = bpy.context.tool_settings.mesh_select_mode
     bpy.context.tool_settings.mesh_select_mode  = (True, False, False)
     bm = bmesh.from_edit_mesh(obj.data)
 

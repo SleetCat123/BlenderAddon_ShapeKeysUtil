@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import FloatVectorProperty, EnumProperty, FloatProperty
+from bpy.props import EnumProperty, FloatProperty, FloatVectorProperty
+
 from ..funcs import func_select_axis_from_point
 
 

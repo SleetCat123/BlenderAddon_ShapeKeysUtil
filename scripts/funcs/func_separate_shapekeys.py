@@ -16,10 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import time
+
 from . import func_apply_modifiers, func_shapekey_utils
-from .utils import func_object_utils, func_mesh_utils, func_package_utils
+from .utils import func_mesh_utils, func_object_utils, func_package_utils
 
 
 # シェイプキーをそれぞれ別のオブジェクトにする

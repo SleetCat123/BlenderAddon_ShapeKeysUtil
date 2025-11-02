@@ -16,12 +16,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import traceback
+
+import bpy
 from bpy.props import BoolProperty
+
 from ..funcs import func_apply_modifiers_with_shapekeys
 from ..funcs.utils import func_object_utils
 from ..link import func_link_with_MeshDeformUtils
+
 
 class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_apply_modifiers"

@@ -16,8 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import traceback
+
+import bpy
+
 from ..funcs.utils import func_object_utils
 
 

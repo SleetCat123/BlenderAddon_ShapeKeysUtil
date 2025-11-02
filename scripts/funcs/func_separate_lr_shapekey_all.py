@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from .. import consts
 from ..funcs import func_separate_lr_shapekey
 from ..funcs.utils import func_object_utils

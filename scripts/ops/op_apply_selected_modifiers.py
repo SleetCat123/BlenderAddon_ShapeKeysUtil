@@ -16,11 +16,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import traceback
-from ..funcs import func_separate_shapekeys
-from ..funcs.utils import func_object_utils
+
+import bpy
+
 from ..funcs import func_apply_selected_modifier
+from ..funcs.utils import func_object_utils
 
 
 class OBJECT_OT_mizore_shapekeys_util_apply_selected_modifiers(bpy.types.Operator):

@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from ..ops import op_sideofactive_point
 
 
