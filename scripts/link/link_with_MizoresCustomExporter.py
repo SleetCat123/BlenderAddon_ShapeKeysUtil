@@ -20,6 +20,7 @@ import bpy
 
 from ..funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
 from ..funcs.func_separate_lr_shapekey_all import separate_lr_shapekey_all
+from ..funcs.func_subtract_base_shapekey import subtract_base_shapekey_all
 
 
 # MizoresCustomExporter連携用
@@ -53,9 +54,21 @@ class OBJECT_OT_separate_lr_shapekey_for_mizores_custom_exporter_addon(bpy.types
         return {'FINISHED'}
 
 
+class OBJECT_OT_subtract_base_shapekey_for_mizores_custom_exporter_addon(bpy.types.Operator):
+    bl_idname = "object.shapekeys_util_subtract_base_shapekey_for_exporter"
+    bl_label = "[Internal] Subtract Base Shapekey For MizoresCustomExporter Addon"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        print("ShapekeysUtil - Subtract Base Shapekeys")
+        subtract_base_shapekey_all()
+        return {'FINISHED'}
+
+
 classes = [
     OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon,
     OBJECT_OT_separate_lr_shapekey_for_mizores_custom_exporter_addon,
+    OBJECT_OT_subtract_base_shapekey_for_mizores_custom_exporter_addon,
 ]
 
 
