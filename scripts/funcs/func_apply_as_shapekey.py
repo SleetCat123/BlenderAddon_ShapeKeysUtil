@@ -24,10 +24,95 @@ from ..funcs import func_composite_shapekey, func_shapekey_utils
 from ..funcs.utils import func_object_utils
 
 
+def _apply_override_delta(obj, modifier, already_exists_index):
+    """
+    デルタ加算モード: Basisからの差分を既存シェイプキーに加算
+    """
+    modifier_name = modifier.name
+    base_shapekey_name = consts.get_base_shapekey_name(modifier)
+
+    # モディファイア変形を新規シェイプキーとして取得（Basisとの差分）
+    bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier_name)
+    new_shapekey = obj.data.shape_keys.key_blocks[-1]
+
+    # ベースシェイプキーがあれば減算処理
+    if base_shapekey_name:
+        func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
+
+    # 既存シェイプキーを取得
+    exists_shapekey = obj.data.shape_keys.key_blocks[already_exists_index]
+    basis = obj.data.shape_keys.key_blocks[0]
+
+    # 既存シェイプキーの座標に、新規シェイプキーの差分（Basisからの変位）を加算
+    for i in range(len(exists_shapekey.data)):
+        delta_x = new_shapekey.data[i].co.x - basis.data[i].co.x
+        delta_y = new_shapekey.data[i].co.y - basis.data[i].co.y
+        delta_z = new_shapekey.data[i].co.z - basis.data[i].co.z
+        exists_shapekey.data[i].co.x += delta_x
+        exists_shapekey.data[i].co.y += delta_y
+        exists_shapekey.data[i].co.z += delta_z
+
+    # 新規シェイプキーを削除
+    obj.shape_key_remove(new_shapekey)
+
+
+def _apply_override_direct(obj, modifier, already_exists_index):
+    """
+    直接適用モード: 既存シェイプキーの座標に直接変形を適用
+    """
+    modifier_name = modifier.name
+    base_shapekey_name = consts.get_base_shapekey_name(modifier)
+
+    temp_selected_objects = bpy.context.selected_objects
+
+    func_object_utils.deselect_all_objects()
+    func_object_utils.select_object(obj, True)
+    func_object_utils.set_active_object(obj)
+
+    # オブジェクトをコピーしてモディファイアを適用
+    dup_obj = func_object_utils.duplicate_object(obj)
+
+    # 同名シェイプキーの形状がベースになるようにして他シェイプを消す
+    func_shapekey_utils.bake_shape_key(already_exists_index)
+
+    # AS用モディファイアを普通に適用
+    bpy.ops.object.modifier_apply(modifier=modifier_name)
+
+    # 元オブジェクトにJoin as Shape
+    func_object_utils.select_object(dup_obj, True)
+    func_object_utils.select_object(obj, True)
+    func_object_utils.set_active_object(obj)
+    bpy.ops.object.join_shapes()
+
+    # AS用モディファイアは削除
+    bpy.ops.object.modifier_remove(modifier=modifier_name)
+
+    # 既存のシェイプキーを新規シェイプキーで上書き
+    new_shapekey = obj.data.shape_keys.key_blocks[-1]
+
+    # ベースシェイプキーがあれば減算処理
+    if base_shapekey_name:
+        func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
+
+    exists_shapekey = obj.data.shape_keys.key_blocks[already_exists_index]
+    for i, v in enumerate(new_shapekey.data):
+        exists_shapekey.data[i].co = v.co
+    obj.shape_key_remove(new_shapekey)
+
+    # コピーしたオブジェクトを削除
+    func_object_utils.remove_object(dup_obj)
+
+    func_object_utils.select_objects(temp_selected_objects)
+
+
 def apply_as_shapekey(modifier):
+    modifier_name = modifier.name
+    modifier_type = modifier.type
+    base_shapekey_name = consts.get_base_shapekey_name(modifier)
+
     try:
         obj = func_object_utils.get_active_object()
-        print(f"ShapeKeysUtil - func_apply_as_shapekey: {modifier.name}")
+        print(f"ShapeKeysUtil - func_apply_as_shapekey: {modifier_name}")
         if consts.use_apply_each_shapekeys(modifier):
             # SurfaceDeformモディファイアのターゲットオブジェクトにシェイプキーが2つ以上存在していて、最初のシェイプキーの名前が"All"ならshow_only_shape_keyをTrueにしてシェイプキーを個別にシェイプキーとして適用
             print("Add shapekeys from SurfaceDeform")
@@ -47,14 +132,14 @@ def apply_as_shapekey(modifier):
                     keep_modifier = False
                 else:
                     keep_modifier = True
-                bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=keep_modifier, modifier=modifier.name)
+                bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=keep_modifier, modifier=modifier_name)
                 # シェイプキー名を変更
                 new_shapekey = obj.data.shape_keys.key_blocks[-1]
                 # シェイプキー名から個別のベース指定をチェック
                 clean_name, individual_base = consts.parse_shapekey_name_for_base(key.name)
-                # 個別ベースがなければモディファイアのベースをチェック
+                # 個別ベースがなければモディファイアのベースを使用
                 if not individual_base:
-                    individual_base = consts.get_base_shapekey_name(modifier)
+                    individual_base = base_shapekey_name
                 # ベースシェイプキーがあれば減算処理
                 if individual_base:
                     func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, individual_base)
@@ -84,7 +169,7 @@ def apply_as_shapekey(modifier):
                 pose_bone.scale = mathutils.Vector((1 / pose_bone.scale[0], 1 / pose_bone.scale[1], 1 / pose_bone.scale[2]))
 
         # 名前の文字列から%AS%を削除する
-        shape_name = consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.sub("", modifier.name)
+        shape_name = consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.sub("", modifier_name)
         # 名前の文字列から$以降を削除する
         shape_name = shape_name.split("$")[0]
 
@@ -93,59 +178,26 @@ def apply_as_shapekey(modifier):
         if already_exists_index == -1:
             if not obj.data.shape_keys and shape_name == 'Basis':
                 # シェイプキーが存在せず、新規シェイプキー名がBasisの場合は通常のモディファイア適用
-                bpy.ops.object.modifier_apply(modifier=modifier.name)
+                bpy.ops.object.modifier_apply(modifier=modifier_name)
             else:
                 print(f"add shapekey: {shape_name}")
-                # Apply As Shape
-                bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier.name)
-                # シェイプキー名を変更
+                bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier_name)
                 new_shapekey = obj.data.shape_keys.key_blocks[-1]
-                # ベースシェイプキーがあれば減算処理
-                try:
-                    base_shapekey_name = consts.get_base_shapekey_name(modifier)
-                    if base_shapekey_name:
-                        func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
-                except Exception as e:
-                    # エラーが発生してもシェイプキーの処理は続行
-                    print(f"WARNING: Could not get base shapekey name: {e}")
-                    print("Continuing without base shapekey subtraction.")
+                if base_shapekey_name:
+                    func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
                 new_shapekey.name = shape_name
         else:
-            # 同名のシェイプキーが存在するなら、そのシェイプキーに対してモディファイアの変形を適用する
-            print(f"override shapekey: {shape_name}")
-            temp_selected_objects = bpy.context.selected_objects
-            func_object_utils.deselect_all_objects()
-            func_object_utils.select_object(obj, True)
-            func_object_utils.set_active_object(obj)
-            # オブジェクトをコピーしてモディファイアを適用
-            dup_obj = func_object_utils.duplicate_object(obj)
-            # 同名シェイプキーの形状がベースになるようにして他シェイプを消す
-            func_shapekey_utils.bake_shape_key(already_exists_index)
-            # AS用モディファイアを普通に適用
-            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            # 同名のシェイプキーが存在するなら、そのシェイプキーに対してモディファイアの変形を適用
+            use_direct_mode = consts.use_direct_apply_mode(modifier)
 
-            # 元オブジェクトにJoin as Shape
-            func_object_utils.select_object(dup_obj, True)
-            func_object_utils.select_object(obj, True)
-            func_object_utils.set_active_object(obj)
-            bpy.ops.object.join_shapes()
-            # AS用モディファイアは削除
-            bpy.ops.object.modifier_remove(modifier=modifier.name)
-            # 既存のシェイプキーを新規シェイプキーで上書き
-            new_shapekey = obj.data.shape_keys.key_blocks[-1]
-            # ベースシェイプキーがあれば減算処理
-            base_shapekey_name = consts.get_base_shapekey_name(modifier)
-            if base_shapekey_name:
-                func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
-            exists_shapekey = obj.data.shape_keys.key_blocks[already_exists_index]
-            for i, v in enumerate(new_shapekey.data):
-                exists_shapekey.data[i].co = v.co
-            obj.shape_key_remove(new_shapekey)
-
-            # コピーしたオブジェクトを削除
-            func_object_utils.remove_object(dup_obj)
-
-            func_object_utils.select_objects(temp_selected_objects)
+            if use_direct_mode:
+                # 直接適用モード: 既存シェイプキーの座標に直接変形を適用
+                print(f"override shapekey (DIRECT mode): {shape_name}")
+                _apply_override_direct(obj, modifier, already_exists_index)
+            else:
+                # デルタ加算モード（デフォルト）: Basisからの差分を既存シェイプキーに加算
+                print(f"override shapekey (DELTA mode): {shape_name}")
+                _apply_override_delta(obj, modifier, already_exists_index)
 
         if use_inverted_bones:
             # ボーンの移動と回転とスケールを元に戻す
@@ -157,14 +209,10 @@ def apply_as_shapekey(modifier):
         # 無効なModifier（対象オブジェクトが指定されていないなどの状態）は適用しない
         warn = bpy.app.translations.pgettext("mizore_error_apply_as_shapekey_invalid_modifier").format(
             obj_name = obj.name,
-            modifier_name = modifier.name,
-            modifier_type = modifier.type
+            modifier_name = modifier_name,
+            modifier_type = modifier_type
         )
         print(e)
-        # bpy.ops.object.modifier_remove(modifier=modifier.name)
-        raise Exception(warn)
+        raise Exception(warn) from e
     else:
-        try:
-            print(f"func_apply_as_shapekey: [{modifier.name}]")
-        except UnicodeDecodeError:
-            print("func_apply_as_shapekey")
+        print(f"func_apply_as_shapekey: [{modifier_name}]")
