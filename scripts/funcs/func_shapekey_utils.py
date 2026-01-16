@@ -15,16 +15,28 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
+import time
+
 import bpy
 
 from ..funcs.utils import func_object_utils
 
 
-def get_shape_key_index(shape_name:str):
-    obj = func_object_utils.get_active_object()
-    return get_shape_key_index(obj, shape_name)
+def get_shape_key_index(obj_or_name, shape_name: str = None):
+    """シェイプキーのインデックスを取得
 
-def get_shape_key_index(obj: bpy.types.Object, shape_name:str):
+    Args:
+        obj_or_name: bpy.types.Object または shape_name(str)
+        shape_name: obj_or_nameがObjectの場合に必要
+    """
+    if isinstance(obj_or_name, str):
+        # get_shape_key_index(shape_name) 形式
+        obj = func_object_utils.get_active_object()
+        shape_name = obj_or_name
+    else:
+        # get_shape_key_index(obj, shape_name) 形式
+        obj = obj_or_name
+
     if not obj.data.shape_keys:
         return -1
     key_blocks = obj.data.shape_keys.key_blocks
@@ -34,19 +46,28 @@ def get_shape_key_index(obj: bpy.types.Object, shape_name:str):
     return -1
 
 
-def bake_shape_key(shape_name: str):
-    obj = func_object_utils.get_active_object()
-    shape_index = get_shape_key_index(obj, shape_name)
-    if shape_index == -1:
-        raise ValueError(f"shape_name not found: {shape_name}")
-    bake_shape_key(shape_index)
-
 # 指定されたシェイプキーの形状を適用する。他のシェイプキーは削除される
-def bake_shape_key(shape_index: int):
+def bake_shape_key(shape_name_or_index):
+    """シェイプキーをベイク（形状を適用してシェイプキーをクリア）
+
+    Args:
+        shape_name_or_index: シェイプキー名(str) または インデックス(int)
+    """
+    start_time = time.perf_counter()
     obj = func_object_utils.get_active_object()
     key_blocks = obj.data.shape_keys.key_blocks
+
+    # 引数の型によってインデックスを取得
+    if isinstance(shape_name_or_index, str):
+        shape_index = get_shape_key_index(obj, shape_name_or_index)
+        if shape_index == -1:
+            raise ValueError(f"shape_name not found: {shape_name_or_index}")
+    else:
+        shape_index = shape_name_or_index
+
     target_shapekey = key_blocks[shape_index]
-    
+    shapekey_name = target_shapekey.name
+
     # シェイプキーの頂点座標を適用
     shape_co = [v.co for v in target_shapekey.data]
     for i, v in enumerate(obj.data.vertices):
@@ -54,6 +75,7 @@ def bake_shape_key(shape_index: int):
     obj.data.update()
 
     obj.shape_key_clear()
+    print(f"[bake_shape_key] {shapekey_name}: {time.perf_counter() - start_time:.3f}s")
 
     
 def shape_key_props_to_dict(shapekey):

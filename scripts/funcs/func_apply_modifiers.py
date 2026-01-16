@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import time
+
 import bpy
 
 from .. import consts
@@ -25,6 +27,7 @@ from ..funcs.utils import func_object_utils
 
 # オブジェクトのモディファイアを適用
 def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
+    start_time = time.perf_counter()
     print("apply_modifiers")
     obj = func_object_utils.get_active_object()
 
@@ -70,3 +73,4 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
                 print(f"!!! Apply failed !!!: [{modifier.name}]")
                 bpy.ops.object.modifier_remove(modifier=modifier.name)
     print(f"Finish Apply Modifiers: [{obj.name}]")
+    print(f"[apply_modifiers] {obj.name}: {time.perf_counter() - start_time:.3f}s")
