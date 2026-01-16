@@ -1,3 +1,5 @@
+import time
+
 import bpy
 
 from .. import func_separate_shapekeys
@@ -5,6 +7,8 @@ from ..utils import func_object_utils
 
 
 def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon):
+    start_time = time.perf_counter()
+    phase_start = start_time
     # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
     separated_objects = func_separate_shapekeys.separate_shapekeys(
         duplicate=False,
@@ -13,6 +17,8 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
         keep_original_shapekeys=False,
         use_update_mesh_deform_addon=use_update_mesh_deform_addon
     )
+    print(f"[apply_each_shapekey_modifiers] separate_shapekeys: {time.perf_counter() - phase_start:.3f}s")
+    phase_start = time.perf_counter()
 
     print("Source: " + source_obj.name)
     print("------ Merge Separated Objects ------\n" + '\n'.join(
@@ -62,6 +68,11 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
                 # 削除予定オブジェクトへの参照がある場合はBasisに変更
                 shapekey.relative_key = source_obj.data.shape_keys.key_blocks[0]
 
+    print(f"[apply_each_shapekey_modifiers] join_shapes: {time.perf_counter() - phase_start:.3f}s")
+    phase_start = time.perf_counter()
+
     # 使い終わったオブジェクトを削除
     func_object_utils.select_object(source_obj, False)
     func_object_utils.remove_objects(shape_objects)
+    print(f"[apply_each_shapekey_modifiers] cleanup: {time.perf_counter() - phase_start:.3f}s")
+    print(f"[apply_each_shapekey_modifiers] total: {time.perf_counter() - start_time:.3f}s")
