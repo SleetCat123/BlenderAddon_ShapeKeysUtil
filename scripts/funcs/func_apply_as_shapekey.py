@@ -168,10 +168,9 @@ def apply_as_shapekey(modifier):
                 pose_bone.rotation_quaternion = pose_bone.rotation_quaternion.inverted()
                 pose_bone.scale = mathutils.Vector((1 / pose_bone.scale[0], 1 / pose_bone.scale[1], 1 / pose_bone.scale[2]))
 
-        # 名前の文字列から%AS%を削除する
-        shape_name = consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.sub("", modifier_name)
-        # 名前の文字列から$以降を削除する
-        shape_name = shape_name.split("$")[0]
+        # 名前の文字列から%AS%を削除し、$以降と.001などのサフィックスも削除する
+        raw_name = consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.sub("", modifier_name)
+        shape_name = consts.normalize_shapekey_name(raw_name)
 
         # 同名のシェイプキーが存在するならインデックスを取得
         already_exists_index = func_shapekey_utils.get_shape_key_index(obj, shape_name)

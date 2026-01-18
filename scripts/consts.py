@@ -28,6 +28,29 @@ REGEX_APPLY_AS_SHAPEKEY_PREFIX = re.compile(r"^%AS(?::(.*))?%", re.IGNORECASE)  
 FORCE_APPLY_MODIFIER_PREFIX = "%A%"  # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
 FORCE_KEEP_MODIFIER_PREFIX = "%KEEP%"  # モディファイア名が"%KEEP%"で始まっているならモディファイアを適用せずに処理を続行する
 
+# Blender自動付与サフィックスのパターン（.001, .002 など）
+REGEX_BLENDER_SUFFIX = re.compile(r'\.\d{3}$')
+
+
+def normalize_shapekey_name(name: str) -> str:
+    """
+    シェイプキー名を正規化する
+
+    1. $以降を削除
+    2. .001などのBlender自動付与サフィックスを削除
+
+    Args:
+        name: 正規化前の名前
+
+    Returns:
+        正規化後の名前
+    """
+    # $以降を削除
+    result = name.split("$")[0]
+    # .001などのBlender自動付与サフィックスを削除
+    result = REGEX_BLENDER_SUFFIX.sub("", result)
+    return result
+
 def get_tag(match):
     if match:
         groups = match.groups()
