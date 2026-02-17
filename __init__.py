@@ -20,7 +20,7 @@ from .scripts.funcs.utils import func_package_utils
 bl_info = {
     "name": "ShapeKeys Util",
     "author": "@sleetcat123(Twitter)",
-    "version": (2, 2, 0),
+    "version": (2, 3, 0),
     "blender": (2, 80, 0),
     "location": "",
     "description": "",
@@ -35,7 +35,7 @@ if 'bpy' in locals():
             reload(v)
 else:
     from .scripts import (
-        addon_preferences,
+        modal_ops,
         translations,
     )
     from .scripts.link import link_with_AutoMerge, link_with_MizoresCustomExporter
@@ -44,7 +44,9 @@ else:
         op_apply_modifiers,
         op_apply_selected_modifiers,
         op_assign_lr_shapekey_tag,
+        op_change_base_shapekey,
         op_copy_shapekey_to_others,
+        op_reorder_shapekeys,
         op_separate_lr_shapekey,
         op_separate_lr_shapekey_all,
         op_separate_lr_shapekey_all_tag_detect,
@@ -54,13 +56,14 @@ else:
 
 import bpy
 
-
 classes = [
-    addon_preferences,
     translations,
-    
+
     link_with_AutoMerge,
     link_with_MizoresCustomExporter,
+
+    # Modal版オペレーター（メニューより先に登録）
+    modal_ops,
 
     menu_edit_mesh_context,
     menu_object_context,
@@ -74,6 +77,8 @@ classes = [
     op_separate_lr_shapekey_all_tag_detect,
     op_separate_shapekeys,
     op_sideofactive_point,
+    op_change_base_shapekey,
+    op_reorder_shapekeys,
 ]
 
 

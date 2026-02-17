@@ -17,20 +17,23 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from ..ops import (
-    op_apply_modifiers, 
-    op_separate_lr_shapekey,
-    op_separate_lr_shapekey_all_tag_detect, 
-    op_assign_lr_shapekey_tag, 
-    op_separate_lr_shapekey_all,
-    op_separate_shapekeys,
+    op_apply_modifiers,
     op_apply_selected_modifiers,
+    op_assign_lr_shapekey_tag,
+    op_change_base_shapekey,
     op_copy_shapekey_to_others,
+    op_reorder_shapekeys,
+    op_separate_lr_shapekey,
+    op_separate_lr_shapekey_all,
+    op_separate_lr_shapekey_all_tag_detect,
+    op_separate_shapekeys,
 )
 
 
 # オブジェクトモード　Special → ShapeKeys Util を登録する
-def INFO_MT_object_specials_shapekeys_util_menu(self, context):
+def draw_shapekeys_util_menu(self, context):
     self.layout.menu(VIEW3D_MT_object_specials_shapekeys_util.bl_idname)
 
 
@@ -55,12 +58,17 @@ class VIEW3D_MT_object_specials_shapekeys_util(bpy.types.Menu):
         layout.separator()
         layout.operator(op_copy_shapekey_to_others.OBJECT_OT_mizore_copy_shapekey_to_others.bl_idname)
 
+        layout.separator()
+        layout.operator(op_change_base_shapekey.OBJECT_OT_shapekeys_util_change_base_shapekey.bl_idname)
+        layout.operator(op_reorder_shapekeys.OBJECT_OT_shapekeys_util_sort_shapekeys_by_name.bl_idname)
+        layout.operator(op_reorder_shapekeys.OBJECT_OT_shapekeys_util_swap_shapekeys.bl_idname)
+
 
 def register():
     bpy.utils.register_class(VIEW3D_MT_object_specials_shapekeys_util)
-    bpy.types.VIEW3D_MT_object_context_menu.append(INFO_MT_object_specials_shapekeys_util_menu)
+    bpy.types.VIEW3D_MT_object_context_menu.append(draw_shapekeys_util_menu)
 
 
 def unregister():
     bpy.utils.unregister_class(VIEW3D_MT_object_specials_shapekeys_util)
-    bpy.types.VIEW3D_MT_object_context_menu.remove(INFO_MT_object_specials_shapekeys_util_menu)
+    bpy.types.VIEW3D_MT_object_context_menu.remove(draw_shapekeys_util_menu)

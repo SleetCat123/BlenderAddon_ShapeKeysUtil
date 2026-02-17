@@ -228,30 +228,41 @@ Apply Modifiersと同様に、モディファイア名の先頭に特殊な文�
 　　注意：Enableにチェックが入っていないと操作できません  
 　　注意：シェイプキーの数が多いオブジェクトで有効にすると移動処理に時間がかかります  
 
+### ◆Change Base Shape Key
+`オブジェクトモードで右クリック → ShapeKeys Util → Change Base Shape Key`
+
+指定したシェイプキーをBasis（ベース形状）として適用し、元のBasis形状を逆シェイプキーとして保存します。
+
+例: 「アクセサリーオン」シェイプキーをBasisに適用すると、アクセサリーオン状態がデフォルト形状になり、
+元のアクセサリーオフ状態が指定した名前のシェイプキーとして残ります。
+
+- Source Shape Key: Basisとして適用するシェイプキー名
+- Reverse Shape Key Name: 元のBasis形状を保存する逆シェイプキーの名前
+
+### ◆Sort Shape Keys by Name
+`オブジェクトモードで右クリック → ShapeKeys Util → Sort Shape Keys by Name`
+
+Basis以外のシェイプキーを名前のアルファベット順にソートします。
+
+### ◆Swap Shape Keys
+`オブジェクトモードで右クリック → ShapeKeys Util → Swap Shape Keys`
+
+指定した2つのシェイプキーの位置を入れ替えます。
+
 ### ◆Copy Shapekeys
 `オブジェクトモードで右クリック → ShapeKeys Util → Copy Shapekeys`  
 
 アクティブオブジェクトの形状を他の選択オブジェクトにbpy.ops.object.join_shapes()でコピーします。  
 
 ### ◆Side of Active from Point
-`編集モードで右クリック → ShapeKeys Util → Side of Active from Point`  
+`編集モードで右クリック → ShapeKeys Util → Side of Active from Point`
 
-アドオン製作時の副産物として生まれた機能です。  
+アドオン製作時の副産物として生まれた機能です。
 指定座標を基準にSide of Activeを行います。
 
 - 設定
     - Point
 　　基準となる座標です。
-
-## ◇Addon Preference（アドオン導入画面で変更可能な設定）
-- Wait Interval
-一部処理に挟まれる待機処理の間隔を設定します。  
-数値を大きくすると、シェイプキーが多い場合の処理時間が短くなりますが、代わりにCPU負荷が増します。  
-
-- Wait Sleep
-一部処理に挟まれる待機処理の長さを設定します。  
-数値を小さくすると、シェイプキーが多い場合の処理時間が短くなりますが、代わりにCPU負荷が増します。  
-負荷的に問題なさそうであれば小さくしておくと時間短縮になるかもしれません。  
 
 ## 不具合・エラーが起きた時
 このアドオンの機能はBlender標準のAPIを使って作成しているため、何らかの不具合が発生した場合にはすぐに Undo（Ctrl+Z） すれば機能使用前の状態に復元できます。  
