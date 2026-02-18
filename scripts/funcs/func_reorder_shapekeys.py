@@ -30,6 +30,29 @@ from .func_shapekey_utils import (
 from .progress_info import ProgressInfo
 
 
+def _apply_props_to_shapekey(kb, props):
+    """1つのシェイプキーにプロパティを書き込む（relative_key除く）"""
+    kb.interpolation = props['interpolation']
+    kb.mute = props['mute']
+    kb.name = props['name']
+    kb.slider_max = props['slider_max']
+    kb.slider_min = props['slider_min']
+    kb.value = props['value']
+    kb.vertex_group = props['vertex_group']
+    co = props['co']
+    for j, v in enumerate(kb.data):
+        v.co = co[j]
+
+
+def _resolve_relative_key(key_blocks, index, rel_name):
+    """relative_keyを名前で解決して設定する"""
+    if rel_name:
+        for candidate in key_blocks:
+            if candidate.name == rel_name:
+                key_blocks[index].relative_key = candidate
+                return
+
+
 def _serialize_shapekeys(key_blocks, start_index=0):
     """シェイプキーをシリアライズ（relative_keyは名前で保持）
 
@@ -67,26 +90,11 @@ def _write_shapekeys(key_blocks, props_list, start_index=0):
 
     # プロパティを書き戻し（relative_key以外）
     for i, props in enumerate(props_list):
-        kb = key_blocks[start_index + i]
-        kb.interpolation = props['interpolation']
-        kb.mute = props['mute']
-        kb.name = props['name']
-        kb.slider_max = props['slider_max']
-        kb.slider_min = props['slider_min']
-        kb.value = props['value']
-        kb.vertex_group = props['vertex_group']
-        co = props['co']
-        for j, v in enumerate(kb.data):
-            v.co = co[j]
+        _apply_props_to_shapekey(key_blocks[start_index + i], props)
 
     # relative_keyを名前で解決
     for i, props in enumerate(props_list):
-        rel_name = props.get('_relative_key_name')
-        if rel_name:
-            for candidate in key_blocks:
-                if candidate.name == rel_name:
-                    key_blocks[start_index + i].relative_key = candidate
-                    break
+        _resolve_relative_key(key_blocks, start_index + i, props.get('_relative_key_name'))
 
 
 def sort_shapekeys_by_name(obj):
@@ -161,26 +169,11 @@ def swap_shapekeys(obj, name_a, name_b):
 
     # 入れ替え（relative_key以外のプロパティ）
     for idx, props in [(index_a, props_b), (index_b, props_a)]:
-        kb = key_blocks[idx]
-        kb.interpolation = props['interpolation']
-        kb.mute = props['mute']
-        kb.name = props['name']
-        kb.slider_max = props['slider_max']
-        kb.slider_min = props['slider_min']
-        kb.value = props['value']
-        kb.vertex_group = props['vertex_group']
-        co = props['co']
-        for j, v in enumerate(kb.data):
-            v.co = co[j]
+        _apply_props_to_shapekey(key_blocks[idx], props)
 
     # relative_keyを名前で解決
     for idx, props in [(index_a, props_b), (index_b, props_a)]:
-        rel_name = props.get('_relative_key_name')
-        if rel_name:
-            for candidate in key_blocks:
-                if candidate.name == rel_name:
-                    key_blocks[idx].relative_key = candidate
-                    break
+        _resolve_relative_key(key_blocks, idx, props.get('_relative_key_name'))
 
     # 他のシェイプキーがAまたはBをrelative_keyとして参照していた場合の修正
     old_name_a = props_a['name']
