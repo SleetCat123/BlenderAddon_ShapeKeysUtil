@@ -82,7 +82,9 @@ def get_children_recursive(targets, only_current_view_layer: bool = True, contai
     for obj in targets:
         recursive(obj)
     if not contains_self:
-        result.remove(targets)
+        for obj in targets:
+            if obj in result:
+                result.remove(obj)
     return result
 
 
@@ -225,7 +227,7 @@ def duplicate_object(
     if source is None:
         source = bpy.context.selected_objects
     print("Duplicate Source: " + str(source))
-    if type(source) == bpy.types.Object:
+    if isinstance(source, bpy.types.Object):
         deselect_all_objects()
         select_object(source, True)
         set_active_object(source)

@@ -12,6 +12,7 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
     """
     start_time = time.perf_counter()
     print("_apply_surface_deform_to_basis_core - core processing")
+    modifier_name = modifier.name
     if use_update_mesh_deform_addon:
         from .. import func_update_mesh_deform_addon
         func_update_mesh_deform_addon.update_mesh_deform_addon(
@@ -29,7 +30,10 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
     temp_obj.active_shape_key_index = 0
     bpy.ops.object.shape_key_remove(all=True, apply_mix=False)
     # 複製したオブジェクトのSurfaceDeformモディファイアを適用
-    bpy.ops.object.modifier_apply(modifier=temp_obj.modifiers[0].name)
+    temp_modifier = temp_obj.modifiers.get(modifier_name)
+    if temp_modifier is None:
+        raise RuntimeError(f"SurfaceDeform modifier not found on temp object: {modifier_name}")
+    bpy.ops.object.modifier_apply(modifier=temp_modifier.name)
 
     temp_active_shape_key_index = source_obj.active_shape_key_index
     
@@ -62,7 +66,9 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
         bpy.ops.object.mode_set(mode=temp_mode)
 
     # 元オブジェクトのSurfaceDeformモディファイアを削除
-    bpy.ops.object.modifier_remove(modifier=source_obj.modifiers[0].name)
+    source_modifier = source_obj.modifiers.get(modifier_name)
+    if source_modifier:
+        bpy.ops.object.modifier_remove(modifier=source_modifier.name)
     print(f"[_apply_surface_deform_to_basis_core] total: {time.perf_counter() - start_time:.3f}s")
 
 def apply_surface_deform_to_basis(source_obj, modifier, use_update_mesh_deform_addon, remove_nonrender=True):

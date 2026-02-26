@@ -45,7 +45,12 @@ class OBJECT_OT_specials_shapekeys_util_separate_lr_shapekey_all(bpy.types.Opera
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj.type == 'MESH' and obj.data.shape_keys and len(obj.data.shape_keys.key_blocks) != 0
+        return (
+            obj is not None
+            and obj.type == 'MESH'
+            and obj.data.shape_keys
+            and len(obj.data.shape_keys.key_blocks) != 0
+        )
 
     def execute(self, context):
         try:

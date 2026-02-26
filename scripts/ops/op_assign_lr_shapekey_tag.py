@@ -48,7 +48,12 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
     def poll(cls, context):
         obj = context.object
 
-        b = (obj.type == 'MESH' and obj.data.shape_keys and obj.active_shape_key_index != 0)
+        b = (
+            obj is not None
+            and obj.type == 'MESH'
+            and obj.data.shape_keys
+            and obj.active_shape_key_index != 0
+        )
         if b:
             shapekey = obj.data.shape_keys.key_blocks[obj.active_shape_key_index]
             # 名前の最後が_leftまたは_rightのシェイプキーには使えないように
@@ -70,7 +75,6 @@ class OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag(bpy.types.Operato
 
     def draw(self, context):
         layout = self.layout
-        idname = OBJECT_OT_specials_shapekeys_util_assign_lr_shapekey_tag.bl_idname
         layout.label(text=bpy.app.translations.pgettext("target_object").format(self.target_name))
         layout.label(text=bpy.app.translations.pgettext("target_shape").format(self.target_shape_name))
         layout.prop(self, "enable")

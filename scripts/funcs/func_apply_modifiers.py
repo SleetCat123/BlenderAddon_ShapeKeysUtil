@@ -37,7 +37,10 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
                                         animation=False)
 
     print("Apply Modifiers: [" + obj.name + "]")
-    for modifier in obj.modifiers:
+    for modifier_name in [modifier.name for modifier in obj.modifiers]:
+        modifier = obj.modifiers.get(modifier_name)
+        if modifier is None:
+            continue
         if use_update_mesh_deform_addon:
             func_update_mesh_deform_addon.update_mesh_deform_addon(
                 obj=obj, 
@@ -51,13 +54,13 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
             # モディファイアがレンダリング対象ではない（モディファイア一覧のカメラアイコンが押されていない）なら無視
             if remove_nonrender:
                 print(f"remove_nonrender: [{modifier.name}]")
-                bpy.ops.object.modifier_remove(modifier=modifier.name)
+                bpy.ops.object.modifier_remove(modifier=modifier_name)
             continue
 
         if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
             # ここではApply as shapekeyさせたくない
             print("ERROR: apply_as_shapekey")
-            bpy.ops.object.modifier_remove(modifier=modifier.name)
+            bpy.ops.object.modifier_remove(modifier=modifier_name)
         elif modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type != 'ARMATURE':
             # 対象モディファイアが処理対象外モディファイアでないなら
             # または、モディファイアの名前欄が%A%で始まっているなら
@@ -67,10 +70,10 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
                     print(f"Apply: [{modifier.name}]")
                 except UnicodeDecodeError:
                     print("Apply")
-                bpy.ops.object.modifier_apply(modifier=modifier.name)
+                bpy.ops.object.modifier_apply(modifier=modifier_name)
             except RuntimeError:
                 # 無効なModifier（対象オブジェクトが指定されていないなどの状態）は適用しない
                 print(f"!!! Apply failed !!!: [{modifier.name}]")
-                bpy.ops.object.modifier_remove(modifier=modifier.name)
+                bpy.ops.object.modifier_remove(modifier=modifier_name)
     print(f"Finish Apply Modifiers: [{obj.name}]")
     print(f"[apply_modifiers] {obj.name}: {time.perf_counter() - start_time:.3f}s")

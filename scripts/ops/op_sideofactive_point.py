@@ -60,7 +60,7 @@ class MESH_OT_specials_shapekeys_util_sideofactive_point(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj.type == 'MESH'
+        return obj is not None and obj.type == 'MESH'
 
     def execute(self, context):
         func_select_axis_from_point.select_axis_from_point(self.point, self.mode, self.axis, self.threshold)

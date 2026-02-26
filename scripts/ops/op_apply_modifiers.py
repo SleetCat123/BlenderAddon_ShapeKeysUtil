@@ -57,8 +57,11 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
             active = func_object_utils.get_active_object()
             selected_objects = bpy.context.selected_objects
             targets = [d for d in selected_objects if d.type == 'MESH']
-            if active.type == 'MESH' and active not in targets:
+            if active and active.type == 'MESH' and active not in targets:
                 targets.append(active)
+            if not targets:
+                self.report({'ERROR'}, "No mesh objects selected")
+                return {'CANCELLED'}
 
             func_object_utils.deselect_all_objects()
             func_object_utils.select_objects(targets, True)

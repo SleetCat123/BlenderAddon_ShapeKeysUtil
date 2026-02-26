@@ -55,7 +55,7 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj.type == 'MESH'
+        return obj is not None and obj.type == 'MESH'
 
     def execute(self, context):
         try:
