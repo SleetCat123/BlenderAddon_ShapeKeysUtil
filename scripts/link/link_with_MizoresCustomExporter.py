@@ -88,7 +88,7 @@ def get_reorder_iter_for_exporter(objects_with_settings):
     return reorder_shapekeys_iter(objects_with_settings)
 
 
-# MizoresCustomExporter連携用（同期版・後方互換性のため残す）
+# MizoresCustomExporter連携用（同期版エクスポートフローで使用中）
 class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Operator):
     bl_idname = "object.shapekeys_util_apply_mod_for_exporter_addon"
     bl_label = "[Internal] Apply Modifiers With Shapekeys For MizoresCustomExporter Addon"

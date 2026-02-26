@@ -16,12 +16,24 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
+"""
+Modal版オペレーターモジュール
+
+進捗表示とキャンセル機能をサポートするModal版オペレーターを提供します。
+"""
+
+from . import mop_apply_modifiers, mop_separate_lr_shapekey_all, mop_separate_shapekeys
 
 
-def get_package_root():
-    return __package__[:__package__.find('.')]
+def register():
+    """Modal版オペレーターを登録"""
+    mop_apply_modifiers.register()
+    mop_separate_lr_shapekey_all.register()
+    mop_separate_shapekeys.register()
 
 
-def get_addon_prefs():
-    return bpy.context.preferences.addons[get_package_root()].preferences
+def unregister():
+    """Modal版オペレーターを登録解除"""
+    mop_apply_modifiers.unregister()
+    mop_separate_lr_shapekey_all.unregister()
+    mop_separate_shapekeys.unregister()

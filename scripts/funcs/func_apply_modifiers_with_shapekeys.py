@@ -16,6 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import time
+from collections.abc import Generator
+
 import bpy
 
 from .. import consts
@@ -34,12 +37,37 @@ from ..funcs.func_apply_modifiers_with_shapekeys_helpers.partial_apply_modifiers
     partial_apply_modifiers,
 )
 from ..funcs.utils import func_object_utils
+from .progress_info import ProgressInfo, T
 
 
-# シェイプキーをもつオブジェクトのモディファイアを適用
-def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform_addon=False):
+def apply_modifiers_with_shapekeys_iter(
+    remove_nonrender: bool = True,
+    use_update_mesh_deform_addon: bool = False,
+    depth: int = 0
+) -> Generator[ProgressInfo, None, None]:
+    """シェイプキー付きモディファイア適用（ジェネレータ版）
+
+    Args:
+        remove_nonrender: レンダリング無効モディファイアを削除するか
+        use_update_mesh_deform_addon: MeshDeformアドオン連携を使用するか
+        depth: 再帰の深さ（進捗表示用）
+
+    Yields:
+        ProgressInfo: 進捗情報
+    """
+    start_time = time.perf_counter()
     source_obj = func_object_utils.get_active_object()
-    print(f"apply_modifiers_with_shapekeys: [{source_obj.name}] [{source_obj.type}]  {len(source_obj.modifiers)} modifiers")
+    obj_name = source_obj.name
+
+    yield ProgressInfo(
+        phase="apply_modifiers",
+        progress=0.0,
+        message=T("sku_progress_processing").format(obj=obj_name),
+        object_name=obj_name
+    )
+
+    print(f"[apply_modifiers_with_shapekeys] start: {obj_name} ({len(source_obj.modifiers)} modifiers)")
+
     # Apply as shapekey用モディファイアのインデックスを検索
     apply_as_shape_index = -1
     apply_as_shape_modifier = None
@@ -49,51 +77,78 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform
             apply_as_shape_modifier = modifier
             print(f"%AS% modifier is found: {str(apply_as_shape_index)} - {modifier.name}")
             break
+
     if apply_as_shape_index == 0:
-        # Apply as shapekey用のモディファイアが一番上にあったらモディファイアをシェイプキーとして適用
+        yield ProgressInfo(
+            phase="apply_as_shape",
+            progress=0.2,
+            message=T("sku_progress_apply_as_shape").format(modifier=apply_as_shape_modifier.name),
+            object_name=obj_name
+        )
 
         if use_update_mesh_deform_addon:
             func_update_mesh_deform_addon.update_mesh_deform_addon(
-                obj=source_obj, 
-                modifier=apply_as_shape_modifier, 
+                obj=source_obj,
+                modifier=apply_as_shape_modifier,
                 use_update_mesh_deform_addon=use_update_mesh_deform_addon)
 
         print("%AS% modifier is top")
         func_apply_as_shapekey.apply_as_shapekey(apply_as_shape_modifier)
-        # 関数を再実行して終了
+
+        # 再帰呼び出し
         print("re-execute apply_modifiers_with_shapekeys")
-        apply_modifiers_with_shapekeys(
-            remove_nonrender=remove_nonrender, 
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        yield from apply_modifiers_with_shapekeys_iter(
+            remove_nonrender=remove_nonrender,
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            depth=depth + 1
+        )
+        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% top): {time.perf_counter() - start_time:.3f}s")
         return
+
     elif apply_as_shape_index >= 1:
-        # 2番目以降にApply as shape用のモディファイアがあったら
+        yield ProgressInfo(
+            phase="partial_apply",
+            progress=0.2,
+            message=T("sku_progress_partial_apply").format(obj=obj_name),
+            object_name=obj_name
+        )
         print("%AS% modifier is not top")
         partial_apply_modifiers(
-            source_obj=source_obj, 
-            modifier_index=apply_as_shape_index, 
+            source_obj=source_obj,
+            modifier_index=apply_as_shape_index,
             remove_nonrender=remove_nonrender,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% partial): {time.perf_counter() - start_time:.3f}s")
         return
     else:
         print("%AS% modifier is not found")
 
     if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks) == 1:
-        # Basisしかなければシェイプキー削除
+        yield ProgressInfo(
+            phase="remove_basis",
+            progress=0.3,
+            message=T("sku_progress_removing_basis").format(obj=obj_name),
+            object_name=obj_name
+        )
         print("remove basis: " + source_obj.name)
-        # 0番目のシェイプキーをアクティブにする（これが無いとエラーが出る場合がある）
         source_obj.active_shape_key_index = 0
         bpy.ops.object.shape_key_remove(all=True)
 
     if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
-        # シェイプキーがなければモディファイア適用処理だけ実行
+        yield ProgressInfo(
+            phase="apply_modifiers",
+            progress=0.5,
+            message=T("sku_progress_apply_modifiers_no_shapekeys").format(obj=obj_name),
+            object_name=obj_name
+        )
         print("only apply_modifiers: " + source_obj.name)
         func_apply_modifiers.apply_modifiers(
-            remove_nonrender=remove_nonrender, 
+            remove_nonrender=remove_nonrender,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        print(f"[apply_modifiers_with_shapekeys] {obj_name} (no shapekeys): {time.perf_counter() - start_time:.3f}s")
         return
-    
-    # シェイプキーがある場合、SurfaceDeformモディファイアはBasisシェイプに対して適用される
+
+    # SurfaceDeformモディファイア処理
     surface_deform_index = -1
     surface_deform_modifier = None
     for i, modifier in enumerate(source_obj.modifiers):
@@ -102,28 +157,41 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform
             surface_deform_modifier = modifier
             print(f"SurfaceDeform modifier is found: {str(surface_deform_index)} - {modifier.name}")
             break
+
     if surface_deform_index == 0:
-        # SurfaceDeformモディファイアが一番上にあったら
+        yield ProgressInfo(
+            phase="surface_deform",
+            progress=0.4,
+            message=T("sku_progress_surface_deform").format(obj=obj_name),
+            object_name=obj_name
+        )
         print("SurfaceDeform modifier is top")
         apply_surface_deform_to_basis(
-            source_obj=source_obj, 
-            modifier=surface_deform_modifier, 
+            source_obj=source_obj,
+            modifier=surface_deform_modifier,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon,
             remove_nonrender=remove_nonrender)
+        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform top): {time.perf_counter() - start_time:.3f}s")
         return
+
     if surface_deform_index >= 1:
-        # SurfaceDeformモディファイアが2番目以降にあったら
+        yield ProgressInfo(
+            phase="partial_apply",
+            progress=0.4,
+            message=T("sku_progress_partial_apply_surface_deform").format(obj=obj_name),
+            object_name=obj_name
+        )
         print("SurfaceDeform modifier is not top")
         partial_apply_modifiers(
-            source_obj=source_obj, 
-            modifier_index=surface_deform_index, 
+            source_obj=source_obj,
+            modifier_index=surface_deform_index,
             remove_nonrender=remove_nonrender,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform partial): {time.perf_counter() - start_time:.3f}s")
         return
     else:
         print("SurfaceDeform modifier is not found")
 
-    # 対象オブジェクトだけを選択
     func_object_utils.deselect_all_objects()
     func_object_utils.select_object(source_obj, True)
     func_object_utils.set_active_object(source_obj)
@@ -135,16 +203,32 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform
             if modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type != 'ARMATURE':
                 need_apply_modifier = True
                 break
+
     print(f"{source_obj.name}: Need Apply Modifiers: {str(need_apply_modifier)}")
+
     if need_apply_modifier:
+        yield ProgressInfo(
+            phase="apply_each_shapekey",
+            progress=0.6,
+            message=T("sku_progress_apply_each_shapekey").format(obj=obj_name),
+            object_name=obj_name
+        )
+
         # シェイプキーの名前と数値を記憶
         active_shape_key_index = source_obj.active_shape_key_index
         shapekey_name_and_values = []
         for shapekey in source_obj.data.shape_keys.key_blocks:
             shapekey_name_and_values.append((shapekey.name, shapekey.value))
 
-        # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用してからオブジェクトを1つにまとめなおす
+        # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
         apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon)
+
+        yield ProgressInfo(
+            phase="restore_shapekeys",
+            progress=0.9,
+            message=T("sku_progress_restoring_shapekeys").format(obj=obj_name),
+            object_name=obj_name
+        )
 
         print(shapekey_name_and_values)
         print([v.name for v in source_obj.data.shape_keys.key_blocks])
@@ -158,3 +242,24 @@ def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform
 
     func_object_utils.select_object(source_obj, True)
     func_object_utils.set_active_object(source_obj)
+
+    yield ProgressInfo(
+        phase="complete",
+        progress=1.0,
+        message=T("sku_progress_complete").format(obj=obj_name),
+        object_name=obj_name
+    )
+    print(f"[apply_modifiers_with_shapekeys] {obj_name}: {time.perf_counter() - start_time:.3f}s")
+
+
+def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform_addon=False):
+    """シェイプキー付きモディファイア適用（同期版ラッパー）
+
+    既存コードとの互換性のため、ジェネレータ版を消費して実行します。
+    """
+    gen = apply_modifiers_with_shapekeys_iter(
+        remove_nonrender=remove_nonrender,
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon
+    )
+    for _ in gen:
+        pass
