@@ -73,6 +73,7 @@ class OBJECT_OT_specials_shapekeys_util_shapekeys_to_objects(bpy.types.Operator)
             func_separate_shapekeys.separate_shapekeys(
                 duplicate=self.keep_original,
                 enable_apply_modifiers=self.apply_modifiers,
+                skip_modifier_types=set(),
                 remove_nonrender=self.remove_nonrender,
                 keep_original_shapekeys=self.keep_original_shapekeys
             )

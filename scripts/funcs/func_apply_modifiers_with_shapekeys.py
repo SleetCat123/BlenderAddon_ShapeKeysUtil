@@ -41,6 +41,7 @@ from .progress_info import ProgressInfo, T
 
 
 def apply_modifiers_with_shapekeys_iter(
+    skip_modifier_types: set,
     remove_nonrender: bool = True,
     use_update_mesh_deform_addon: bool = False,
     depth: int = 0
@@ -50,11 +51,13 @@ def apply_modifiers_with_shapekeys_iter(
     Args:
         remove_nonrender: レンダリング無効モディファイアを削除するか
         use_update_mesh_deform_addon: MeshDeformアドオン連携を使用するか
+        skip_modifier_types: スキップするモディファイアタイプのセット
         depth: 再帰の深さ（進捗表示用）
 
     Yields:
         ProgressInfo: 進捗情報
     """
+    print(f"[apply_modifiers_with_shapekeys_iter] skip_modifier_types={skip_modifier_types}")
     start_time = time.perf_counter()
     source_obj = func_object_utils.get_active_object()
     obj_name = source_obj.name
@@ -100,6 +103,7 @@ def apply_modifiers_with_shapekeys_iter(
         yield from apply_modifiers_with_shapekeys_iter(
             remove_nonrender=remove_nonrender,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            skip_modifier_types=skip_modifier_types,
             depth=depth + 1
         )
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% top): {time.perf_counter() - start_time:.3f}s")
@@ -117,7 +121,8 @@ def apply_modifiers_with_shapekeys_iter(
             source_obj=source_obj,
             modifier_index=apply_as_shape_index,
             remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            skip_modifier_types=skip_modifier_types)
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% partial): {time.perf_counter() - start_time:.3f}s")
         return
     else:
@@ -144,7 +149,8 @@ def apply_modifiers_with_shapekeys_iter(
         print("only apply_modifiers: " + source_obj.name)
         func_apply_modifiers.apply_modifiers(
             remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            skip_modifier_types=skip_modifier_types)
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (no shapekeys): {time.perf_counter() - start_time:.3f}s")
         return
 
@@ -170,7 +176,8 @@ def apply_modifiers_with_shapekeys_iter(
             source_obj=source_obj,
             modifier=surface_deform_modifier,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            remove_nonrender=remove_nonrender)
+            remove_nonrender=remove_nonrender,
+            skip_modifier_types=skip_modifier_types)
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform top): {time.perf_counter() - start_time:.3f}s")
         return
 
@@ -186,7 +193,8 @@ def apply_modifiers_with_shapekeys_iter(
             source_obj=source_obj,
             modifier_index=surface_deform_index,
             remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            skip_modifier_types=skip_modifier_types)
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform partial): {time.perf_counter() - start_time:.3f}s")
         return
     else:
@@ -200,7 +208,7 @@ def apply_modifiers_with_shapekeys_iter(
     need_apply_modifier = False
     for modifier in source_obj.modifiers:
         if modifier.show_render or remove_nonrender:
-            if modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type != 'ARMATURE':
+            if modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type not in skip_modifier_types:
                 need_apply_modifier = True
                 break
 
@@ -221,7 +229,7 @@ def apply_modifiers_with_shapekeys_iter(
             shapekey_name_and_values.append((shapekey.name, shapekey.value))
 
         # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
-        apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon)
+        apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon, skip_modifier_types)
 
         yield ProgressInfo(
             phase="restore_shapekeys",
@@ -252,14 +260,15 @@ def apply_modifiers_with_shapekeys_iter(
     print(f"[apply_modifiers_with_shapekeys] {obj_name}: {time.perf_counter() - start_time:.3f}s")
 
 
-def apply_modifiers_with_shapekeys(remove_nonrender=True, use_update_mesh_deform_addon=False):
+def apply_modifiers_with_shapekeys(skip_modifier_types: set, remove_nonrender=True, use_update_mesh_deform_addon=False):
     """シェイプキー付きモディファイア適用（同期版ラッパー）
 
-    既存コードとの互換性のため、ジェネレータ版を消費して実行します。
+    ジェネレータ版を消費して実行します。
     """
     gen = apply_modifiers_with_shapekeys_iter(
         remove_nonrender=remove_nonrender,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types
     )
     for _ in gen:
         pass

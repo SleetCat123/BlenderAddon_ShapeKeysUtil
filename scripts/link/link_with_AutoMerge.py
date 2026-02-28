@@ -29,16 +29,23 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
     bl_options = {'REGISTER', 'UNDO'}
 
     use_update_mesh_deform_addon: bpy.props.BoolProperty(
-        name="Use Update Mesh Deform Addon", 
+        name="Use Update Mesh Deform Addon",
         default=False,
         description="Use MeshDeformUtils Addon"
     )
 
+    skip_modifier_types_str: bpy.props.StringProperty(
+        name="Skip Modifier Types"
+    )
+
     def execute(self, context):
-        print("ShapekeysUtil - link_with_AutoMerge")
+        # カンマ区切りの文字列からスキップ対象モディファイアタイプのセットをパース
+        skip_types = set(filter(None, self.skip_modifier_types_str.split(',')))
+        print(f"ShapekeysUtil - link_with_AutoMerge (skip_types={skip_types})")
         func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(
-            remove_nonrender=True, 
-            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon)
+            remove_nonrender=True,
+            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon,
+            skip_modifier_types=skip_types)
         return {'FINISHED'}
 
 

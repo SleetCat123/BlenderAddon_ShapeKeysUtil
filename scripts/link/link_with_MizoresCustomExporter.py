@@ -31,20 +31,22 @@ from ..funcs.func_separate_lr_shapekey_all import (
 from ..funcs.func_subtract_base_shapekey import subtract_base_shapekey_all
 
 
-def get_apply_modifiers_iter_for_exporter(remove_nonrender=False, use_update_mesh_deform_addon=False):
+def get_apply_modifiers_iter_for_exporter(skip_modifier_types: set, remove_nonrender=False, use_update_mesh_deform_addon=False):
     """MizoresCustomExporter連携用のモディファイア適用ジェネレータを取得
 
     Args:
         remove_nonrender: レンダリング無効モディファイアを削除するか
         use_update_mesh_deform_addon: MeshDeformアドオン連携を使用するか
+        skip_modifier_types: スキップするモディファイアタイプのセット
 
     Returns:
         Generator: モディファイア適用処理のジェネレータ
     """
-    print("ShapekeysUtil - Apply Modifiers With Shapekeys (iter)")
+    print(f"ShapekeysUtil - Apply Modifiers With Shapekeys (iter) skip_modifier_types={skip_modifier_types}")
     return apply_modifiers_with_shapekeys_iter(
         remove_nonrender=remove_nonrender,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types
     )
 
 
@@ -100,11 +102,18 @@ class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Oper
         description="Use MeshDeformUtils Addon"
     )
 
+    skip_modifier_types_str: bpy.props.StringProperty(
+        name="Skip Modifier Types"
+    )
+
     def execute(self, context):
-        print("ShapekeysUtil - Apply Modifiers With Shapekeys")
+        # カンマ区切りの文字列からスキップ対象モディファイアタイプのセットをパース
+        skip_types = set(filter(None, self.skip_modifier_types_str.split(',')))
+        print(f"ShapekeysUtil - Apply Modifiers With Shapekeys (skip_types={skip_types})")
         apply_modifiers_with_shapekeys(
             remove_nonrender=False,
-            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon)
+            use_update_mesh_deform_addon=self.use_update_mesh_deform_addon,
+            skip_modifier_types=skip_types)
         return {'FINISHED'}
 
 

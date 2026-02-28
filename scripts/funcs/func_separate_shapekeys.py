@@ -27,9 +27,10 @@ from .utils import func_mesh_utils, func_object_utils
 def separate_shapekeys_iter(
         duplicate: bool,
         enable_apply_modifiers: bool,
+        skip_modifier_types: set,
         remove_nonrender: bool = True,
         keep_original_shapekeys: bool = False,
-        use_update_mesh_deform_addon: bool = False
+        use_update_mesh_deform_addon: bool = False,
 ) -> Generator[ProgressInfo, None, list]:
     """シェイプキーをそれぞれ別のオブジェクトにする（ジェネレータ版）
 
@@ -39,6 +40,7 @@ def separate_shapekeys_iter(
         remove_nonrender: レンダリング無効モディファイアを削除するか
         keep_original_shapekeys: 元のシェイプキーを残すか
         use_update_mesh_deform_addon: MeshDeformアドオン連携を使用するか
+        skip_modifier_types: スキップするモディファイアタイプのセット
 
     Yields:
         ProgressInfo: 進捗情報
@@ -46,6 +48,7 @@ def separate_shapekeys_iter(
     Returns:
         List: 分割されたオブジェクトのリスト
     """
+    print(f"[separate_shapekeys_iter] skip_modifier_types={skip_modifier_types}")
     start_time = time.perf_counter()
     source_obj = func_object_utils.get_active_object()
     source_obj_name = source_obj.name
@@ -150,7 +153,8 @@ def separate_shapekeys_iter(
             func_object_utils.set_active_object(obj)
             func_apply_modifiers.apply_modifiers(
                 remove_nonrender=remove_nonrender,
-                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+                skip_modifier_types=skip_modifier_types)
 
         func_object_utils.set_active_object(source_obj)
         print(f"[separate_shapekeys] apply_modifiers_loop: {time.perf_counter() - phase_start:.3f}s")
@@ -172,9 +176,10 @@ def separate_shapekeys_iter(
 def separate_shapekeys(
         duplicate: bool,
         enable_apply_modifiers: bool,
+        skip_modifier_types: set,
         remove_nonrender: bool = True,
         keep_original_shapekeys: bool = False,
-        use_update_mesh_deform_addon: bool = False
+        use_update_mesh_deform_addon: bool = False,
 ):
     """シェイプキーをそれぞれ別のオブジェクトにする（同期版ラッパー）
 
@@ -184,6 +189,7 @@ def separate_shapekeys(
         remove_nonrender: レンダリング無効モディファイアを削除するか
         keep_original_shapekeys: 元のシェイプキーを残すか
         use_update_mesh_deform_addon: MeshDeformアドオン連携を使用するか
+        skip_modifier_types: スキップするモディファイアタイプのセット
 
     Returns:
         List: 分割されたオブジェクトのリスト
@@ -193,7 +199,8 @@ def separate_shapekeys(
         enable_apply_modifiers=enable_apply_modifiers,
         remove_nonrender=remove_nonrender,
         keep_original_shapekeys=keep_original_shapekeys,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types
     )
     result = None
     try:

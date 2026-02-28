@@ -5,7 +5,7 @@ import bpy
 from ..utils import func_object_utils
 
 
-def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, use_update_mesh_deform_addon: bool):
+def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, use_update_mesh_deform_addon: bool, skip_modifier_types: set):
     start_time = time.perf_counter()
     phase_start = start_time
     print("func_apply_modifiers_with_shapekeys - partial_apply_modifiers")
@@ -32,7 +32,8 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
     from ..func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
     apply_modifiers_with_shapekeys(
         remove_nonrender=remove_nonrender,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types)
     print(f"[partial_apply_modifiers] first_apply: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
 
@@ -63,6 +64,7 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
     from ..func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
     apply_modifiers_with_shapekeys(
         remove_nonrender=remove_nonrender,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types)
     print(f"[partial_apply_modifiers] second_apply: {time.perf_counter() - phase_start:.3f}s")
     print(f"[partial_apply_modifiers] total: {time.perf_counter() - start_time:.3f}s")

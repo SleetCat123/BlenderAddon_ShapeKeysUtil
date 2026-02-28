@@ -6,7 +6,7 @@ from .. import func_separate_shapekeys
 from ..utils import func_object_utils
 
 
-def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon):
+def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_deform_addon, skip_modifier_types: set):
     start_time = time.perf_counter()
     phase_start = start_time
     # シェイプキーをそれぞれ別オブジェクトにしてモディファイア適用
@@ -15,7 +15,8 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
         enable_apply_modifiers=True,
         remove_nonrender=remove_nonrender,
         keep_original_shapekeys=False,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types
     )
     print(f"[apply_each_shapekey_modifiers] separate_shapekeys: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
@@ -49,9 +50,9 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
         prev_obj_name = obj.name
 
         # 一気にjoin_shapesするとシェイプキーの順番がおかしくなるので1つずつ
-        # Armatureによる変形を無効化
+        # スキップ対象モディファイアタイプの変形を無効化
         for modifier in obj.modifiers:
-            if modifier.type == 'ARMATURE':
+            if modifier.type in skip_modifier_types:
                 modifier.show_viewport = False
                 modifier.show_render = False
         func_object_utils.select_object(obj, True)

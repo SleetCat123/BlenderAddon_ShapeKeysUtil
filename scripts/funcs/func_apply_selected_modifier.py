@@ -54,6 +54,7 @@ def apply_selected_modifier(original_obj):
     separated_objects = func_separate_shapekeys.separate_shapekeys(
         duplicate=False,
         enable_apply_modifiers=False,
+        skip_modifier_types=set(),
         remove_nonrender=False,
         keep_original_shapekeys=False
     )

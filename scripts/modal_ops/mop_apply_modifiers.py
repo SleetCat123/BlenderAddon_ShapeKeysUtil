@@ -68,7 +68,8 @@ def apply_modifiers_all_iter(
         # 個別オブジェクトの処理をジェネレータで実行
         for sub_progress in apply_modifiers_with_shapekeys_iter(
             remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon
+            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            skip_modifier_types={'ARMATURE'}
         ):
             # サブ進捗を全体進捗にマッピング
             combined_progress = base_progress + (sub_progress.progress / total)

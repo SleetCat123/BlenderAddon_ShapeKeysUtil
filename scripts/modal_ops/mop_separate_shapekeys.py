@@ -107,6 +107,7 @@ class OBJECT_OT_shapekeys_util_separate_shapekeys_modal(GeneratorModalOperator):
         return separate_shapekeys_iter(
             duplicate=self.keep_original,
             enable_apply_modifiers=self.apply_modifiers,
+            skip_modifier_types=set(),
             remove_nonrender=self.remove_nonrender,
             keep_original_shapekeys=self.keep_original_shapekeys,
             use_update_mesh_deform_addon=self.use_update_mesh_deform_addon

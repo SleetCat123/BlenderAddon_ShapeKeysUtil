@@ -71,7 +71,7 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
         bpy.ops.object.modifier_remove(modifier=source_modifier.name)
     print(f"[_apply_surface_deform_to_basis_core] total: {time.perf_counter() - start_time:.3f}s")
 
-def apply_surface_deform_to_basis(source_obj, modifier, use_update_mesh_deform_addon, remove_nonrender=True):
+def apply_surface_deform_to_basis(source_obj, modifier, use_update_mesh_deform_addon, skip_modifier_types: set, remove_nonrender=True):
     """
     SurfaceDeformモディファイアをBasisシェイプキーに適用し、その後全モディファイアを再帰的に処理
     既存機能との互換性を維持
@@ -87,7 +87,8 @@ def apply_surface_deform_to_basis(source_obj, modifier, use_update_mesh_deform_a
     from ..func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys
     apply_modifiers_with_shapekeys(
         remove_nonrender=remove_nonrender,
-        use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+        use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+        skip_modifier_types=skip_modifier_types)
     print(f"[apply_surface_deform_to_basis] total: {time.perf_counter() - start_time:.3f}s")
 
 def apply_single_surface_deform_to_basis(source_obj, modifier, use_update_mesh_deform_addon, remove_nonrender=False):

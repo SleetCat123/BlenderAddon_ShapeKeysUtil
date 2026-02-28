@@ -26,9 +26,9 @@ from ..funcs.utils import func_object_utils
 
 
 # オブジェクトのモディファイアを適用
-def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
+def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool, skip_modifier_types: set):
     start_time = time.perf_counter()
-    print("apply_modifiers")
+    print(f"apply_modifiers (skip_modifier_types={skip_modifier_types})")
     obj = func_object_utils.get_active_object()
 
     if obj.users != 1 or (obj.data and obj.data.users != 1):
@@ -61,7 +61,7 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool):
             # ここではApply as shapekeyさせたくない
             print("ERROR: apply_as_shapekey")
             bpy.ops.object.modifier_remove(modifier=modifier_name)
-        elif modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type != 'ARMATURE':
+        elif modifier.name.startswith(consts.FORCE_APPLY_MODIFIER_PREFIX) or modifier.type not in skip_modifier_types:
             # 対象モディファイアが処理対象外モディファイアでないなら
             # または、モディファイアの名前欄が%A%で始まっているなら
             try:
