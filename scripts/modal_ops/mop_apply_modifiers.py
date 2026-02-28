@@ -29,6 +29,7 @@ from typing import Optional
 import bpy
 from bpy.props import BoolProperty
 
+from .. import consts
 from ..funcs.func_apply_modifiers_with_shapekeys import apply_modifiers_with_shapekeys_iter
 from ..funcs.modal_base import GeneratorModalOperator
 from ..funcs.progress_info import ProgressInfo
@@ -69,7 +70,7 @@ def apply_modifiers_all_iter(
         for sub_progress in apply_modifiers_with_shapekeys_iter(
             remove_nonrender=remove_nonrender,
             use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            skip_modifier_types={'ARMATURE'}
+            skip_modifier_types=consts.DEFAULT_SKIP_MODIFIER_TYPES
         ):
             # サブ進捗を全体進捗にマッピング
             combined_progress = base_progress + (sub_progress.progress / total)

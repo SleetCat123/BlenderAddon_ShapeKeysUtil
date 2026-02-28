@@ -18,6 +18,7 @@
 
 import bpy
 
+from .. import consts
 from ..funcs.func_apply_modifiers_with_shapekeys import (
     apply_modifiers_with_shapekeys,
     apply_modifiers_with_shapekeys_iter,
@@ -108,7 +109,7 @@ class OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon(bpy.types.Oper
 
     def execute(self, context):
         # カンマ区切りの文字列からスキップ対象モディファイアタイプのセットをパース
-        skip_types = set(filter(None, self.skip_modifier_types_str.split(',')))
+        skip_types = consts.parse_skip_modifier_types_str(self.skip_modifier_types_str)
         print(f"ShapekeysUtil - Apply Modifiers With Shapekeys (skip_types={skip_types})")
         apply_modifiers_with_shapekeys(
             remove_nonrender=False,

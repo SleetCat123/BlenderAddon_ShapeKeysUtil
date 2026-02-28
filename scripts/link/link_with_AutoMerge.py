@@ -18,6 +18,7 @@
 
 import bpy
 
+from .. import consts
 from ..funcs import func_apply_modifiers_with_shapekeys
 
 
@@ -40,7 +41,7 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
 
     def execute(self, context):
         # カンマ区切りの文字列からスキップ対象モディファイアタイプのセットをパース
-        skip_types = set(filter(None, self.skip_modifier_types_str.split(',')))
+        skip_types = consts.parse_skip_modifier_types_str(self.skip_modifier_types_str)
         print(f"ShapekeysUtil - link_with_AutoMerge (skip_types={skip_types})")
         func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(
             remove_nonrender=True,

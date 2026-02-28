@@ -21,6 +21,7 @@ import traceback
 import bpy
 from bpy.props import BoolProperty
 
+from .. import consts
 from ..funcs import func_apply_modifiers_with_shapekeys
 from ..funcs.utils import func_object_utils
 from ..link import func_link_with_MeshDeformUtils
@@ -73,7 +74,7 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
                 func_apply_modifiers_with_shapekeys.apply_modifiers_with_shapekeys(
                     remove_nonrender=self.remove_nonrender,
                     use_update_mesh_deform_addon=self.use_update_mesh_deform_addon,
-                    skip_modifier_types={'ARMATURE'})
+                    skip_modifier_types=consts.DEFAULT_SKIP_MODIFIER_TYPES)
             func_object_utils.select_objects(selected_objects, True)
             func_object_utils.set_active_object(active)
             return {'FINISHED'}

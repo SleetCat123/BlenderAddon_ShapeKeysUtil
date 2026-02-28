@@ -28,8 +28,16 @@ REGEX_APPLY_AS_SHAPEKEY_PREFIX = re.compile(r"^%AS(?::(.*))?%", re.IGNORECASE)  
 FORCE_APPLY_MODIFIER_PREFIX = "%A%"  # モディファイア名が"%A%"で始まっているならArmatureなどの対象外モディファイアでも強制的に適用
 FORCE_KEEP_MODIFIER_PREFIX = "%KEEP%"  # モディファイア名が"%KEEP%"で始まっているならモディファイアを適用せずに処理を続行する
 
+# モディファイア適用時にデフォルトでスキップするモディファイアタイプ
+DEFAULT_SKIP_MODIFIER_TYPES = {'ARMATURE'}
+
 # Blender自動付与サフィックスのパターン（.001, .002 など）
 REGEX_BLENDER_SUFFIX = re.compile(r'\.\d{3}$')
+
+
+def parse_skip_modifier_types_str(s: str) -> set:
+    """カンマ区切り文字列からスキップ対象モディファイアタイプのセットをパース"""
+    return set(filter(None, s.split(',')))
 
 
 def normalize_shapekey_name(name: str) -> str:
