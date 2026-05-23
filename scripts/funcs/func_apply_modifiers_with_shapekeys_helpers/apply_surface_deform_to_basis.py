@@ -2,6 +2,7 @@ import time
 
 import bpy
 
+from ..func_shapekey_integrity import ensure_shape_key_integrity
 from ..utils import func_object_utils
 
 
@@ -41,6 +42,8 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
     func_object_utils.select_object(source_obj, True)
     func_object_utils.set_active_object(source_obj)
     bpy.ops.object.join_shapes()
+    if not ensure_shape_key_integrity(source_obj, log_prefix="apply_surface_deform_to_basis"):
+        raise RuntimeError(f"Shape key integrity check failed after join_shapes: {source_obj.name}")
     # 複製したオブジェクトを削除
     func_object_utils.remove_object(temp_obj)
 
@@ -60,6 +63,8 @@ def _apply_surface_deform_to_basis_core(source_obj, modifier, use_update_mesh_de
     bpy.ops.object.mode_set(mode='OBJECT')
     source_obj.active_shape_key_index = last_shapekey_index
     bpy.ops.object.shape_key_remove()
+    if not ensure_shape_key_integrity(source_obj, log_prefix="apply_surface_deform_to_basis"):
+        raise RuntimeError(f"Shape key integrity check failed after temp shape removal: {source_obj.name}")
 
     if temp_mode != 'OBJECT':
         # 元のモードに戻す

@@ -21,7 +21,15 @@ import mathutils
 
 from .. import consts
 from ..funcs import func_composite_shapekey, func_shapekey_utils
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 from ..funcs.utils import func_object_utils
+
+
+def _ensure_shape_key_integrity_or_raise(obj, stage):
+    if not ensure_shape_key_integrity(obj, log_prefix="apply_as_shapekey"):
+        raise RuntimeError(
+            f"Shape key integrity check failed on '{obj.name}' after {stage}"
+        )
 
 
 def _apply_override_delta(obj, modifier, already_exists_index):
@@ -54,6 +62,7 @@ def _apply_override_delta(obj, modifier, already_exists_index):
 
     # 新規シェイプキーを削除
     obj.shape_key_remove(new_shapekey)
+    _ensure_shape_key_integrity_or_raise(obj, "delta override cleanup")
 
 
 def _apply_override_direct(obj, modifier, already_exists_index):
@@ -96,8 +105,9 @@ def _apply_override_direct(obj, modifier, already_exists_index):
 
     exists_shapekey = obj.data.shape_keys.key_blocks[already_exists_index]
     for i, v in enumerate(new_shapekey.data):
-        exists_shapekey.data[i].co = v.co
+        exists_shapekey.data[i].co = (v.co.x, v.co.y, v.co.z)
     obj.shape_key_remove(new_shapekey)
+    _ensure_shape_key_integrity_or_raise(obj, "direct override cleanup")
 
     # コピーしたオブジェクトを削除
     func_object_utils.remove_object(dup_obj)
@@ -114,9 +124,12 @@ def apply_as_shapekey(modifier):
         obj = func_object_utils.get_active_object()
         print(f"ShapeKeysUtil - func_apply_as_shapekey: {modifier_name}")
         if consts.use_apply_each_shapekeys(modifier):
-            # SurfaceDeformモディファイアのターゲットオブジェクトにシェイプキーが2つ以上存在していて、最初のシェイプキーの名前が"All"ならshow_only_shape_keyをTrueにしてシェイプキーを個別にシェイプキーとして適用
-            print("Add shapekeys from SurfaceDeform")
-            mod_target = modifier.target
+            # ターゲットオブジェクトのシェイプキーを個別にシェイプキーとして適用
+            print(f"Add shapekeys from deform modifier (type={modifier_type})")
+            if modifier_type == 'MESH_DEFORM':
+                mod_target = modifier.object
+            else:
+                mod_target = modifier.target
             temp_show_only_shape_key = mod_target.show_only_shape_key
             temp_active_shape_key_index = mod_target.active_shape_key_index
 
@@ -144,6 +157,7 @@ def apply_as_shapekey(modifier):
                 if individual_base:
                     func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, individual_base)
                 new_shapekey.name = clean_name
+                _ensure_shape_key_integrity_or_raise(obj, f"apply-each '{clean_name}'")
             mod_target.show_only_shape_key = temp_show_only_shape_key
             mod_target.active_shape_key_index = temp_active_shape_key_index
             # 特殊な処理なので以降の処理はスキップ
@@ -185,6 +199,7 @@ def apply_as_shapekey(modifier):
                 if base_shapekey_name:
                     func_composite_shapekey.apply_composite_subtraction(obj, new_shapekey, base_shapekey_name)
                 new_shapekey.name = shape_name
+                _ensure_shape_key_integrity_or_raise(obj, f"new shape '{shape_name}'")
         else:
             # 同名のシェイプキーが存在するなら、そのシェイプキーに対してモディファイアの変形を適用
             use_direct_mode = consts.use_direct_apply_mode(modifier)
@@ -214,4 +229,6 @@ def apply_as_shapekey(modifier):
         print(e)
         raise Exception(warn) from e
     else:
+        if obj.data.shape_keys:
+            _ensure_shape_key_integrity_or_raise(obj, "apply_as_shapekey completion")
         print(f"func_apply_as_shapekey: [{modifier_name}]")

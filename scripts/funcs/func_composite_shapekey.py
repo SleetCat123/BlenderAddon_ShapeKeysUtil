@@ -20,6 +20,7 @@ import bpy
 
 from .. import consts
 from ..funcs import func_shapekey_utils
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 
 
 def apply_composite_subtraction(obj, shapekey, base_shapekey_name):
@@ -58,6 +59,8 @@ def apply_single_composite_shapekey(obj, modifier):
         new_shapekey = func_shapekey_utils.create_composite_shapekey(obj, modifier, base_shapekey_name, shape_name)
         # モディファイアを削除
         bpy.ops.object.modifier_remove(modifier=modifier_name)
+        if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):
+            raise RuntimeError(f"Shape key integrity check failed after single composite apply: {obj.name}")
         return new_shapekey
     except ValueError as e:
         print(f"Error creating composite shapekey: {e}")
@@ -65,6 +68,8 @@ def apply_single_composite_shapekey(obj, modifier):
         bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=False, modifier=modifier_name)
         new_shapekey = obj.data.shape_keys.key_blocks[-1]
         new_shapekey.name = shape_name
+        if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):
+            raise RuntimeError(f"Shape key integrity check failed after single composite fallback: {obj.name}")
         return new_shapekey
 
 
@@ -114,11 +119,15 @@ def apply_multiple_composite_shapekeys(obj, modifier):
                 bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=keep_modifier, modifier=modifier_name)
                 new_shapekey = obj.data.shape_keys.key_blocks[-1]
                 new_shapekey.name = clean_name
+                if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):
+                    raise RuntimeError(f"Shape key integrity check failed after composite fallback: {obj.name}")
         else:
             # 通常のシェイプキー適用
             bpy.ops.object.modifier_apply_as_shapekey(keep_modifier=keep_modifier, modifier=modifier_name)
             new_shapekey = obj.data.shape_keys.key_blocks[-1]
             new_shapekey.name = clean_name
+            if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):
+                raise RuntimeError(f"Shape key integrity check failed after normal composite apply: {obj.name}")
 
     mod_target.show_only_shape_key = temp_show_only_shape_key
     mod_target.active_shape_key_index = temp_active_shape_key_index
@@ -147,3 +156,5 @@ def _apply_composite_shapekey_for_multiple(obj, modifier_name, base_shapekey_nam
     
     # 5. シェイプキー名を設定
     new_shapekey.name = target_shapekey_name
+    if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):
+        raise RuntimeError(f"Shape key integrity check failed after multi composite apply: {obj.name}")

@@ -19,6 +19,7 @@ import time
 
 import bpy
 
+from .func_shapekey_integrity import resolve_relative_key_by_name
 from ..funcs.utils import func_object_utils
 
 
@@ -69,7 +70,7 @@ def bake_shape_key(shape_name_or_index):
     shapekey_name = target_shapekey.name
 
     # シェイプキーの頂点座標を適用
-    shape_co = [v.co for v in target_shapekey.data]
+    shape_co = [(v.co.x, v.co.y, v.co.z) for v in target_shapekey.data]
     for i, v in enumerate(obj.data.vertices):
         v.co = shape_co[i]
     obj.data.update()
@@ -79,11 +80,18 @@ def bake_shape_key(shape_name_or_index):
 
     
 def shape_key_props_to_dict(shapekey):
+    relative_key_name = None
+    try:
+        if shapekey.relative_key is not None:
+            relative_key_name = shapekey.relative_key.name
+    except ReferenceError:
+        relative_key_name = None
+
     result = {
         'interpolation': shapekey.interpolation,
         'mute': shapekey.mute,
         'name': shapekey.name,
-        'relative_key': shapekey.relative_key,
+        'relative_key_name': relative_key_name,
         'slider_max': shapekey.slider_max,
         'slider_min': shapekey.slider_min,
         'value': shapekey.value,
@@ -93,11 +101,10 @@ def shape_key_props_to_dict(shapekey):
     return result
 
 
-def set_shape_key_props_from_dict(shapekey, props: dict):
+def set_shape_key_props_from_dict(shapekey, props: dict, key_blocks=None):
     shapekey.interpolation = props['interpolation']
     shapekey.mute = props['mute']
     shapekey.name = props['name']
-    shapekey.relative_key = props['relative_key']
     shapekey.slider_max = props['slider_max']
     shapekey.slider_min = props['slider_min']
     shapekey.value = props['value']
@@ -105,6 +112,13 @@ def set_shape_key_props_from_dict(shapekey, props: dict):
     co = props['co']
     for i, v in enumerate(shapekey.data):
         v.co = co[i]
+
+    if key_blocks is None:
+        key_blocks = shapekey.id_data.key_blocks
+    shapekey.relative_key = resolve_relative_key_by_name(
+        key_blocks,
+        props.get('relative_key_name'),
+    )
 
 
 def move_shape_key(source_index: int, dest_index: int, length: int = 1):
@@ -130,7 +144,7 @@ def move_shape_key(source_index: int, dest_index: int, length: int = 1):
             this_shapekey_props = shape_key_props_to_dict(this_shapekey)
             this_shapekey.name += "%temp%"
             prev_shapekey = key_blocks[i - length]
-            set_shape_key_props_from_dict(prev_shapekey, this_shapekey_props)
+            set_shape_key_props_from_dict(prev_shapekey, this_shapekey_props, key_blocks=key_blocks)
             #print([shape.name for shape in key_blocks])
     else:
         #print("source_index > dest_index")
@@ -141,14 +155,14 @@ def move_shape_key(source_index: int, dest_index: int, length: int = 1):
             this_shapekey_props = shape_key_props_to_dict(this_shapekey)
             this_shapekey.name += "%temp%"
             next_shapekey = key_blocks[i + length]
-            set_shape_key_props_from_dict(next_shapekey, this_shapekey_props)
+            set_shape_key_props_from_dict(next_shapekey, this_shapekey_props, key_blocks=key_blocks)
             #print([shape.name for shape in key_blocks])
     # sourceのシェイプキーをdestに移動
     dest_shapekeys = []
     for i, source_shapekey_props in enumerate(source_shapekey_props_list):
         dest_shapekey = key_blocks[dest_index + i]
         #print(f"dest_shapekey: {dest_shapekey.name}")
-        set_shape_key_props_from_dict(dest_shapekey, source_shapekey_props)
+        set_shape_key_props_from_dict(dest_shapekey, source_shapekey_props, key_blocks=key_blocks)
         dest_shapekeys.append(dest_shapekey)
         #print([shape.name for shape in key_blocks])
     return dest_shapekeys

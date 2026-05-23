@@ -20,6 +20,7 @@ import traceback
 
 import bpy
 
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 from ..funcs.utils import func_object_utils
 
 
@@ -48,6 +49,8 @@ class OBJECT_OT_mizore_copy_shapekey_to_others(bpy.types.Operator):
                 func_object_utils.select_object(active_obj)
                 print(f"Copy Shapekey: {active_obj} -> {obj}")
                 bpy.ops.object.join_shapes()
+                if not ensure_shape_key_integrity(obj, log_prefix="copy_shapekey_to_others"):
+                    raise RuntimeError(f"Shape key integrity check failed after join_shapes: {obj.name}")
 
             self.report({'INFO'}, "Finished")
             return {'FINISHED'}

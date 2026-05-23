@@ -18,6 +18,13 @@
 
 import bpy
 
+_MODIFIER_COPY_SKIP_PROPERTIES = {
+    "bl_rna",
+    "name",
+    "rna_type",
+    "type",
+}
+
 
 def select_object(obj, value=True):
     try:
@@ -133,6 +140,67 @@ def deselect_all_objects():
     for obj in targets:
         select_object(obj, False)
     # bpy.context.view_layer.objects.active = None
+
+
+def ensure_single_user_object_data(targets=None):
+    if targets is None:
+        targets = bpy.context.selected_objects
+    elif isinstance(targets, bpy.types.Object):
+        targets = [targets]
+    else:
+        targets = list(targets)
+
+    copied_count = 0
+    for obj in targets:
+        if obj is None:
+            continue
+        data = getattr(obj, "data", None)
+        if data is None:
+            continue
+        if getattr(data, "users", 0) <= 1:
+            continue
+
+        original_name = data.name
+        original_users = data.users
+        obj.data = data.copy()
+        copied_count += 1
+        print(
+            "[func_object_utils] duplicated shared object data: "
+            f"{obj.name} ({original_name} users={original_users})"
+        )
+    return copied_count
+
+
+def copy_modifier_settings(source_modifier, target_modifier):
+    failed = []
+    for prop in source_modifier.bl_rna.properties:
+        if prop.identifier in _MODIFIER_COPY_SKIP_PROPERTIES:
+            continue
+        if prop.is_readonly or prop.type == 'COLLECTION':
+            continue
+        try:
+            setattr(target_modifier, prop.identifier, getattr(source_modifier, prop.identifier))
+        except Exception as exc:
+            failed.append(f"{prop.identifier}({exc})")
+    return failed
+
+
+def replace_modifiers(target_obj, source_obj):
+    while target_obj.modifiers:
+        target_obj.modifiers.remove(target_obj.modifiers[-1])
+
+    failed = {}
+    for source_modifier in source_obj.modifiers:
+        new_modifier = target_obj.modifiers.new(source_modifier.name, source_modifier.type)
+        copy_failed = copy_modifier_settings(source_modifier, new_modifier)
+        if copy_failed:
+            failed[new_modifier.name] = copy_failed
+
+    if failed:
+        print(
+            f"[func_object_utils] modifier copy warnings on '{target_obj.name}': {failed}"
+        )
+    return failed
 
 
 def remove_object(target: bpy.types.Object = None):

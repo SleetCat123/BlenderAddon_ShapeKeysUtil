@@ -83,7 +83,11 @@ class OBJECT_OT_shapekeys_util_change_base_shapekey(bpy.types.Operator):
         try:
             obj = context.object
             func_object_utils.set_active_object(obj)
-            result = change_base_shapekey(obj, self.source_shapekey_name, self.reverse_shapekey_name)
+            result = change_base_shapekey(
+                obj,
+                self.source_shapekey_name,
+                self.reverse_shapekey_name,
+            )
             if result:
                 self.report({'INFO'}, f"Changed base: '{self.source_shapekey_name}' -> Basis")
                 return {'FINISHED'}

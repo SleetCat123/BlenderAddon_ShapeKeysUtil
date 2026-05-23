@@ -14,12 +14,10 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
     print("create tempobj")
     tempobj = func_object_utils.duplicate_object(source_obj)
     func_object_utils.deselect_all_objects()
+    func_object_utils.select_object(source_obj, True)
     func_object_utils.select_object(tempobj, True)
-    print("duplicate: " + tempobj.name)
     func_object_utils.set_active_object(source_obj)
-    # モディファイアを一時オブジェクトにコピー
-    print("copyto temp: make_links_data(type='MODIFIERS')")
-    bpy.ops.object.make_links_data(type='MODIFIERS')
+    print("duplicate: " + tempobj.name)
     print(f"[partial_apply_modifiers] create_tempobj: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
 
@@ -39,11 +37,7 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
 
     # 削除していたモディファイアを一時オブジェクトから復元
     print("restore modifiers")
-    func_object_utils.deselect_all_objects()
-    func_object_utils.select_object(source_obj, True)
-    func_object_utils.set_active_object(tempobj)
-    print("restore: make_links_data(type='MODIFIERS')")
-    bpy.ops.object.make_links_data(type='MODIFIERS')
+    func_object_utils.replace_modifiers(source_obj, tempobj)
     print("temp: " + str(tempobj))
     print("source: " + str(source_obj))
     func_object_utils.set_active_object(source_obj)

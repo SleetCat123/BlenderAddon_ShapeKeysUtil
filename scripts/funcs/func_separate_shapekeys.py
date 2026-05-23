@@ -20,6 +20,7 @@ import time
 from collections.abc import Generator
 
 from . import func_apply_modifiers, func_shapekey_utils
+from .func_shapekey_integrity import ensure_shape_key_integrity
 from .progress_info import ProgressInfo, T
 from .utils import func_mesh_utils, func_object_utils
 
@@ -109,6 +110,8 @@ def separate_shapekeys_iter(
         func_object_utils.set_object_name(dup_obj, new_name)
         # シェイプキーの形状を固定
         func_shapekey_utils.bake_shape_key(shapekey.name)
+        if not ensure_shape_key_integrity(dup_obj, log_prefix="separate_shapekeys"):
+            raise RuntimeError(f"Shape key integrity check failed after baking: {dup_obj.name}")
 
         separated_objects.append(dup_obj)
 
@@ -127,6 +130,8 @@ def separate_shapekeys_iter(
     if not keep_original_shapekeys:
         # 元オブジェクトのシェイプキーを全削除
         source_obj.shape_key_clear()
+        if not ensure_shape_key_integrity(source_obj, log_prefix="separate_shapekeys"):
+            raise RuntimeError(f"Shape key integrity check failed after clearing source keys: {source_obj.name}")
 
     func_object_utils.deselect_all_objects()
     print(f"[separate_shapekeys] cleanup: {time.perf_counter() - phase_start:.3f}s")

@@ -2,6 +2,7 @@ import time
 
 import bpy
 
+from ..func_shapekey_integrity import ensure_shape_key_integrity
 from .. import func_separate_shapekeys
 from ..utils import func_object_utils
 
@@ -62,12 +63,8 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
 
         shape_objects.append(obj)
 
-    # オブジェクト削除前にシェイプキーの参照を正規化（無効参照によるエラーを防止）
-    if source_obj.data.shape_keys:
-        for shapekey in source_obj.data.shape_keys.key_blocks:
-            if shapekey.relative_key and shapekey.relative_key.name not in source_obj.data.shape_keys.key_blocks:
-                # 削除予定オブジェクトへの参照がある場合はBasisに変更
-                shapekey.relative_key = source_obj.data.shape_keys.key_blocks[0]
+        if not ensure_shape_key_integrity(source_obj, log_prefix="apply_each_shapekey_modifiers"):
+            raise Exception(f"Shape key vertex count mismatch after join_shapes: {source_obj.name}")
 
     print(f"[apply_each_shapekey_modifiers] join_shapes: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
@@ -75,5 +72,7 @@ def apply_each_shapekey_modifiers(source_obj, remove_nonrender, use_update_mesh_
     # 使い終わったオブジェクトを削除
     func_object_utils.select_object(source_obj, False)
     func_object_utils.remove_objects(shape_objects)
+    if not ensure_shape_key_integrity(source_obj, log_prefix="apply_each_shapekey_modifiers"):
+        raise Exception(f"Shape key integrity check failed after cleanup: {source_obj.name}")
     print(f"[apply_each_shapekey_modifiers] cleanup: {time.perf_counter() - phase_start:.3f}s")
     print(f"[apply_each_shapekey_modifiers] total: {time.perf_counter() - start_time:.3f}s")

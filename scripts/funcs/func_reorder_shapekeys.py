@@ -66,9 +66,6 @@ def _serialize_shapekeys(key_blocks, start_index=0):
     props_list = []
     for i in range(start_index, len(key_blocks)):
         props = shape_key_props_to_dict(key_blocks[i])
-        props['_relative_key_name'] = (
-            props['relative_key'].name if props['relative_key'] else key_blocks[0].name
-        )
         props_list.append(props)
     return props_list
 
@@ -94,7 +91,7 @@ def _write_shapekeys(key_blocks, props_list, start_index=0):
 
     # relative_keyを名前で解決
     for i, props in enumerate(props_list):
-        _resolve_relative_key(key_blocks, start_index + i, props.get('_relative_key_name'))
+        _resolve_relative_key(key_blocks, start_index + i, props.get('relative_key_name'))
 
 
 def sort_shapekeys_by_name(obj):
@@ -155,13 +152,7 @@ def swap_shapekeys(obj, name_a, name_b):
 
     # プロパティをシリアライズ（relative_keyの名前も保持）
     props_a = shape_key_props_to_dict(key_blocks[index_a])
-    props_a['_relative_key_name'] = (
-        props_a['relative_key'].name if props_a['relative_key'] else key_blocks[0].name
-    )
     props_b = shape_key_props_to_dict(key_blocks[index_b])
-    props_b['_relative_key_name'] = (
-        props_b['relative_key'].name if props_b['relative_key'] else key_blocks[0].name
-    )
 
     # 名前衝突を避ける
     key_blocks[index_a].name = "__swap_temp_a__"
@@ -173,7 +164,7 @@ def swap_shapekeys(obj, name_a, name_b):
 
     # relative_keyを名前で解決
     for idx, props in [(index_a, props_b), (index_b, props_a)]:
-        _resolve_relative_key(key_blocks, idx, props.get('_relative_key_name'))
+        _resolve_relative_key(key_blocks, idx, props.get('relative_key_name'))
 
     # 他のシェイプキーがAまたはBをrelative_keyとして参照していた場合の修正
     old_name_a = props_a['name']

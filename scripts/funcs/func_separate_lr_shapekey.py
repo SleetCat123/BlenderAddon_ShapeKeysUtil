@@ -19,11 +19,12 @@
 import bpy
 
 from .. import consts
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 from ..funcs import func_select_axis_from_point
 from ..funcs.utils import func_object_utils
 
 
-def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
+def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort, invert_lr_names=False):
     obj = func_object_utils.get_active_object()
     source_shape_key = obj.data.shape_keys.key_blocks[source_shape_key_index]
 
@@ -43,7 +44,7 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     bpy.ops.object.shape_key_add(from_mix=False)
     left_shape_index = obj.active_shape_key_index
     left_shape = obj.data.shape_keys.key_blocks[left_shape_index]
-    left_shape.name = result_shape_key_name + "_left"
+    left_shape.name = result_shape_key_name + ("_right" if invert_lr_names else "_left")
     func_select_axis_from_point.select_axis_from_point(
         point=(0, 0, 0),
         mode='NEGATIVE',
@@ -67,7 +68,7 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     bpy.ops.object.shape_key_add(from_mix=False)
     right_shape_index = obj.active_shape_key_index
     right_shape = obj.data.shape_keys.key_blocks[right_shape_index]
-    right_shape.name = result_shape_key_name + "_right"
+    right_shape.name = result_shape_key_name + ("_left" if invert_lr_names else "_right")
     func_select_axis_from_point.select_axis_from_point(
         point=(0, 0, 0),
         mode='POSITIVE',
@@ -119,4 +120,6 @@ def separate_lr_shapekey(source_shape_key_index, duplicate, enable_sort):
     if not duplicate:
         obj.active_shape_key_index = source_shape_key_index
         bpy.ops.object.shape_key_remove()
+        if not ensure_shape_key_integrity(obj, log_prefix="separate_lr_shapekey"):
+            raise RuntimeError(f"Shape key integrity check failed after source removal: {obj.name}")
     obj.active_shape_key_index = source_shape_key_index

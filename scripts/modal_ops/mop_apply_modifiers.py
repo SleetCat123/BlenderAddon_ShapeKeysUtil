@@ -139,14 +139,7 @@ class OBJECT_OT_shapekeys_util_apply_modifiers_modal(GeneratorModalOperator):
         func_object_utils.deselect_all_objects()
         func_object_utils.select_objects(targets, True)
 
-        # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除
-        bpy.ops.object.make_single_user(
-            type='SELECTED_OBJECTS',
-            object=True,
-            obdata=True,
-            material=False,
-            animation=False
-        )
+        func_object_utils.ensure_single_user_object_data(targets)
 
         # 状態保存（処理後の復元用）
         self._original_active = active

@@ -36,6 +36,7 @@ from ..funcs.func_apply_modifiers_with_shapekeys_helpers.apply_surface_deform_to
 from ..funcs.func_apply_modifiers_with_shapekeys_helpers.partial_apply_modifiers import (
     partial_apply_modifiers,
 )
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 from ..funcs.utils import func_object_utils
 from .progress_info import ProgressInfo, T
 
@@ -60,6 +61,7 @@ def apply_modifiers_with_shapekeys_iter(
     print(f"[apply_modifiers_with_shapekeys_iter] skip_modifier_types={skip_modifier_types}")
     start_time = time.perf_counter()
     source_obj = func_object_utils.get_active_object()
+    func_object_utils.ensure_single_user_object_data(source_obj)
     obj_name = source_obj.name
 
     yield ProgressInfo(
@@ -138,6 +140,8 @@ def apply_modifiers_with_shapekeys_iter(
         print("remove basis: " + source_obj.name)
         source_obj.active_shape_key_index = 0
         bpy.ops.object.shape_key_remove(all=True)
+        if not ensure_shape_key_integrity(source_obj, log_prefix="apply_modifiers_with_shapekeys"):
+            raise RuntimeError(f"Shape key integrity check failed after removing Basis: {source_obj.name}")
 
     if source_obj.data.shape_keys is None or len(source_obj.data.shape_keys.key_blocks) == 0:
         yield ProgressInfo(
@@ -245,6 +249,10 @@ def apply_modifiers_with_shapekeys_iter(
         for i, shapekey in enumerate(source_obj.data.shape_keys.key_blocks):
             shapekey.name = shapekey_name_and_values[i][0]
             shapekey.value = shapekey_name_and_values[i][1]
+        if not ensure_shape_key_integrity(source_obj, log_prefix="apply_modifiers_with_shapekeys"):
+            raise RuntimeError(
+                f"Shape key integrity check failed after restoring shape keys: {source_obj.name}"
+            )
 
     print("Shapekey Count (Include Basis Shapekey): " + str(len(source_obj.data.shape_keys.key_blocks)))
 

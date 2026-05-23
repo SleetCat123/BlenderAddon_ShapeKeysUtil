@@ -20,6 +20,7 @@ import bpy
 
 from .. import consts
 from ..funcs import func_apply_modifiers_with_shapekeys
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 
 
 # シェイプキーをもつオブジェクトのモディファイアを適用
@@ -50,6 +51,10 @@ class OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon(bpy.types.Ope
         return {'FINISHED'}
 
 
+def ensure_shape_key_integrity_for_host(obj):
+    return ensure_shape_key_integrity(obj, log_prefix="link_with_AutoMerge")
+
+
 classes = [
     OBJECT_OT_apply_modifiers_with_shapekeys_for_automerge_addon,
 ]
@@ -58,9 +63,12 @@ classes = [
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    bpy.types.WindowManager.shapekeys_util_ensure_shape_key_integrity = ensure_shape_key_integrity_for_host
 
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+    if hasattr(bpy.types.WindowManager, 'shapekeys_util_ensure_shape_key_integrity'):
+        del bpy.types.WindowManager.shapekeys_util_ensure_shape_key_integrity
 

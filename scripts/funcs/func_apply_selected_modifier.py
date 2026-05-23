@@ -22,6 +22,7 @@ from ..funcs import func_separate_shapekeys
 from ..funcs.func_apply_modifiers_with_shapekeys_helpers.apply_surface_deform_to_basis import (
     apply_single_surface_deform_to_basis,
 )
+from ..funcs.func_shapekey_integrity import ensure_shape_key_integrity
 from ..funcs.utils import func_object_utils
 
 
@@ -97,6 +98,8 @@ def apply_selected_modifier(original_obj):
         print(f"Join: [{obj.name}]({vert_count}) -> [{basis_obj.name}]({len(basis_obj.data.vertices)})")
         # オブジェクトを1つにまとめなおす
         bpy.ops.object.join_shapes()
+        if not ensure_shape_key_integrity(basis_obj, log_prefix="apply_selected_modifier"):
+            raise RuntimeError(f"Shape key integrity check failed after join_shapes: {basis_obj.name}")
         func_object_utils.select_object(obj, False)
     # シェイプキーの名前と数値を復元
     basis_obj.active_shape_key_index = original_obj.active_shape_key_index
@@ -106,6 +109,8 @@ def apply_selected_modifier(original_obj):
 
     # オリジナルオブジェクトに反映
     original_obj.data = basis_obj.data
+    if not ensure_shape_key_integrity(original_obj, log_prefix="apply_selected_modifier"):
+        raise RuntimeError(f"Shape key integrity check failed after data swap: {original_obj.name}")
     original_obj.modifiers.remove(original_obj.modifiers[active_mod_name])
     func_object_utils.remove_object(basis_obj)
     func_object_utils.remove_objects(separated_objects)

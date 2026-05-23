@@ -23,7 +23,10 @@ from ..funcs.func_apply_modifiers_with_shapekeys import (
     apply_modifiers_with_shapekeys,
     apply_modifiers_with_shapekeys_iter,
 )
-from ..funcs.func_change_base_shapekey import change_base_shapekeys_iter
+from ..funcs.func_change_base_shapekey import (
+    apply_deferred_change_base_splits_for_object,
+    change_base_shapekeys_iter,
+)
 from ..funcs.func_reorder_shapekeys import reorder_shapekeys_iter
 from ..funcs.func_separate_lr_shapekey_all import (
     separate_lr_shapekey_all,
@@ -78,6 +81,11 @@ def get_change_base_iter_for_exporter(objects_with_settings):
     return change_base_shapekeys_iter(objects_with_settings)
 
 
+def apply_deferred_change_base_splits_for_host(obj, settings_list):
+    print(f"ShapekeysUtil - Deferred Change Base splits: {obj.name}")
+    return apply_deferred_change_base_splits_for_object(obj, settings_list)
+
+
 def get_reorder_iter_for_exporter(objects_with_settings):
     """MizoresCustomExporter連携用の並び替えジェネレータを取得
 
@@ -89,6 +97,12 @@ def get_reorder_iter_for_exporter(objects_with_settings):
     """
     print("ShapekeysUtil - Reorder Shapekeys (iter)")
     return reorder_shapekeys_iter(objects_with_settings)
+
+
+def subtract_base_for_exporter(obj):
+    """MizoresCustomExporter連携用の基準減算処理"""
+    print(f"ShapekeysUtil - Subtract Base Shapekeys (direct): {obj.name}")
+    return subtract_base_shapekey_all(obj)
 
 
 # MizoresCustomExporter連携用（同期版エクスポートフローで使用中）
@@ -129,21 +143,9 @@ class OBJECT_OT_separate_lr_shapekey_for_mizores_custom_exporter_addon(bpy.types
         return {'FINISHED'}
 
 
-class OBJECT_OT_subtract_base_shapekey_for_mizores_custom_exporter_addon(bpy.types.Operator):
-    bl_idname = "object.shapekeys_util_subtract_base_shapekey_for_exporter"
-    bl_label = "[Internal] Subtract Base Shapekey For MizoresCustomExporter Addon"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        print("ShapekeysUtil - Subtract Base Shapekeys")
-        subtract_base_shapekey_all()
-        return {'FINISHED'}
-
-
 classes = [
     OBJECT_OT_apply_modifiers_for_mizores_custom_exporter_addon,
     OBJECT_OT_separate_lr_shapekey_for_mizores_custom_exporter_addon,
-    OBJECT_OT_subtract_base_shapekey_for_mizores_custom_exporter_addon,
 ]
 
 
@@ -154,7 +156,9 @@ def register():
     bpy.types.WindowManager.shapekeys_util_get_apply_modifiers_iter = get_apply_modifiers_iter_for_exporter
     bpy.types.WindowManager.shapekeys_util_get_separate_lr_iter = get_separate_lr_iter_for_exporter
     bpy.types.WindowManager.shapekeys_util_get_change_base_iter = get_change_base_iter_for_exporter
+    bpy.types.WindowManager.shapekeys_util_apply_deferred_change_base_splits = apply_deferred_change_base_splits_for_host
     bpy.types.WindowManager.shapekeys_util_get_reorder_iter = get_reorder_iter_for_exporter
+    bpy.types.WindowManager.shapekeys_util_subtract_base_for_exporter = subtract_base_for_exporter
 
 
 def unregister():
@@ -166,6 +170,9 @@ def unregister():
         del bpy.types.WindowManager.shapekeys_util_get_separate_lr_iter
     if hasattr(bpy.types.WindowManager, 'shapekeys_util_get_change_base_iter'):
         del bpy.types.WindowManager.shapekeys_util_get_change_base_iter
+    if hasattr(bpy.types.WindowManager, 'shapekeys_util_apply_deferred_change_base_splits'):
+        del bpy.types.WindowManager.shapekeys_util_apply_deferred_change_base_splits
     if hasattr(bpy.types.WindowManager, 'shapekeys_util_get_reorder_iter'):
         del bpy.types.WindowManager.shapekeys_util_get_reorder_iter
-
+    if hasattr(bpy.types.WindowManager, 'shapekeys_util_subtract_base_for_exporter'):
+        del bpy.types.WindowManager.shapekeys_util_subtract_base_for_exporter

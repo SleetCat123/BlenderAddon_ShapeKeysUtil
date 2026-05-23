@@ -66,8 +66,7 @@ class OBJECT_OT_specials_shapekeys_util_apply_modifiers(bpy.types.Operator):
 
             func_object_utils.deselect_all_objects()
             func_object_utils.select_objects(targets, True)
-            # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
-            bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False, animation=False)
+            func_object_utils.ensure_single_user_object_data(targets)
 
             for obj in targets:
                 func_object_utils.set_active_object(obj)

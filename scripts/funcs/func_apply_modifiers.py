@@ -31,10 +31,7 @@ def apply_modifiers(remove_nonrender: bool, use_update_mesh_deform_addon: bool, 
     print(f"apply_modifiers (skip_modifier_types={skip_modifier_types})")
     obj = func_object_utils.get_active_object()
 
-    if obj.users != 1 or (obj.data and obj.data.users != 1):
-        # リンクされたオブジェクトのモディファイアは適用できないので予めリンクを解除しておく
-        bpy.ops.object.make_single_user(type='SELECTED_OBJECTS', object=True, obdata=True, material=False,
-                                        animation=False)
+    func_object_utils.ensure_single_user_object_data(obj)
 
     print("Apply Modifiers: [" + obj.name + "]")
     for modifier_name in [modifier.name for modifier in obj.modifiers]:
