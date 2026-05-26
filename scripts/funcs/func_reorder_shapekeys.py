@@ -94,6 +94,105 @@ def _write_shapekeys(key_blocks, props_list, start_index=0):
         _resolve_relative_key(key_blocks, start_index + i, props.get('relative_key_name'))
 
 
+def _find_props_index(props_list, shapekey_name):
+    for index, props in enumerate(props_list):
+        if props['name'] == shapekey_name:
+            return index
+    return -1
+
+
+def _apply_sort_by_name_to_props(props_list):
+    if len(props_list) <= 2:
+        return True
+
+    basis = props_list[:1]
+    sorted_props = sorted(props_list[1:], key=lambda p: p['name'].lower())
+    props_list[:] = basis + sorted_props
+    return True
+
+
+def _apply_swap_to_props(props_list, name_a, name_b):
+    index_a = _find_props_index(props_list, name_a)
+    index_b = _find_props_index(props_list, name_b)
+
+    if index_a == -1:
+        print(f"[swap_shapekeys] Shape key '{name_a}' not found")
+        return False
+    if index_b == -1:
+        print(f"[swap_shapekeys] Shape key '{name_b}' not found")
+        return False
+    if index_a == index_b:
+        return True
+
+    props_list[index_a], props_list[index_b] = props_list[index_b], props_list[index_a]
+    return True
+
+
+def _apply_move_to_index_to_props(props_list, shapekey_name, dest_index):
+    source_index = _find_props_index(props_list, shapekey_name)
+    if source_index == -1:
+        print(f"[move_shapekey_to_index] Shape key '{shapekey_name}' not found")
+        return False
+    if dest_index < 0 or dest_index >= len(props_list):
+        print(f"[move_shapekey_to_index] dest_index {dest_index} out of range (0-{len(props_list) - 1})")
+        return False
+    if source_index == dest_index:
+        return True
+
+    moved = props_list.pop(source_index)
+    props_list.insert(dest_index, moved)
+    return True
+
+
+def _apply_move_before_to_props(props_list, target_name, before_name):
+    target_index = _find_props_index(props_list, target_name)
+    before_index = _find_props_index(props_list, before_name)
+
+    if target_index == -1:
+        print(f"[move_shapekey_before] Target '{target_name}' not found")
+        return False
+    if before_index == -1:
+        print(f"[move_shapekey_before] Before '{before_name}' not found")
+        return False
+    if target_index == before_index:
+        return True
+
+    moved = props_list.pop(target_index)
+    new_before_index = _find_props_index(props_list, before_name)
+    if new_before_index == -1:
+        print(f"[move_shapekey_before] Failed to locate '{before_name}' after pop")
+        return False
+
+    props_list.insert(new_before_index, moved)
+    return True
+
+
+def _apply_operations_to_props_list(props_list, operations_list):
+    count = 0
+    for op in operations_list:
+        op_type = op.get('type', '')
+        target = op.get('target', '')
+        second = op.get('second', '')
+        index = op.get('index', 0)
+
+        success = False
+        if op_type == 'SORT_BY_NAME':
+            success = _apply_sort_by_name_to_props(props_list)
+        elif op_type == 'SWAP':
+            success = _apply_swap_to_props(props_list, target, second)
+        elif op_type == 'MOVE_TO_INDEX':
+            success = _apply_move_to_index_to_props(props_list, target, index)
+        elif op_type == 'MOVE_BEFORE':
+            success = _apply_move_before_to_props(props_list, target, second)
+        else:
+            print(f"[reorder_shapekeys_for_object] Unknown operation type: '{op_type}'")
+
+        if success:
+            count += 1
+
+    return count
+
+
 def sort_shapekeys_by_name(obj):
     """Basis以外のシェイプキーを名前のアルファベット順にソート
 
@@ -300,27 +399,14 @@ def reorder_shapekeys_for_object(obj, operations_list):
         print(f"[reorder_shapekeys_for_object] No shape keys on '{obj.name}'")
         return 0
 
-    count = 0
-    for op in operations_list:
-        op_type = op.get('type', '')
-        target = op.get('target', '')
-        second = op.get('second', '')
-        index = op.get('index', 0)
+    key_blocks = obj.data.shape_keys.key_blocks
+    original_names = [key_block.name for key_block in key_blocks]
+    props_list = _serialize_shapekeys(key_blocks, start_index=0)
+    count = _apply_operations_to_props_list(props_list, operations_list)
 
-        if op_type == 'SORT_BY_NAME':
-            sort_shapekeys_by_name(obj)
-            count += 1
-        elif op_type == 'SWAP':
-            if swap_shapekeys(obj, target, second):
-                count += 1
-        elif op_type == 'MOVE_TO_INDEX':
-            if move_shapekey_to_index(obj, target, index):
-                count += 1
-        elif op_type == 'MOVE_BEFORE':
-            if move_shapekey_before(obj, target, second):
-                count += 1
-        else:
-            print(f"[reorder_shapekeys_for_object] Unknown operation type: '{op_type}'")
+    reordered_names = [props['name'] for props in props_list]
+    if reordered_names != original_names:
+        _write_shapekeys(key_blocks, props_list, start_index=0)
 
     return count
 
