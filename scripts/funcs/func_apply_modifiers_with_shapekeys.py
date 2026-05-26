@@ -31,6 +31,7 @@ from ..funcs.func_apply_modifiers_with_shapekeys_helpers.apply_each_shapekey_mod
     apply_each_shapekey_modifiers,
 )
 from ..funcs.func_apply_modifiers_with_shapekeys_helpers.apply_surface_deform_to_basis import (
+    _apply_surface_deform_to_basis_core,
     apply_surface_deform_to_basis,
 )
 from ..funcs.func_apply_modifiers_with_shapekeys_helpers.partial_apply_modifiers import (
@@ -70,6 +71,7 @@ def apply_modifiers_with_shapekeys_iter(
     source_obj = func_object_utils.get_active_object()
     func_object_utils.ensure_single_user_object_data(source_obj)
     obj_name = source_obj.name
+    current_depth = depth
 
     yield ProgressInfo(
         phase="apply_modifiers",
@@ -78,74 +80,125 @@ def apply_modifiers_with_shapekeys_iter(
         object_name=obj_name
     )
 
-    print(
-        f"[apply_modifiers_with_shapekeys] start: {obj_name} "
-        f"modifiers={len(source_obj.modifiers)} "
-        f"shapekeys={_get_shape_key_count(source_obj)} "
-        f"depth={depth}"
-    )
+    while True:
+        print(
+            f"[apply_modifiers_with_shapekeys] start: {obj_name} "
+            f"modifiers={len(source_obj.modifiers)} "
+            f"shapekeys={_get_shape_key_count(source_obj)} "
+            f"depth={current_depth}"
+        )
 
-    # Apply as shapekey用モディファイアのインデックスを検索
-    apply_as_shape_index = -1
-    apply_as_shape_modifier = None
-    for i, modifier in enumerate(source_obj.modifiers):
-        if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
-            apply_as_shape_index = i
-            apply_as_shape_modifier = modifier
-            print(
-                f"[apply_modifiers_with_shapekeys] found_apply_as_shape: "
-                f"object={obj_name} index={apply_as_shape_index} "
-                f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
-                f"depth={depth}"
+        # Apply as shapekey用モディファイアのインデックスを検索
+        apply_as_shape_index = -1
+        apply_as_shape_modifier = None
+        for i, modifier in enumerate(source_obj.modifiers):
+            if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
+                apply_as_shape_index = i
+                apply_as_shape_modifier = modifier
+                print(
+                    f"[apply_modifiers_with_shapekeys] found_apply_as_shape: "
+                    f"object={obj_name} index={apply_as_shape_index} "
+                    f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
+                    f"depth={current_depth}"
+                )
+                break
+
+        if apply_as_shape_index == 0:
+            yield ProgressInfo(
+                phase="apply_as_shape",
+                progress=0.2,
+                message=T("sku_progress_apply_as_shape").format(modifier=apply_as_shape_modifier.name),
+                object_name=obj_name
             )
-            break
 
-    if apply_as_shape_index == 0:
-        yield ProgressInfo(
-            phase="apply_as_shape",
-            progress=0.2,
-            message=T("sku_progress_apply_as_shape").format(modifier=apply_as_shape_modifier.name),
-            object_name=obj_name
-        )
+            if use_update_mesh_deform_addon:
+                func_update_mesh_deform_addon.update_mesh_deform_addon(
+                    obj=source_obj,
+                    modifier=apply_as_shape_modifier,
+                    use_update_mesh_deform_addon=use_update_mesh_deform_addon)
 
-        if use_update_mesh_deform_addon:
-            func_update_mesh_deform_addon.update_mesh_deform_addon(
-                obj=source_obj,
-                modifier=apply_as_shape_modifier,
-                use_update_mesh_deform_addon=use_update_mesh_deform_addon)
+            print("%AS% modifier is top")
+            func_apply_as_shapekey.apply_as_shapekey(apply_as_shape_modifier)
+            current_depth += 1
+            print(
+                f"[apply_modifiers_with_shapekeys] {obj_name} "
+                f"(via %AS% top loop): {time.perf_counter() - start_time:.3f}s"
+            )
+            continue
 
-        print("%AS% modifier is top")
-        func_apply_as_shapekey.apply_as_shapekey(apply_as_shape_modifier)
+        if apply_as_shape_index >= 1:
+            yield ProgressInfo(
+                phase="partial_apply",
+                progress=0.2,
+                message=T("sku_progress_partial_apply").format(obj=obj_name),
+                object_name=obj_name
+            )
+            print("%AS% modifier is not top")
+            partial_apply_modifiers(
+                source_obj=source_obj,
+                modifier_index=apply_as_shape_index,
+                remove_nonrender=remove_nonrender,
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+                skip_modifier_types=skip_modifier_types)
+            print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% partial): {time.perf_counter() - start_time:.3f}s")
+            return
 
-        # 再帰呼び出し
-        print("re-execute apply_modifiers_with_shapekeys")
-        yield from apply_modifiers_with_shapekeys_iter(
-            remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            skip_modifier_types=skip_modifier_types,
-            depth=depth + 1
-        )
-        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% top): {time.perf_counter() - start_time:.3f}s")
-        return
-
-    elif apply_as_shape_index >= 1:
-        yield ProgressInfo(
-            phase="partial_apply",
-            progress=0.2,
-            message=T("sku_progress_partial_apply").format(obj=obj_name),
-            object_name=obj_name
-        )
-        print("%AS% modifier is not top")
-        partial_apply_modifiers(
-            source_obj=source_obj,
-            modifier_index=apply_as_shape_index,
-            remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            skip_modifier_types=skip_modifier_types)
-        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via %AS% partial): {time.perf_counter() - start_time:.3f}s")
-        return
-    else:
         print("%AS% modifier is not found")
+
+        # SurfaceDeformモディファイア処理
+        surface_deform_index = -1
+        surface_deform_modifier = None
+        for i, modifier in enumerate(source_obj.modifiers):
+            if modifier.type == 'SURFACE_DEFORM':
+                surface_deform_index = i
+                surface_deform_modifier = modifier
+                print(
+                    f"[apply_modifiers_with_shapekeys] found_surface_deform: "
+                    f"object={obj_name} index={surface_deform_index} "
+                    f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
+                    f"depth={current_depth}"
+                )
+                break
+
+        if surface_deform_index == 0:
+            yield ProgressInfo(
+                phase="surface_deform",
+                progress=0.4,
+                message=T("sku_progress_surface_deform").format(obj=obj_name),
+                object_name=obj_name
+            )
+            print("SurfaceDeform modifier is top")
+            _apply_surface_deform_to_basis_core(
+                source_obj=source_obj,
+                modifier=surface_deform_modifier,
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+            )
+            current_depth += 1
+            print(
+                f"[apply_modifiers_with_shapekeys] {obj_name} "
+                f"(via SurfaceDeform top loop): {time.perf_counter() - start_time:.3f}s"
+            )
+            continue
+
+        if surface_deform_index >= 1:
+            yield ProgressInfo(
+                phase="partial_apply",
+                progress=0.4,
+                message=T("sku_progress_partial_apply_surface_deform").format(obj=obj_name),
+                object_name=obj_name
+            )
+            print("SurfaceDeform modifier is not top")
+            partial_apply_modifiers(
+                source_obj=source_obj,
+                modifier_index=surface_deform_index,
+                remove_nonrender=remove_nonrender,
+                use_update_mesh_deform_addon=use_update_mesh_deform_addon,
+                skip_modifier_types=skip_modifier_types)
+            print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform partial): {time.perf_counter() - start_time:.3f}s")
+            return
+
+        print("SurfaceDeform modifier is not found")
+        break
 
     if source_obj.data.shape_keys and len(source_obj.data.shape_keys.key_blocks) == 1:
         yield ProgressInfo(
@@ -174,57 +227,6 @@ def apply_modifiers_with_shapekeys_iter(
             skip_modifier_types=skip_modifier_types)
         print(f"[apply_modifiers_with_shapekeys] {obj_name} (no shapekeys): {time.perf_counter() - start_time:.3f}s")
         return
-
-    # SurfaceDeformモディファイア処理
-    surface_deform_index = -1
-    surface_deform_modifier = None
-    for i, modifier in enumerate(source_obj.modifiers):
-        if modifier.type == 'SURFACE_DEFORM':
-            surface_deform_index = i
-            surface_deform_modifier = modifier
-            print(
-                f"[apply_modifiers_with_shapekeys] found_surface_deform: "
-                f"object={obj_name} index={surface_deform_index} "
-                f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
-                f"depth={depth}"
-            )
-            break
-
-    if surface_deform_index == 0:
-        yield ProgressInfo(
-            phase="surface_deform",
-            progress=0.4,
-            message=T("sku_progress_surface_deform").format(obj=obj_name),
-            object_name=obj_name
-        )
-        print("SurfaceDeform modifier is top")
-        apply_surface_deform_to_basis(
-            source_obj=source_obj,
-            modifier=surface_deform_modifier,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            remove_nonrender=remove_nonrender,
-            skip_modifier_types=skip_modifier_types)
-        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform top): {time.perf_counter() - start_time:.3f}s")
-        return
-
-    if surface_deform_index >= 1:
-        yield ProgressInfo(
-            phase="partial_apply",
-            progress=0.4,
-            message=T("sku_progress_partial_apply_surface_deform").format(obj=obj_name),
-            object_name=obj_name
-        )
-        print("SurfaceDeform modifier is not top")
-        partial_apply_modifiers(
-            source_obj=source_obj,
-            modifier_index=surface_deform_index,
-            remove_nonrender=remove_nonrender,
-            use_update_mesh_deform_addon=use_update_mesh_deform_addon,
-            skip_modifier_types=skip_modifier_types)
-        print(f"[apply_modifiers_with_shapekeys] {obj_name} (via SurfaceDeform partial): {time.perf_counter() - start_time:.3f}s")
-        return
-    else:
-        print("SurfaceDeform modifier is not found")
 
     func_object_utils.deselect_all_objects()
     func_object_utils.select_object(source_obj, True)
