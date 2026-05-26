@@ -33,14 +33,13 @@ def apply_composite_subtraction(obj, shapekey, base_shapekey_name):
             return
         
         # シェイプキーの座標を取得
-        applied_co = [(v.co.x, v.co.y, v.co.z) for v in shapekey.data]
-        
+        applied_co = func_shapekey_utils._get_flat_coordinates(shapekey.data)
+
         # ベースシェイプキーを減算
-        diff_co = func_shapekey_utils.calculate_shapekey_difference(obj, base_shapekey_name, applied_co)
-        
+        diff_co = func_shapekey_utils._subtract_base_shapekey_delta(obj, base_shapekey_name, applied_co)
+
         # 差分を適用
-        for i, v in enumerate(shapekey.data):
-            v.co = diff_co[i]
+        shapekey.data.foreach_set("co", diff_co)
     except Exception as e:
         print(f"Error applying composite subtraction: {e}")
 
@@ -145,15 +144,14 @@ def _apply_composite_shapekey_for_multiple(obj, modifier_name, base_shapekey_nam
     
     # 2. 適用されたシェイプキーを取得
     new_shapekey = obj.data.shape_keys.key_blocks[-1]
-    applied_co = [(v.co.x, v.co.y, v.co.z) for v in new_shapekey.data]
-    
+    applied_co = func_shapekey_utils._get_flat_coordinates(new_shapekey.data)
+
     # 3. ベースシェイプキーを減算
-    diff_co = func_shapekey_utils.calculate_shapekey_difference(obj, base_shapekey_name, applied_co)
-    
+    diff_co = func_shapekey_utils._subtract_base_shapekey_delta(obj, base_shapekey_name, applied_co)
+
     # 4. 差分を適用
-    for i, v in enumerate(new_shapekey.data):
-        v.co = diff_co[i]
-    
+    new_shapekey.data.foreach_set("co", diff_co)
+
     # 5. シェイプキー名を設定
     new_shapekey.name = target_shapekey_name
     if not ensure_shape_key_integrity(obj, log_prefix="composite_shapekey"):

@@ -40,6 +40,13 @@ def _coordinate_tuples_to_flat(coordinates):
     return [value for coordinate in coordinates for value in coordinate]
 
 
+def _subtract_flat_coordinates(minuend_flat, subtrahend_flat):
+    return [
+        minuend_flat[i] - subtrahend_flat[i]
+        for i in range(len(minuend_flat))
+    ]
+
+
 def get_shape_key_index(obj_or_name, shape_name: str = None):
     """シェイプキーのインデックスを取得
 
@@ -190,40 +197,27 @@ def clean_shapekey_name(name):
     return name
 
 
-def calculate_shapekey_difference(obj, base_shapekey_name, shapekey_co):
-    """シェイプキーからベースシェイプキーを減算"""
+def _subtract_base_shapekey_delta(obj, base_shapekey_name, shapekey_flat_co):
+    """シェイプキーからベースシェイプキーの変位を減算する"""
     if not obj.data.shape_keys:
-        return shapekey_co
-    
+        return shapekey_flat_co
+
     # ベースシェイプキーが存在するかチェック
     base_index = get_shape_key_index(obj, base_shapekey_name)
     if base_index == -1:
         print(f"Warning: base shapekey '{base_shapekey_name}' not found")
-        return shapekey_co
-    
+        return shapekey_flat_co
+
     # ベースシェイプキーの座標を取得
     base_shapekey = obj.data.shape_keys.key_blocks[base_index]
-    base_co = [(v.co.x, v.co.y, v.co.z) for v in base_shapekey.data]
-    
+    base_co = _get_flat_coordinates(base_shapekey.data)
+
     # Basisからの差分を計算
-    basis_co = [(v.co.x, v.co.y, v.co.z) for v in obj.data.shape_keys.key_blocks[0].data]
-    
+    basis_co = _get_flat_coordinates(obj.data.shape_keys.key_blocks[0].data)
+
     # 差分を計算: shapekey_co - (base_co - basis_co)
-    diff_co = []
-    for i in range(len(shapekey_co)):
-        # ベースシェイプキーのBasisからの変位
-        base_delta_x = base_co[i][0] - basis_co[i][0]
-        base_delta_y = base_co[i][1] - basis_co[i][1]
-        base_delta_z = base_co[i][2] - basis_co[i][2]
-        
-        # 適用されたシェイプキーからベースの変位を減算
-        diff_x = shapekey_co[i][0] - base_delta_x
-        diff_y = shapekey_co[i][1] - base_delta_y
-        diff_z = shapekey_co[i][2] - base_delta_z
-        
-        diff_co.append((diff_x, diff_y, diff_z))
-    
-    return diff_co
+    base_delta_co = _subtract_flat_coordinates(base_co, basis_co)
+    return _subtract_flat_coordinates(shapekey_flat_co, base_delta_co)
 
 
 def create_composite_shapekey(obj, modifier, base_shapekey_name, target_shapekey_name):
@@ -240,15 +234,14 @@ def create_composite_shapekey(obj, modifier, base_shapekey_name, target_shapekey
     
     # 2. 適用されたシェイプキーを取得
     new_shapekey = obj.data.shape_keys.key_blocks[-1]
-    applied_co = [(v.co.x, v.co.y, v.co.z) for v in new_shapekey.data]
-    
+    applied_co = _get_flat_coordinates(new_shapekey.data)
+
     # 3. ベースシェイプキーを減算
-    diff_co = calculate_shapekey_difference(obj, base_shapekey_name, applied_co)
-    
+    diff_co = _subtract_base_shapekey_delta(obj, base_shapekey_name, applied_co)
+
     # 4. 差分を適用
-    for i, v in enumerate(new_shapekey.data):
-        v.co = diff_co[i]
-    
+    new_shapekey.data.foreach_set("co", diff_co)
+
     # 5. シェイプキー名を設定
     new_shapekey.name = target_shapekey_name
     
