@@ -24,16 +24,13 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
         f"modifiers={len(source_obj.modifiers)} "
         f"shapekeys={_get_shape_key_count(source_obj)}"
     )
-    # 2番目以降にmodifier_index用のモディファイアがあったら
-    # 一時オブジェクトを作成
-    print("create tempobj")
-    tempobj = func_object_utils.duplicate_object(source_obj)
-    func_object_utils.deselect_all_objects()
-    func_object_utils.select_object(source_obj, True)
-    func_object_utils.select_object(tempobj, True)
-    func_object_utils.set_active_object(source_obj)
-    print("duplicate: " + tempobj.name)
-    print(f"[partial_apply_modifiers] create_tempobj: {time.perf_counter() - phase_start:.3f}s")
+    modifier_snapshots, _ = func_object_utils.serialize_modifiers(source_obj.modifiers[modifier_index:])
+    print(
+        f"[partial_apply_modifiers] snapshot_modifiers: "
+        f"object={source_obj.name} "
+        f"saved_modifiers={len(modifier_snapshots)}"
+    )
+    print(f"[partial_apply_modifiers] snapshot_modifiers: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
 
     # modifier_indexとそれよりあとのモディファイアを削除
@@ -56,19 +53,11 @@ def partial_apply_modifiers(source_obj, modifier_index, remove_nonrender: bool, 
     print(f"[partial_apply_modifiers] first_apply: {time.perf_counter() - phase_start:.3f}s")
     phase_start = time.perf_counter()
 
-    # 削除していたモディファイアを一時オブジェクトから復元
+    # 削除していたモディファイアを復元
     print("restore modifiers")
-    func_object_utils.replace_modifiers(source_obj, tempobj)
-    print("temp: " + str(tempobj))
+    func_object_utils.replace_modifiers_from_snapshots(source_obj, modifier_snapshots)
     print("source: " + str(source_obj))
     func_object_utils.set_active_object(source_obj)
-    # 適用済みのモディファイアを削除。これでモディファイアの1番目がmodifier_index用のモディファイアになる
-    for modifier in source_obj.modifiers[:modifier_index]:
-        bpy.ops.object.modifier_remove(modifier=modifier.name)
-
-    # 一時オブジェクトを削除
-    print("remove tempobj")
-    func_object_utils.remove_object(tempobj)
     func_object_utils.select_object(source_obj, True)
     func_object_utils.set_active_object(source_obj)
     print(f"[partial_apply_modifiers] restore_cleanup: {time.perf_counter() - phase_start:.3f}s")

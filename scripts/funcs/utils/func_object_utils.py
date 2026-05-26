@@ -26,6 +26,34 @@ _MODIFIER_COPY_SKIP_PROPERTIES = {
 }
 
 
+def _snapshot_property_value(value):
+    if isinstance(value, (str, int, float, bool, type(None))):
+        return value
+    if isinstance(value, set):
+        return set(value)
+    if isinstance(value, tuple):
+        return tuple(value)
+    if isinstance(value, list):
+        return list(value)
+    if isinstance(value, bpy.types.ID):
+        return value
+
+    copy_method = getattr(value, "copy", None)
+    if callable(copy_method):
+        try:
+            return copy_method()
+        except Exception:
+            pass
+
+    if hasattr(value, "__iter__"):
+        try:
+            return tuple(value)
+        except Exception:
+            pass
+
+    return value
+
+
 def select_object(obj, value=True):
     try:
         obj.select_set(value)
@@ -182,6 +210,77 @@ def copy_modifier_settings(source_modifier, target_modifier):
             setattr(target_modifier, prop.identifier, getattr(source_modifier, prop.identifier))
         except Exception as exc:
             failed.append(f"{prop.identifier}({exc})")
+    return failed
+
+
+def serialize_modifier_settings(source_modifier):
+    settings = {}
+    failed = []
+    for prop in source_modifier.bl_rna.properties:
+        if prop.identifier in _MODIFIER_COPY_SKIP_PROPERTIES:
+            continue
+        if prop.is_readonly or prop.type == 'COLLECTION':
+            continue
+        try:
+            settings[prop.identifier] = _snapshot_property_value(
+                getattr(source_modifier, prop.identifier)
+            )
+        except Exception as exc:
+            failed.append(f"{prop.identifier}({exc})")
+    return settings, failed
+
+
+def apply_modifier_settings(target_modifier, settings):
+    failed = []
+    for prop_identifier, value in settings.items():
+        try:
+            setattr(target_modifier, prop_identifier, value)
+        except Exception as exc:
+            failed.append(f"{prop_identifier}({exc})")
+    return failed
+
+
+def serialize_modifiers(source_modifiers):
+    snapshots = []
+    failed = {}
+    for source_modifier in source_modifiers:
+        settings, serialize_failed = serialize_modifier_settings(source_modifier)
+        snapshots.append({
+            "name": source_modifier.name,
+            "type": source_modifier.type,
+            "settings": settings,
+        })
+        if serialize_failed:
+            failed[source_modifier.name] = serialize_failed
+
+    if failed:
+        print(
+            f"[func_object_utils] modifier serialize warnings: {failed}"
+        )
+    return snapshots, failed
+
+
+def replace_modifiers_from_snapshots(target_obj, modifier_snapshots):
+    while target_obj.modifiers:
+        target_obj.modifiers.remove(target_obj.modifiers[-1])
+
+    failed = {}
+    for modifier_snapshot in modifier_snapshots:
+        new_modifier = target_obj.modifiers.new(
+            modifier_snapshot["name"],
+            modifier_snapshot["type"],
+        )
+        copy_failed = apply_modifier_settings(
+            new_modifier,
+            modifier_snapshot["settings"],
+        )
+        if copy_failed:
+            failed[new_modifier.name] = copy_failed
+
+    if failed:
+        print(
+            f"[func_object_utils] modifier restore warnings on '{target_obj.name}': {failed}"
+        )
     return failed
 
 
