@@ -25,6 +25,18 @@ from .progress_info import ProgressInfo, T
 from .utils import func_mesh_utils, func_object_utils
 
 
+def _duplicate_object_for_shapekey_split(source_obj):
+    collection = source_obj.users_collection[0] if source_obj.users_collection else bpy.context.scene.collection
+    dup_obj = source_obj.copy()
+    if source_obj.data:
+        dup_obj.data = source_obj.data.copy()
+    collection.objects.link(dup_obj)
+    func_object_utils.deselect_all_objects()
+    func_object_utils.select_object(dup_obj, True)
+    func_object_utils.set_active_object(dup_obj)
+    return dup_obj
+
+
 def separate_shapekeys_iter(
         duplicate: bool,
         enable_apply_modifiers: bool,
@@ -103,7 +115,7 @@ def separate_shapekeys_iter(
 
         # オブジェクトを複製し、元オブジェクトの子にする
         # bpy.ops.object.parent_setだと更新処理が走って重くなるのでLowLevelな方法を採用
-        dup_obj = func_object_utils.duplicate_object(source_obj)
+        dup_obj = _duplicate_object_for_shapekey_split(source_obj)
         dup_obj.parent = source_obj
         dup_obj.matrix_parent_inverse = source_obj_matrix_world_inverted
         # シェイプキーの名前をオブジェクト名として設定
