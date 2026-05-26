@@ -41,6 +41,13 @@ from ..funcs.utils import func_object_utils
 from .progress_info import ProgressInfo, T
 
 
+def _get_shape_key_count(obj) -> int:
+    shape_keys = getattr(getattr(obj, "data", None), "shape_keys", None)
+    if not shape_keys:
+        return 0
+    return len(shape_keys.key_blocks)
+
+
 def apply_modifiers_with_shapekeys_iter(
     skip_modifier_types: set,
     remove_nonrender: bool = True,
@@ -71,7 +78,12 @@ def apply_modifiers_with_shapekeys_iter(
         object_name=obj_name
     )
 
-    print(f"[apply_modifiers_with_shapekeys] start: {obj_name} ({len(source_obj.modifiers)} modifiers)")
+    print(
+        f"[apply_modifiers_with_shapekeys] start: {obj_name} "
+        f"modifiers={len(source_obj.modifiers)} "
+        f"shapekeys={_get_shape_key_count(source_obj)} "
+        f"depth={depth}"
+    )
 
     # Apply as shapekey用モディファイアのインデックスを検索
     apply_as_shape_index = -1
@@ -80,7 +92,12 @@ def apply_modifiers_with_shapekeys_iter(
         if consts.REGEX_APPLY_AS_SHAPEKEY_PREFIX.match(modifier.name):
             apply_as_shape_index = i
             apply_as_shape_modifier = modifier
-            print(f"%AS% modifier is found: {str(apply_as_shape_index)} - {modifier.name}")
+            print(
+                f"[apply_modifiers_with_shapekeys] found_apply_as_shape: "
+                f"object={obj_name} index={apply_as_shape_index} "
+                f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
+                f"depth={depth}"
+            )
             break
 
     if apply_as_shape_index == 0:
@@ -165,7 +182,12 @@ def apply_modifiers_with_shapekeys_iter(
         if modifier.type == 'SURFACE_DEFORM':
             surface_deform_index = i
             surface_deform_modifier = modifier
-            print(f"SurfaceDeform modifier is found: {str(surface_deform_index)} - {modifier.name}")
+            print(
+                f"[apply_modifiers_with_shapekeys] found_surface_deform: "
+                f"object={obj_name} index={surface_deform_index} "
+                f"modifier={modifier.name} shapekeys={_get_shape_key_count(source_obj)} "
+                f"depth={depth}"
+            )
             break
 
     if surface_deform_index == 0:
@@ -216,7 +238,13 @@ def apply_modifiers_with_shapekeys_iter(
                 need_apply_modifier = True
                 break
 
-    print(f"{source_obj.name}: Need Apply Modifiers: {str(need_apply_modifier)}")
+    print(
+        f"[apply_modifiers_with_shapekeys] need_apply: "
+        f"object={source_obj.name} result={need_apply_modifier} "
+        f"modifiers={len(source_obj.modifiers)} "
+        f"shapekeys={_get_shape_key_count(source_obj)} "
+        f"depth={depth}"
+    )
 
     if need_apply_modifier:
         yield ProgressInfo(
@@ -224,6 +252,11 @@ def apply_modifiers_with_shapekeys_iter(
             progress=0.6,
             message=T("sku_progress_apply_each_shapekey").format(obj=obj_name),
             object_name=obj_name
+        )
+        print(
+            f"[apply_modifiers_with_shapekeys] apply_each_shapekey: "
+            f"object={obj_name} modifiers={len(source_obj.modifiers)} "
+            f"shapekeys={_get_shape_key_count(source_obj)} depth={depth}"
         )
 
         # シェイプキーの名前と数値を記憶
