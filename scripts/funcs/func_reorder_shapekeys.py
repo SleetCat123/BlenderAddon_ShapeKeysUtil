@@ -40,8 +40,8 @@ def _apply_props_to_shapekey(kb, props):
     kb.value = props['value']
     kb.vertex_group = props['vertex_group']
     co = props['co']
-    for j, v in enumerate(kb.data):
-        v.co = co[j]
+    flat_co = [value for vector in co for value in vector]
+    kb.data.foreach_set("co", flat_co)
 
 
 def _resolve_relative_key(key_blocks, index, rel_name):
