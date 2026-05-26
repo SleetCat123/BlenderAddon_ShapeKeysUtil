@@ -23,6 +23,23 @@ from .func_shapekey_integrity import resolve_relative_key_by_name
 from ..funcs.utils import func_object_utils
 
 
+def _get_flat_coordinates(data):
+    flat_co = [0.0] * (len(data) * 3)
+    data.foreach_get("co", flat_co)
+    return flat_co
+
+
+def _flat_to_coordinate_tuples(flat_co):
+    return [
+        (flat_co[i], flat_co[i + 1], flat_co[i + 2])
+        for i in range(0, len(flat_co), 3)
+    ]
+
+
+def _coordinate_tuples_to_flat(coordinates):
+    return [value for coordinate in coordinates for value in coordinate]
+
+
 def get_shape_key_index(obj_or_name, shape_name: str = None):
     """シェイプキーのインデックスを取得
 
@@ -70,9 +87,8 @@ def bake_shape_key(shape_name_or_index):
     shapekey_name = target_shapekey.name
 
     # シェイプキーの頂点座標を適用
-    shape_co = [(v.co.x, v.co.y, v.co.z) for v in target_shapekey.data]
-    for i, v in enumerate(obj.data.vertices):
-        v.co = shape_co[i]
+    shape_co = _get_flat_coordinates(target_shapekey.data)
+    obj.data.vertices.foreach_set("co", shape_co)
     obj.data.update()
 
     obj.shape_key_clear()
@@ -96,7 +112,7 @@ def shape_key_props_to_dict(shapekey):
         'slider_min': shapekey.slider_min,
         'value': shapekey.value,
         'vertex_group': shapekey.vertex_group,
-        'co': [(v.co.x, v.co.y, v.co.z) for v in shapekey.data]
+        'co': _flat_to_coordinate_tuples(_get_flat_coordinates(shapekey.data))
     }
     return result
 
@@ -110,8 +126,7 @@ def set_shape_key_props_from_dict(shapekey, props: dict, key_blocks=None):
     shapekey.value = props['value']
     shapekey.vertex_group = props['vertex_group']
     co = props['co']
-    for i, v in enumerate(shapekey.data):
-        v.co = co[i]
+    shapekey.data.foreach_set("co", _coordinate_tuples_to_flat(co))
 
     if key_blocks is None:
         key_blocks = shapekey.id_data.key_blocks
